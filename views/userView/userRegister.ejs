@@ -91,6 +91,7 @@
                 setTimeout(() => {
                     nameError.innerHTML = ''
                 }, 5000)
+                return false;
             }
             if (!nameRegex.test(name.value)) {
                 nameError.innerHTML = 'First letter should be capital'
@@ -141,7 +142,7 @@
                 return false;
             }
             if (!passwordRegex.test(password.value)) {
-                passwordError.innerHTML = "Please enter a tight password"
+                passwordError.innerHTML = "password should be Alphanumeric and min 8 letters"
                 setTimeout(() => {
                     passwordError.innerHTML = ''
                 }, 5000);
@@ -156,7 +157,7 @@
                 return false;
             }
             if (confirmPassword.value !== password.value) {
-                confirmPasswordError.innerHTML = "Passwords do not match";
+                confirmPasswordError.innerHTML = "Passwords does not match";
                 setTimeout(() => {
                     confirmPasswordError.innerHTML = '';
                 }, 5000);

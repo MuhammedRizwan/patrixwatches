@@ -288,7 +288,37 @@ const changePassword = async (req, res) => {
     }
 }
 
+const verifyEmailPage=async(req,res)=>{
+    try {
+        const loggedIn = req.user ? true : false;
+        return res.status(200).render('email-verified',{loggedIn})
+    } catch (error) {
+        return res.status(500).send('Internal Server Error');
+    }
+}
+const verifyEmail=async(req,res)=>{
+    try {
+        const loggedIn = req.user ? true : false;
+        const {email}=req.body;
+        const userData=await User.findOne({email:email});
+        if(!userData){
+            return res.status(404).render('email-verified',{message:"User not found "});
+        }else{
+            return res.status(200).render("forgetPassword",{loggedIn});
+        }
+    } catch (error) {
+        return res.status(500).send('Internal Server Error');
+    }
+}
 
+const forgetPassword=async (req,res)=>{
+    try {
+        const loggedIn = req.user ? true : false;
+        console.log(req.body);
+    } catch (error) {
+        return res.status(500).send('Internal Server Error');
+    }
+}
 
 module.exports = {
     Home,
@@ -302,5 +332,9 @@ module.exports = {
     userLogout,
     account,
     changePasswordPage,
-    changePassword
+    changePassword,
+    verifyEmailPage,
+    verifyEmail,
+    forgetPassword
+
 }

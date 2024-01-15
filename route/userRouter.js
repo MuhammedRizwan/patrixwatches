@@ -12,7 +12,10 @@ user_route.set('views', './views/userView');
 // user route configurations
 user_route.get('/', userController.Home); // Home route  (accessible to all)
 user_route.get('/login', userController.userLoginPage); // Login page accessible only if logged out
-user_route.post('/login', userController.userLogin); // User login endpoint
+user_route.post('/login', userController.userLogin); // User login endpoint;
+user_route.get('/verifyEmail',userController.verifyEmailPage);//getting verify email that email exist 
+user_route.post('/verifyEmail',userController.verifyEmail);//check the email
+user_route.post('/forgetPassword',userController.forgetPassword);//change the passwords
 user_route.get('/register', userController.userRegisterPage); // Register page accessible only if logged out
 user_route.post('/register', userController.userRegister); // User registration endpoint
 user_route.post('/verification', userController.verifyOtp); // Verify OTP accessible only if logged in

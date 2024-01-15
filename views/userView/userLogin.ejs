@@ -36,7 +36,7 @@
                                                         me</span></label>
                                             </div>
                                         </div>
-                                        <a class="text-muted" href="#">Forgot password?</a>
+                                        <a class="text-muted" href="/verifyEmail">Forgot password?</a>
                                     </div>
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-fill-out btn-block hover-up">Log
@@ -61,7 +61,7 @@
             const password = document.getElementById('password')
 
             const emailError = document.getElementById('emailError');
-            const passwordError = document.getElementById('passworError');
+            const passwordError = document.getElementById('passwordError');
 
             const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail+\.[a-zA-Z]{3}$/;
             const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
@@ -69,7 +69,7 @@
 
             // email feild   
             if (email.value.trim() === '') {
-                emailError.innerHTML = 'Field is required'
+                emailError.innerHTML = 'Please Enter Email'
                 setTimeout(() => {
                     emailError.innerHTML = ''
                 }, 5000)
@@ -82,16 +82,16 @@
                 }, 5000);
                 return false;
             }
-            //mobile feild
+
             if (password.value.trim() === '') {
-                mobileError.innerHTML = 'Field is required'
+                passwordError.innerHTML = 'Please Enter Password'
                 setTimeout(() => {
                     passwordError.innerHTML = ''
                 }, 5000)
                 return false;
             }
             if (!passwordRegex.test(password.value)) {
-                passwordError.innerHTML = "Please enter a tight password"
+                passwordError.innerHTML = "please enter a corrrect Password"
                 setTimeout(() => {
                     passwordError.innerHTML = ''
                 }, 5000);
