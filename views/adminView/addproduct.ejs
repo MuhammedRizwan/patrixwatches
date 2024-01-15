@@ -1,0 +1,209 @@
+<%- include('../adminLayout/header') %>
+    <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Add New Product</h2>
+                    <div>
+                        <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                        <button class="btn btn-md rounded font-sm hover-up">Publich</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Basic</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="/admin/addproduct" method="post" enctype="multipart/form-data"
+                            onsubmit="return validate()">
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Product title</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="product_name"
+                                    name="productName">
+                                <a href="" id="productNameError"></a>
+                            </div>
+                            <div class="mb-4">
+                                <label for="brand_name" class="form-label">Brand Name</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="brand_name"
+                                    name="brandName">
+                                <a href="" id="brandNameError"></a>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Full description</label>
+                                <textarea placeholder="Type here" class="form-control" rows="4" id="discription"
+                                    name="discription"></textarea>
+                                <a href="" id="discriptionError"></a>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-4">
+                                        <label class="form-label">Orginal price</label>
+                                        <div class="row gx-2">
+                                            <input placeholder="$" type="number" class="form-control" id="orginal_price"
+                                                name="orginalPrice" min="0">
+                                            <a href="" id="orginalPriceError"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mb-4">
+                                        <label class="form-label">Sale price</label>
+                                        <input placeholder="$" type="number" class="form-control" id="sale_price"
+                                            name="salePrice" min="0">
+                                        <a href="" id="salePriceError"></a>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div> <!-- card end// -->
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Media</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-upload">
+                            <img src="/admin-assets/imgs/theme/upload.svg" alt="">
+                            <input class="form-control" multiple type="file" name="files">
+                            <a href="" id="imageError"></a>
+                        </div>
+                    </div>
+                </div> <!-- card end// -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Organization</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row gx-2">
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" name="select">
+                                    <% for( let i=0; i < cat.length; i++ ) { %>
+                                        <option>
+                                            <%= cat[i].categoryName %>
+                                        </option>
+                                        <% } %>
+                                </select>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-4">
+                                    <label class="form-label">Quantity</label>
+                                    <input type="number" class="form-control" name="stock" id="quantinty" min="0">
+                                    <a href="" id="quantityError"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Add product</button>
+                    </div>
+                </div> <!-- row.// -->
+            </div>
+            </form>
+        </div> <!-- card end// -->
+        </div>
+        </div>
+    </section>
+
+    <script>
+        function validate() {
+            // Input fields
+            const product_name = document.getElementById('product_name');
+            const brand_name = document.getElementById('brand_name');
+            const disciption = document.getElementById('discription');
+            const orginal_price = document.getElementById('orginal_price');
+            const sale_price = document.getElementById('sale_price');
+            const quantity = document.getElementById('quantinty'); // Fixed typo in ID name
+            const fileInput = document.querySelector('input[type="file"]');
+            const files = fileInput.files;
+            // Error fields
+            const productNameError = document.getElementById('productNameError');
+            const brandNameError = document.getElementById('brandNameError');
+            const discriptionError = document.getElementById('discriptionError');
+            const orginalPriceError = document.getElementById('orginalPriceError');
+            const salePriceError = document.getElementById('salePriceError');
+            const quantityError = document.getElementById('quantityError');
+            const imageError = document.getElementById('imageError');
+
+            const textAreaRegex = /(?:[^\d\W_]*[a-zA-Z]){6,}/;
+
+            // Name field
+            if (product_name.value.trim() === '') {
+                productNameError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    productNameError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+
+            // Brand Name field
+            if (brand_name.value.trim() === '') {
+                brandNameError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    brandNameError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+
+            // Description field
+            if (disciption.value.trim() === '') {
+                discriptionError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    discriptionError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            // Assuming textAreaRegex is intended for description validation
+            if (!textAreaRegex.test(disciption.value)) {
+                discriptionError.innerHTML = 'Minimum 10 letters required';
+                setTimeout(() => {
+                    discriptionError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+
+            // Original Price field
+            if (orginal_price.value.trim() === '') {
+                orginalPriceError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    orginalPriceError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+
+            // Sale Price field
+            if (sale_price.value.trim() === '') {
+                salePriceError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    salePriceError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            // File input validation
+            if (files.length === 0) {
+                imageError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    imageError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            // Quantity field
+            if (quantity.value.trim() === '') {
+                quantityError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    quantityError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+
+            // Add your quantity validation logic here using RegExp or comparisons
+
+            return true;
+        }
+    </script>
+
+    <!-- Rest of your HTML code -->
+
+
+    <%- include('../adminLayout/footer') %>

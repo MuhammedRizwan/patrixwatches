@@ -1,0 +1,277 @@
+<%- include('../layout/header') %>
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Your Cart
+                </div>
+            </div>
+        </div>
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <% let totalSubTotal=0 %>
+
+                                <% if (cart) { %>
+                                    <table class="table shopping-summery text-center clean">
+                                        <thead>
+                                            <tr class="main-heading">
+                                                <th scope="col">Image</th>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Price</th>
+                                                <th scope="col">Quantity</th>
+                                                <th scope="col">Subtotal</th>
+                                                <th scope="col">Remove</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <% for( let i=0; i < products.length; i++ ) { %>
+
+
+
+                                                <tr>
+                                                    <td class="image product-thumbnail"><img
+                                                            src="/productImages/<%= products[i].image[0].filename  %>"
+                                                            alt="product image" alt="#"></td>
+                                                    <td class="product-des product-name">
+                                                        <h5 class="product-name"><a href="shop-product-right.html">
+                                                                <%=products[i].productName %>
+                                                            </a></h5>
+                                                        <p class="font-xs">Maboriosam in a tonto nesciung
+                                                            eget<br> distingy magndapibus.
+                                                        </p>
+                                                    </td>
+                                                    <td class="price" data-title="Price"><span>$<%=
+                                                                products[i].salePrice %> </span></td>
+                                                    <td class="text-center" data-title="Stock">
+                                                        <button class="btn btn-sm increment-button"
+                                                            onclick="updateQuantity('qtyInc', '<%= cartData[i].product_id %>', '<%= i %>')">+</button>
+                                                        <input class="quantity-input<%= i %>"
+                                                            id="cartProductqty<%= i %>" style="width: 45px;" type="text"
+                                                            readonly value="<%= cartData[i].quantity %>"
+                                                            data-product-index="<%= i %>">
+                                                        <button class="btn btn-sm decrement-button"
+                                                            onclick="updateQuantity('qtyDec', '<%= cartData[i].product_id %>', '<%= i %>')">-</button>
+                                                    </td>
+
+
+
+                                                    <td class="text-right" data-title="Cart">
+
+
+
+                                                        <span id="subtotal<%= i %>">
+                                                            <%= (products[i].salePrice *
+                                                                cartData[i].quantity).toFixed(2) %>
+                                                        </span>
+                                                    </td>
+
+                                                    <td class="action" data-title="Remove"><a class="text-danger"
+                                                            onclick="confirmDelete('<%= cartData[i].product_id %>')"><i
+                                                                class="fi-rs-trash"></i></a></td>
+
+                                                </tr>
+                                                <% totalSubTotal +=parseFloat(products[i].salePrice *
+                                                    cartData[i].quantity) %>
+                                                    <% } %>
+
+
+                                        </tbody>
+
+                                    </table>
+                                    <% } else { %>
+                                        <div class="container mt-5">
+                                            <div class=" text-center">
+                                                <img src="/assets/imgs/page/download.png" alt="Empty Cart Image">
+                                                <p>Uh-oh! Your cart is feeling a bit lonely.</p>
+                                                <p>Time to fill it up with amazing finds!</p>
+                                                <a href="/" class="btn btn-primary">Add something to Cart</a>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                        </div>
+                        <div class="cart-action text-end">
+
+                            <a class="btn " href="/"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                        </div>
+                        <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
+                        <div class="row mb-50">
+
+                            <div class="col-lg-6 col-md-12">
+                                <div class="border p-md-4 p-30 border-radius cart-totals">
+                                    <div class="heading_s1 mb-3">
+                                        <h4>Cart Totals</h4>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="cart_total_label">Total</td>
+
+                                                    <td class="cart_total_amount"><span
+                                                            class="font-lg fw-900 text-brand">$ <%=
+                                                                totalSubTotal.toFixed(2) %></span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Shipping</td>
+                                                    <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free
+                                                        Shipping</td>
+                                                </tr>
+                                                <!-- <tr>
+                                                    <td class="cart_total_label">Total</td>
+                                                    <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">$ <%= totalSubTotal.toFixed(2) %></span></strong></td>
+                                                </tr> -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
+                                        CheckOut</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function updateQuantity(action, productId, index) {
+            $.ajax({
+                type: 'POST',
+                url: `/${action}?id=${productId}`,
+                success: function (data) {
+                    console.log("Success:", data);
+
+                    if (!data || typeof data !== 'object') {
+                        console.error("Invalid data received from server.");
+                        return;
+                    }
+
+                    if (data.error) {
+                        // Handle specific errors
+                        if (data.error === "Out of stock") {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "This product is currently out of stock.",
+                            });
+                        } else {
+                            // Handle other errors
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: data.error,
+                            });
+                        }
+                        return;
+                    }
+
+                    const newQuantity = Math.max(1, data[0].quantity);
+
+                    const cartProductQty = $(`#cartProductqty${index}`);
+                    const priceElement = $(`#cartProductqty${index}`).closest('tr').find('.price span');
+
+                    const salePriceStr = priceElement.text().replace('$', '').trim();
+
+                    if (!salePriceStr) {
+                        console.error("Error: salePriceStr is null, undefined, or empty");
+                        return;
+                    }
+
+                    const salePrice = parseFloat(salePriceStr);
+
+                    if (isNaN(salePrice)) {
+                        console.error("Error: salePrice is NaN");
+                    } else {
+                        cartProductQty.val(newQuantity);
+                        const newSubtotal = (newQuantity * salePrice).toFixed(2);
+                        $(`#subtotal${index}`).text(newSubtotal);
+
+                        let totalSubTotal = 0;
+                        $('.text-right[data-title="Cart"] span').each(function () {
+                            const textValue = parseFloat($(this).text());
+                            if (!isNaN(textValue)) {
+                                totalSubTotal += textValue;
+                            }
+                        });
+
+                        $('.cart_total_amount span').text(`${totalSubTotal.toFixed(2)}`);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error updating quantity:", error);
+                    const errorMessage = xhr.responseJSON ? xhr.responseJSON.error : "Unknown error";
+                    Swal.fire({
+                        icon: "error",
+                        title: "Hello...",
+                        text: `Error updating quantity: ${errorMessage}`,
+                    });
+                }
+            });
+        }
+    </script>
+
+
+
+
+
+
+
+    <script>
+      function confirmDelete(productId) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Send a DELETE request using the Fetch API
+            fetch(`/delete-cartItem?id=${productId}`, {
+                method: "DELETE",
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Show success message
+                    Swal.fire({
+                        title: "Deleted!",
+                        text: "Your file has been deleted.",
+                        icon: "success"
+                    }).then(() => {
+                        // Redirect after successful deletion
+                        window.location.href = "/cartlist";
+                    });
+                } else {
+                    // Handle error response
+                    console.error("Error deleting cart item:", response.statusText);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: `Error deleting cart item: ${response.statusText}`,
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting cart item:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: `Error deleting cart item: ${error}`,
+                });
+            });
+        }
+    });
+}
+
+    </script>
+    <%- include('../layout/footer') %>

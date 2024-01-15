@@ -1,0 +1,107 @@
+<%- include('../adminLayout/header') %>
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Products grid</h2>
+                <p>Lorem ipsum dolor sit amet.</p>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <div class="row gx-3">
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <input type="text" placeholder="Search..." class="form-control">
+                    </div>
+                    <div class="col-lg-2 col-6 col-md-3">
+                        <select class="form-select">
+                            <option>All category</option>
+                            <option>Electronics</option>
+                            <option>Clothings</option>
+                            <option>Something else</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-6 col-md-3">
+                        <select class="form-select">
+                            <option>Latest added</option>
+                            <option>Cheap first</option>
+                            <option>Most viewed</option>
+                        </select>
+                    </div>
+                </div>
+            </header> <!-- card-header end// -->
+
+            <div class="card-body">
+                <div class="row gx-3 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 row-cols-xxl-5">
+                    <% if (product) { %>
+                        <% for( let i=0; i < product.length; i++ ) { %>
+                            <div class="col">
+                                <div class="card card-product-grid">
+
+                                    <a href="#" class="img-wrap"></a>
+                                    <img src="/productImages/<%= product[i].image[0].filename %>" alt="Product"
+                                        style="height: 200px;">
+                                    </a>
+
+                                    <div class="info-wrap">
+                                        <a href="#" class="title text-truncate">
+                                            <%= product[i].productName %>
+                                        </a>
+                                        <div class="price mb-2">
+                                            <%= product[i].salePrice %>
+                                        </div> <!-- price.// -->
+                                        <a href="/admin/editproduct?id=<%= product[i]._id %>"
+                                            class="btn btn-sm font-sm rounded btn-brand"> Edit</a> </a>
+                                        <button class="btn btn-sm font-sm btn-light rounded"
+                                            onclick="confirmDelete('<%= product[i]._id %>')">Delete</button>
+                                    </div>
+                                </div> <!-- card-product  end// -->
+                            </div> <!-- col.// -->
+                            <% } %>
+
+                                <% } else { %>
+                                    <div>
+                                        <p><b>Not Product were Added</b></p>
+                                    </div>
+                                    <% } %>
+
+                </div> <!-- row.// -->
+            </div> <!-- card-body end// -->
+        </div> <!-- card end// -->
+        <div class="pagination-area mt-30 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                    <li class="page-item"><a class="page-link" href="#">02</a></li>
+                    <li class="page-item"><a class="page-link" href="#">03</a></li>
+                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                    <li class="page-item"><a class="page-link" href="#">16</a></li>
+                    <li class="page-item"><a class="page-link" href="#"><i
+                                class="material-icons md-chevron_right"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+    </section> <!-- content-main end// -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        function confirmDelete(productId) {
+            if (confirm("Are You Want Delete This Product")) {
+                fetch(`/admin/deleteproduct/${productId}`, { method: 'DELETE' })
+                    .then((res) => {
+                        if (res.ok) {
+                            location.reload()
+                        }
+                        else {
+                            swal("unable to update product")
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                        swal("internal server error")
+                    })
+            } else {
+
+            }
+        }
+    </script>
+    <%- include('../adminLayout/footer') %>

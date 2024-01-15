@@ -1,0 +1,98 @@
+<%- include('../adminLayout/header') %>
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Edit Categories </h2>
+            </div>
+            <div>
+                <input type="text" placeholder="Search Categories" class="form-control bg-white">
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 m-auto">
+                        <form action="/admin/edit" method="post" onsubmit="return validate()">
+                            <div class="mb-8">
+                                <label for="product_name" class="form-label">Name</label>
+                                <input type="hidden" name="id" value="<%= cat._id %>">
+                                <input type="text" class="form-control" id="category_name" name="CategoryName"
+                                    value="<%= cat.categoryName %>" />
+                                <a href="" id="categoryNameError"></a>
+                            </div>
+                            <div class="mb-8">
+                                <br><br>
+                                <label class="form-label">List</label>
+                                <input type="radio" name="list" value="true" <% if(cat.is_unList==true){%> checked <%}%>
+                                    >
+                                    <label class="form-label">UnList</label>
+                                    <input type="radio" name="list" value="false" <% if(cat.is_unList==false){%> checked
+                                    <%}%>>
+                                        <br><br>
+                            </div>
+                            <div class="mb-8">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="discription" id="myTextarea"></textarea>
+                                <a href="" id="textAreaError"></a>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Update category</button>
+                            </div>
+                        </form>
+                    </div>
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+    <script>
+        // Get a reference to the textarea
+        const textarea = document.getElementById('myTextarea');
+        // Set the value using JavaScript
+        textarea.value = "<%=cat.discription%>";
+    </script>
+    <script>
+        function validate() {
+
+            // Input feilds
+            const categoryName = document.getElementById('category_name')
+            const textArea = document.getElementById('myTextarea')
+            const password = document.getElementById('password')
+
+
+            // Error feilds
+            const categoryNameError = document.getElementById('categoryNameError')
+            const textAreaError = document.getElementById('textAreaError')
+            const passwordError = document.getElementById('passwordError')
+
+            const textAreaRegex = /(?:[^\d\W_]*[a-zA-Z]){7,}/;
+            //name feild
+            if (categoryName.value.trim() === '') {
+                categoryNameError.innerHTML = 'Field is required'
+                setTimeout(() => {
+                    categoryNameError.innerHTML = ''
+                }, 5000)
+                return false;
+            }
+
+
+            // email feild   
+            if (textArea.value.trim() === '') {
+                textAreaError.innerHTML = 'Field is required'
+                setTimeout(() => {
+                    textAreaError.innerHTML = ''
+                }, 5000)
+                return false;
+            }
+            // password feild
+            if (!textAreaRegex.test(textArea.value)) {
+                textAreaError.innerHTML = 'minimum 10 letters'
+                setTimeout(() => {
+                    textAreaError.innerHTML = ''
+                }, 2000)
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+    <%- include('../adminLayout/footer') %>

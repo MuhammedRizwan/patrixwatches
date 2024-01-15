@@ -1,0 +1,104 @@
+<%- include('../adminLayout/header') %>
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Categories </h2>
+                <p>Add, edit or delete a category</p>
+            </div>
+            <div>
+                <input type="text" placeholder="Search Categories" class="form-control bg-white">
+            </div>
+        </div>
+        <a href="/admin/addCategory" class="btn btn-xs"><i class="material-icons md-add"></i> Add</a>
+        <br>
+        <div class="card">
+            <div class="card-body">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>List/Unlist</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (cat.length) { %>
+                                    <% for( let i=0; i< cat.length; i++ ) { %>
+                                        <tr>
+                                            <td><b>
+                                                    <%= cat[i].categoryName %>
+                                                </b></td>
+                                            <td>
+                                                <%= cat[i].discription %>
+                                            </td>
+                                            <td>
+                                                <button
+                                                    class="toggle-user-btn btn btn-sm font-sm rounded <%= cat[i].is_unList ? 'btn-success' : 'btn-danger' %>"
+                                                    data-user-id="<%= cat[i]._id %>"
+                                                    data-toggle-action="<%= cat[i].is_unList ? 'List' : 'unList' %>">
+                                                    <%= cat[i].is_unList ? 'List' : 'unList' %>
+                                                </button>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="#" data-bs-toggle="dropdown"
+                                                        class="btn btn-light rounded btn-sm font-sm"> <i
+                                                            class="material-icons md-more_horiz"></i> </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item"
+                                                            href="/admin/edit?id=<%= cat[i]._id%>">Edit
+                                                        </a>
+                                                        <a class="dropdown-item text-danger"
+                                                            href="/admin/delete?id=<%= cat[i]._id%>">Delete</a>
+                                                    </div>
+                                                </div> <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+
+                                        <% } %>
+
+                                            <% } else { %>
+                                                <div class="col-12 text-center text-danger fw-600">Category Not Add
+                                                </div>
+                                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div> <!-- .col// -->
+            </div> <!-- .row // -->
+        </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.toggle-user-btn').click(function () {
+                const userId = $(this).data('user-id');
+                const toggleAction = $(this).data('toggle-action');
+
+                $.ajax({
+                    type: 'PUT',
+                    url: `/admin/${toggleAction}-category`,
+                    data: { userId: userId },
+                    success: function (response) {
+                        // Handle success, you can show a success message or update UI
+                        console.log(response.message);
+                        location.reload();
+                        // Update the button color and text based on the action
+                        const buttonText = toggleAction === 'List' ? 'List' : 'unList';
+                        const buttonColor = toggleAction === 'List' ? 'btn-success' : 'btn-danger';
+
+                        // Update button text and color
+                        $(`.toggle-user-btn[data-user-id="${userId}"]`).text(buttonText).removeClass('btn-danger btn-success').addClass(buttonColor);
+                    },
+                    error: function (error) {
+                        // Handle error, show an error message or log it
+                        console.log(`Error ${toggleAction}ing user:`, error);
+                    },
+                });
+            });
+        });
+    </script>
+    <%- include('../adminLayout/footer') %>

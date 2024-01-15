@@ -1,0 +1,131 @@
+<%- include('../adminLayout/header') %>
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Users</h2>
+                <p>Delete Block and Unblock User</p>
+            </div>
+            <div>
+                <input type="text" placeholder="Search Categories" class="form-control bg-white">
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <form action="">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>E-mail</th>
+                                            <th>Phone</th>
+                                            <th>Verified</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (users) { %>
+                                            <% for( let i=0; i < users.length; i++ ) { %>
+                                                <tr>
+                                                    <td><b>
+                                                            <%= users[i].name %>
+                                                        </b></td>
+                                                    <td>
+                                                        <%= users[i].email %>
+                                                    </td>
+                                                    <td>
+                                                        <%= users[i].phone %>
+                                                    </td>
+                                                    <td>
+                                                        <% if (users[i].is_verified==0) { %>
+                                                            <button class="badge badge-pill badge-soft-danger ">Not
+                                                                verified</button>
+                                                            <% } else { %>
+                                                                <button
+                                                                    class="badge badge-pill badge-soft-success">verified</button>
+                                                                <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <button type="submit"
+                                                            class="toggle-user-btn btn btn-sm font-sm rounded <%= users[i].is_block ? 'btn-danger' : 'btn-success' %>"
+                                                            data-user-id="<%= users[i]._id %>"
+                                                            data-toggle-action="<%= users[i].is_block ? 'unblock' : 'block' %>">
+                                                            <%= users[i].is_block ? 'Unblock' : 'Block' %>
+                                                        </button>
+                                                    </td>
+                                                    <td>
+                                                        <button onclick="confirmDelete('<%= users[i]._id%>')"
+                                                            class="btn btn-xs">Delete</a>
+                                                    </td>
+                                                </tr>
+
+                                                <% } %>
+                                                    <% } else { %>
+                                                        <div class="col-12 text-center text-danger fw-600">User Not
+                                                            Found</div>
+                                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div> <!-- .col// -->
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Add a script for handling AJAX requests -->
+    <script>
+        $(document).ready(function () {
+            $('.toggle-user-btn').click(function () {
+                const userId = $(this).data('user-id');
+                const toggleAction = $(this).data('toggle-action');
+
+                $.ajax({
+                    type: 'PUT',
+                    url: `/admin/${toggleAction}-user`,
+                    data: { userId: userId },
+                    success: function (response) {
+                        // Handle success, you can show a success message or update UI
+                        console.log(response.message);
+
+                        // Update the button color and text based on the action
+                        const buttonText = toggleAction === 'block' ? 'Unblock' : 'Block';
+                        const buttonColor = toggleAction === 'block' ? 'btn-danger' : 'btn-success';
+
+                        // Update button text and color
+                        $(`.toggle-user-btn[data-user-id="${userId}"]`).text(buttonText).removeClass('btn-danger btn-success').addClass(buttonColor);
+                    },
+                    error: function (error) {
+                        // Handle error, show an error message or log it
+                        console.log(`Error ${toggleAction}ing user:`, error);
+                    },
+                });
+            });
+        });
+    </script>
+    <script>
+        function confirmDelete(userId) {
+            if (confirm("Are You Want Delete This User")) {
+                fetch(`/admin/delete/${userId}`, { method: 'DELETE' })
+                    .then((res) => {
+                        if (res.ok) {
+                            window.location.reload();
+                        }
+                        else {
+                            swal("unable to update user")
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                        swal("internal server error")
+                    })
+            } else {
+
+            }
+        }
+    </script>
+    <%- include('../adminLayout/footer') %>

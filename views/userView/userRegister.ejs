@@ -1,0 +1,168 @@
+<%- include('../layout/header') %>
+    <div class="col-lg-6 text-center m-auto py-5">
+        <div class="login_wrap widget-taber-content p-30 background-white border-radius-5 ">
+            <div class="padding_eight_all bg-white">
+                <div class="heading_s1">
+                    <h3 class="mb-30">Create an Account</h3>
+                </div>
+                <p class="mb-50 font-sm">
+                    Your personal data will be used to support your experience throughout this website, to manage access
+                    to
+                    your account, and for other purposes described in our privacy policy
+                </p>
+                <div>
+                    <% if (typeof message !=='undefined' ) { %>
+                        <span class="text-center text-danger">
+                            <%= message %>
+                        </span>
+
+                        <% } %>
+                </div>
+                <form action="/register" method="post" id="form" onsubmit="return validate() ">
+                    <div class="form-group">
+                        <input type="text" name="name" placeholder="Username" id="name">
+                        <a id="nameError" class="text-danger"></a>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="email" placeholder="Email" id="email">
+                        <a id="emailError" class="text-danger"></a>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" name="phone" placeholder="Phone" id="mobile">
+                        <a id="mobileError" class="text-danger"></a>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" placeholder="Password" id="password" name="password">
+                        <a id="passwordError" class="text-danger"></a>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="cpassword" placeholder="Confirm password" id="confirmPassword">
+                        <a id="confirmPasswordError" class="text-danger"></a>
+                    </div>
+                    <div class="login_footer form-group">
+                        <div class="chek-form">
+                            <div class="custome-checkbox">
+                                <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox12"
+                                    value="">
+                                <label class="form-check-label" for="exampleCheckbox12"><span>I agree to terms &amp;
+                                        Policy.</span></label>
+                            </div>
+                        </div>
+                        <a href="page-privacy-policy.html"><i class="fi-rs-book-alt mr-5 text-muted"></i>Lean more</a>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-fill-out btn-block hover-up">Submit &amp;
+                            Register</button>
+                    </div>
+                </form>
+                <div class="divider-text-center mt-15 mb-15">
+                </div>
+                <div class="text-muted text-center">Already have an account? <a href="/login">Sign in now</a></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function validate() {
+
+            // Input feilds
+            const name = document.getElementById('name')
+            const email = document.getElementById('email')
+            const password = document.getElementById('password')
+            const confirmPassword = document.getElementById('confirmPassword')
+            const mobile = document.getElementById('mobile')
+
+            // Error feilds
+            const nameError = document.getElementById('nameError')
+            const emailError = document.getElementById('emailError')
+            const passwordError = document.getElementById('passwordError')
+            const confirmPasswordError = document.getElementById('confirmPasswordError')
+            const mobileError = document.getElementById('mobileError');
+
+            // Regex   
+            const nameRegex = /^[A-Z]/;
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail+\.[a-zA-Z]{3}$/;
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+            const mobileRegex = /^[0-9]{10}$/;
+
+
+            //name feild
+            if (name.value.trim() === '') {
+                nameError.innerHTML = 'Field is required'
+                setTimeout(() => {
+                    nameError.innerHTML = ''
+                }, 5000)
+            }
+            if (!nameRegex.test(name.value)) {
+                nameError.innerHTML = 'First letter should be capital'
+                setTimeout(() => {
+                    nameError.innerHTML = ''
+                }, 5000)
+                return false;
+            }
+
+            // email feild   
+            if (email.value.trim() === '') {
+                emailError.innerHTML = 'Field is required'
+                setTimeout(() => {
+                    emailError.innerHTML = ''
+                }, 5000)
+                return false;
+            }
+            if (!emailRegex.test(email.value)) {
+                emailError.innerHTML = "Please enter a valid email"
+                setTimeout(() => {
+                    emailError.innerHTML = ''
+                }, 5000);
+                return false;
+            }
+            //mobile feild
+            if (mobile.value.trim() === '') {
+                mobileError.innerHTML = 'Field is required'
+                setTimeout(() => {
+                    mobileError.innerHTML = ''
+                }, 5000)
+                return false;
+            }
+
+            if (!mobileRegex.test(mobile.value)) {
+                mobileError.innerHTML = 'Please enter a valid number'
+                setTimeout(() => {
+                    mobileError.innerHTML = ''
+                }, 5000)
+                return false;
+            }
+
+            // password feild
+            if (password.value.trim() === '') {
+                passwordError.innerHTML = 'Field is required'
+                setTimeout(() => {
+                    passwordError.innerHTML = ''
+                }, 5000)
+                return false;
+            }
+            if (!passwordRegex.test(password.value)) {
+                passwordError.innerHTML = "Please enter a tight password"
+                setTimeout(() => {
+                    passwordError.innerHTML = ''
+                }, 5000);
+                return false;
+            }
+            ///confirm password
+            if (confirmPassword.value.trim() === '') {
+                confirmPasswordError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    confirmPasswordError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            if (confirmPassword.value !== password.value) {
+                confirmPasswordError.innerHTML = "Passwords do not match";
+                setTimeout(() => {
+                    confirmPasswordError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            return true;
+        }
+    </script>
+ <%- include('../layout/footer') %>
