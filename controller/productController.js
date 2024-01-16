@@ -107,6 +107,30 @@ const deleteProductImage = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 }
+const productShop = async (req, res) => {
+    try {
+        const loggedIn = req.cookies.token ? true : false;
+        const id = req.query.id;
+        const productData = await Product.findOne({ _id: id });
+        const relatedProduct = await Product.find();
+        const categoryData = await Category.find({ is_unList: false });
+        return res.status(200).render('singleProductDetials', { product: productData, productData: relatedProduct, cat: categoryData, loggedIn })
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).send('Internal Server Error');
+    }
+}
+const Shop=async (req,res)=>{
+    try {
+        const loggedIn = req.cookies.token ? true : false;
+        const categoryData = await Category.find({ is_unList: false },{_id:1});
+        const categoryIds=categoryData.map(category => category._id);
+        const productData=await Product.find({category_id:{$in:categoryIds}});
+        return res.status(200).render("productShop",{loggedIn,product:productData})
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+}
 module.exports = {
     productListLoad,
     addProductPage,
@@ -114,5 +138,7 @@ module.exports = {
     editProductPage,
     editProduct,
     deleteProduct,
-    deleteProductImage
+    deleteProductImage,
+    productShop,
+    Shop
 }

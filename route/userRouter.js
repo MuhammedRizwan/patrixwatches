@@ -2,8 +2,9 @@ const express = require('express');
 const user_route = express();
 const userController = require('../controller/userController');
 const cartController = require('../controller/cartController');
-const addressController=require('../controller/addressController')
-const orderController=require('../controller/orderCondroller')
+const addressController=require('../controller/addressController');
+const orderController=require('../controller/orderCondroller');
+const productController=require('../controller/productController')
 const auth = require('../middleware/auth');
 user_route.set('views', './views/userView');
 
@@ -19,13 +20,13 @@ user_route.post('/forgetPassword',userController.forgetPassword);//change the pa
 user_route.get('/register', userController.userRegisterPage); // Register page accessible only if logged out
 user_route.post('/register', userController.userRegister); // User registration endpoint
 user_route.post('/verification', userController.verifyOtp); // Verify OTP accessible only if logged in
-user_route.post('/resendOtp', userController.resendOtp); // Resend OTP accessible only if logged in
-user_route.get('/productShop', userController.productShop); // Product shop (accessible to all)
+user_route.post('/resendOtp', userController.resendOtp); // Resend OTP accessible only if logged 
 user_route.get('/account',auth,userController.account);
 user_route.get('/changePassword',auth,userController.changePasswordPage);
 user_route.post('/changepassword',auth,userController.changePassword)
 
-
+user_route.get('/productShop', productController.productShop); 
+user_route.get('/Shop',productController.Shop);
 
 user_route.get('/cartlist', auth, cartController.cartPage);
 user_route.post('/addcart',auth, cartController.addCart);

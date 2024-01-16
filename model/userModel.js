@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
         default: false
     }
 })
-module.exports = mongoose.model('userDetials', userSchema);
+const User= mongoose.model('userDetials', userSchema);
 
 const otpSchema = new mongoose.Schema({
     email:{
@@ -42,8 +42,10 @@ const otpSchema = new mongoose.Schema({
     createdAt:{
         type:Date,
         default:Date.now,
-        expires:60*5
-    }
-    
-})
-module.exports = mongoose.model('OTP',otpSchema)
+        expires:30
+    }    
+});
+const Otp= mongoose.model('OTP',otpSchema);
+module.exports ={
+    User,Otp
+}
