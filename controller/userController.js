@@ -1,14 +1,14 @@
 require("dotenv").config({ path: ".env" });
-const User = require('../model/userModel');
+const {User,Otp} = require('../model/userModel');
 const Product = require('../model/productModel');
 const Category = require('../model/categoryModel');
 const Address = require('../model/addressModel');
 const Order = require('../model/orderModel');
 const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
-const otpGenarator = require('otp-generator');
 const jwt = require('jsonwebtoken');
-const Swal = require('sweetalert2')
+const otp=require('../util/genarateOtp');
+const sendEmail=require('../util/sendEmail');
+
 
 
 
@@ -22,51 +22,7 @@ const securePassword = async (password) => {
     }
 
 }
-let otp = '';
-let isExpired = true;
 
-function genarateOTP() {
-    otp = otpGenarator.generate(4, { digits: true, lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false });
-    isExpired = false;
-    setTimeout(() => {
-        isExpired = true;
-    }, 60000);
-
-}
-// Change this timeout to your desired expiration duration in milliseconds
-
-
-const sendVerifyMail = async (name, email, otp) => {
-    try {
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false,
-            auth: {
-                user: process.env.MAIL,
-                pass: process.env.PASS
-            }
-        });
-
-        const mailOptions = {
-            from: process.env.MAIL,
-            to: email,
-            subject: 'For OTP Verification',
-            html: '<p>Hii ' + name + ' ,<br> your OTP :' + otp + '</p>'
-
-        }
-        transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-                console.log(error);
-            }
-            else {
-                console.log("Email has been sent:-", info.response);
-            }
-        })
-    } catch (error) {
-        console.log(error.message);
-    }
-}
 const genarateToken = (user) => {
     return jwt.sign({ user }, process.env.SECRETKEY, { expiresIn: 2 * 60 * 60 * 1000 })
 }
@@ -100,8 +56,9 @@ const userRegister = async (req, res) => {
             phone: req.body.phone,
             password: sPassword,
         }
-        genarateOTP()
-        sendVerifyMail(req.body.name, req.body.email, otp);
+        await otp(req.body.email);
+        const otpData=await otp.
+        sendEmail(req.body.name, req.body.email, otp);
         return res.status(200).render('verification', { loggedIn });
 
     } catch (error) {
@@ -304,7 +261,7 @@ const verifyEmail=async(req,res)=>{
         if(!userData){
             return res.status(404).render('email-verified',{message:"User not found "});
         }else{
-            return res.status(200).render("forgetPassword",{loggedIn});
+            return res.status(200).render("forgetOtpVerification",{loggedIn});
         }
     } catch (error) {
         return res.status(500).send('Internal Server Error');

@@ -31,3 +31,19 @@ const userSchema = new mongoose.Schema({
     }
 })
 module.exports = mongoose.model('userDetials', userSchema);
+
+const otpSchema = new mongoose.Schema({
+    email:{
+        type:String
+    },
+    otp:{
+        type:String
+    },
+    createdAt:{
+        type:Date,
+        default:Date.now,
+        expires:60*5
+    }
+    
+})
+module.exports = mongoose.model('OTP',otpSchema)
