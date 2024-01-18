@@ -51,8 +51,19 @@
                                         </div> <!-- price.// -->
                                         <a href="/admin/editproduct?id=<%= product[i]._id %>"
                                             class="btn btn-sm font-sm rounded btn-brand"> Edit</a> </a>
-                                        <button class="btn btn-sm font-sm btn-light rounded"
+                                        <button type="button" class="btn btn-sm font-sm btn-light rounded"
                                             onclick="confirmDelete('<%= product[i]._id %>')">Delete</button>
+
+                                        <% if (product[i].is_blocked===true) { %>
+                                            <button type="button" class="btn btn-sm font-sm btn-danger rounded"
+                                                onclick="blockProduct('<%= product[i]._id %>','Unblock')">
+                                                Unblock</button>
+                                            <% } else { %>
+                                                <button type="button" class="btn btn-sm font-sm btn-danger rounded"
+                                                    onclick="blockProduct('<%= product[i]._id %>','Block')">
+                                                    Block</button>
+                                                <% } %>
+
                                     </div>
                                 </div> <!-- card-product  end// -->
                             </div> <!-- col.// -->
@@ -82,26 +93,92 @@
         </div>
     </section> <!-- content-main end// -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function blockProduct(ProductId, Action) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: `Yes, ${Action}it!`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/${Action}-product/${ProductId}`, {
+                        method: 'PUT'
+                    })
+                        .then((res) => {
+                            if (res.ok) {
+                                Swal.fire({
+                                    position: "center",
+                                    icon: "success",
+                                    title: `product were ${Action}`,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 1000);
+                            } else {
+                                Swal.fire({
+                                    position: "center",
+                                    icon: "error",
+                                    title: `product were not ${Action}`,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                            }
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                            swal.fire("internal server error")
+                        })
 
+                }
+            })
+        }
+    </script>
     <script>
         function confirmDelete(productId) {
-            if (confirm("Are You Want Delete This Product")) {
-                fetch(`/admin/deleteproduct/${productId}`, { method: 'DELETE' })
-                    .then((res) => {
-                        if (res.ok) {
-                            location.reload()
-                        }
-                        else {
-                            swal("unable to update product")
-                        }
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                        swal("internal server error")
-                    })
-            } else {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/deleteproduct/${productId}`, { method: 'DELETE' })
+                        .then((res) => {
+                            if (res.ok) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "product were Deleted.",
+                                    icon: "success"
+                                });
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 1000);
+                            } else {
+                                Swal.fire({
+                                    title: "eror!",
+                                    text: "cannot delete product.",
+                                    icon: "error"
+                                });
+                            }
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                            swal.fire("internal server error")
+                        })
 
-            }
+                }
+            })
         }
+
     </script>
     <%- include('../adminLayout/footer') %>

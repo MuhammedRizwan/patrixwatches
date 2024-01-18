@@ -11,7 +11,7 @@ const addCategoryPage = async (req, res) => {
 const addCategory = async (req, res) => {
     try {
         const catagoryExist=await Category.findOne({categoryName:req.body.categoryName});
-        if(!catagoryExist){
+        if(catagoryExist){
             return res.status(400).render('addCategory',{message:"Category Already Exist"})
         }else{
             const category = new Category({
@@ -48,10 +48,11 @@ const listCategory = async (req, res) => {
         const categoryData = await Category.findByIdAndUpdate(userId, { is_unList: false });
         if (!categoryData) {
             return res.status(404).send('category  not updated'); // Respond with a 404 status if product is not found
+        }else{
+        return res.status(200).json({success:true, message: 'Category listed successfully' });
         }
-        return res.status(200).json({ message: 'Category listed successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Error listing user', error });
+        res.status(500).json({success:false, message: 'Error listing user', error });
     }
 };
 const unListCategory = async (req, res) => {
@@ -60,8 +61,10 @@ const unListCategory = async (req, res) => {
         const categoryData = await Category.findByIdAndUpdate(userId, { is_unList: true });
         if (!categoryData) {
             return res.status(404).send('category  not updated'); // Respond with a 404 status if product is not found
+        }else{
+            return res.status(200).json({success:true, message: 'User unlisted successfully' });
         }
-        res.json({ message: 'User unlisted successfully' });
+        
     } catch (error) {
         res.status(500).json({ message: 'Error unlisting user', error });
     }
@@ -81,7 +84,6 @@ const editCategoryPage = async (req, res) => {
 }
 const editCategory = async (req, res) => {
     try {
-        
         const categoryData = await Category.updateOne({ _id: req.body.id }, {
             $set: {
                 categoryName: req.body.CategoryName,
@@ -100,9 +102,13 @@ const editCategory = async (req, res) => {
 }
 const deleteCategory = async (req, res) => {
     try {
-        const id = req.query.id;
-        await Category.deleteOne({ _id: id });
-        return res.status(200).redirect('/admin/categoryList');
+        const id = req.params.id.trim();
+        const deleteCategory=await Category.deleteOne({ _id: id });
+        if(!deleteCategory){
+            return res.status(400).json({success:false,message:"category does not  Deleted"});
+        }else{
+            return res.status(200).json({success:true,message:"category Deleted"});
+        }
     } catch (error) {
         console.log(error.message);
         return res.status(500).send('Internal Server Error')

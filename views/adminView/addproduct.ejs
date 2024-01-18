@@ -65,10 +65,12 @@
                         <h4>Media</h4>
                     </div>
                     <div class="card-body">
-                        <div class="input-upload">
+                        <div class="input-upload"  style="display: flex;" id="imageContainer" >
                             <img src="/admin-assets/imgs/theme/upload.svg" alt="">
-                            <input class="form-control" multiple type="file" name="files">
                             <a href="" id="imageError"></a>
+                        </div>
+                        <div class="input-upload">
+                            <input id="addImageName" class="form-control" multiple type="file" name="files">
                         </div>
                     </div>
                 </div> <!-- card end// -->
@@ -202,6 +204,40 @@
             return true;
         }
     </script>
+    <script>
+        const input = document.getElementById("addImageName");
+ const imageContainer = document.getElementById("imageContainer");
+ 
+ input.addEventListener("change", () => {
+     // Clear previous images
+     imageContainer.innerHTML = '';
+ 
+     // Loop through selected files and display them
+     for (let i = 0; i < input.files.length; i++) {
+         const imageWrapper = document.createElement("div");
+         const image = document.createElement("img");
+         const deleteButton = document.createElement("button");
+ 
+         image.src = URL.createObjectURL(input.files[i]);
+         image.style.width = "100px"; // Set width as needed
+         image.style.height = "100px"; // Set height as needed
+ 
+         deleteButton.textContent = "Delete";
+         deleteButton.style.background="red"
+         // Add a margin between the image and the delete button
+         deleteButton.style.margin="5px"
+         deleteButton.addEventListener("click", () => {
+             // Remove the image and its wrapper when delete button is clicked
+             imageWrapper.remove();
+         });
+ 
+         imageWrapper.appendChild(image);
+         imageWrapper.appendChild(deleteButton);
+ 
+         imageContainer.appendChild(imageWrapper);
+     }
+ });
+     </script>
 
     <!-- Rest of your HTML code -->
 

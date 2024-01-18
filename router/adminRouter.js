@@ -3,13 +3,13 @@ const admin_route = express();
 const adminController = require('../controller/adminController');
 const productController = require('../controller/productController');
 const categoryController = require('../controller/categoryController');
-const orderController=require('../controller/orderCondroller')
+const orderController = require('../controller/orderCondroller')
 const adminAuth = require('../middleware/adminAuth');
 const upload = require('../config/multer')
 
 admin_route.set('views', './views/adminView');
 //  admin route configurations with session control
-admin_route.get('/',adminController.adminLoginPage); // Admin login page accessible only if logged out
+admin_route.get('/', adminController.adminLoginPage); // Admin login page accessible only if logged out
 admin_route.post('/log', adminController.adminLogin); // Admin login endpoint
 admin_route.get('/home', adminAuth, adminController.Dashboard); // Admin dashboard accessible only if logged in
 admin_route.get('/user', adminAuth, adminController.userList); // User list accessible only if logged in
@@ -32,6 +32,8 @@ admin_route.get('/editProduct', adminAuth, productController.editProductPage);
 admin_route.post('/editProduct', upload.array("files", 4), productController.editProduct);
 admin_route.delete('/deleteproduct/:productId', adminAuth, productController.deleteProduct);
 admin_route.delete('/deleteImg/:productImg/:productId', adminAuth, productController.deleteProductImage);
+admin_route.put('/Block-product/:productId', adminAuth, productController.blockProduct);
+admin_route.put('/Unblock-product/:productId', adminAuth, productController.unBlockProduct);
 
 
 admin_route.get('/categoryList', adminAuth, categoryController.category);
@@ -41,10 +43,10 @@ admin_route.get('/addCategory', adminAuth, categoryController.addCategoryPage);
 admin_route.post('/addCategory', categoryController.addCategory);
 admin_route.get('/edit', adminAuth, categoryController.editCategoryPage);
 admin_route.post('/edit', categoryController.editCategory);
-admin_route.get('/delete', adminAuth, categoryController.deleteCategory);
+admin_route.delete('/deleteCategory/:id', adminAuth, categoryController.deleteCategory);
 
-admin_route.get('/orderPage',adminAuth,orderController.adminOrderPage);
-admin_route.get('/orderDetials',adminAuth,orderController.adminOrderDetails);
-admin_route.get('/cancelOrder/:orderId/:productId',adminAuth,orderController.cancelOrder);
+admin_route.get('/orderPage', adminAuth, orderController.adminOrderPage);
+admin_route.get('/orderDetials', adminAuth, orderController.adminOrderDetails);
+admin_route.get('/cancelOrder/:orderId/:productId', adminAuth, orderController.cancelOrder);
 
 module.exports = admin_route;

@@ -69,8 +69,8 @@
                                     <% for( let i=0; i < product.image.length; i++ ) { %>
                                         <img src="/productImages/<%= product.image[i].filename %>" alt=""
                                             style="width: 80px; height: 80px;">
-                                        <a href="" class="btn btn-danger"
-                                            onclick="confirmDelete('<%= product.image[i].filename %>','<%=product._id %>')">delete</a>
+                                        <button type="button" class="btn btn-danger"
+                                            onclick="confirmDelete('<%= product.image[i].filename %>','<%=product._id %>')">delete</button>
                                         <% } %>
                                             <input class="form-control" type="file" name="files" multiple>
                                             <a href="" id="imageError"></a>
@@ -119,27 +119,51 @@
         textarea.value = "<%= product.discription%>";
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         function confirmDelete(productImg, productId) {
-            if (confirm("Are You Want Delete This Product Image")) {
-                fetch(`/admin/deleteImg/${productImg}/${productId}`, { method: 'DELETE' })
-                    .then((res) => {
-                        if (res.ok) {
-                            window.location.reload();
-                        }
-                        else {
-                            swal("unable to update user")
-                        }
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                        swal("internal server error")
-                    })
-            } else {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't get this Image Back!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/deleteImg/${productImg}/${productId}`, { method: 'DELETE' })
+                        .then((res) => {
+                            if (res.ok) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "Image were Deleted.",
+                                    icon: "success",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 1000);
+                            } else {
+                                Swal.fire({
+                                    title: "eror!",
+                                    text: "cannot delete Image.",
+                                    icon: "error",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                            }
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                            swal.fire("internal server error")
+                        })
 
-            }
-        }
+                }
+            })
+        }      
     </script>
     <script>
         function validate() {
@@ -216,13 +240,13 @@
                 return false;
             }
             // File input validation
-            if (files.length === 0) {
-                imageError.innerHTML = 'Field is required';
-                setTimeout(() => {
-                    imageError.innerHTML = '';
-                }, 5000);
-                return false;
-            }
+            // if (files.length === 0) {
+            //     imageError.innerHTML = 'Field is required';
+            //     setTimeout(() => {
+            //         imageError.innerHTML = '';
+            //     }, 5000);
+            //     return false;
+            // }
             // Quantity field
             if (quantity.value.trim() === '') {
                 quantityError.innerHTML = 'Field is required';

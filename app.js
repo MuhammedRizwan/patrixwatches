@@ -15,10 +15,10 @@ app.use(express.json());
 app.use(cookieParser())
 app.use(express.urlencoded({extended:true}));
 
-const user_route=require('./route/userRouter');
+const user_route=require('./router/userRouter');
 app.use('/',user_route);
 
-const admin_route=require('./route/adminRouter');
+const admin_route=require('./router/adminRouter');
 app.use('/admin',admin_route);
 
 

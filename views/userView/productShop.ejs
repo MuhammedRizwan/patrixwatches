@@ -65,8 +65,8 @@
                                         <div class="product-img-action-wrap">
                                             <div class="product-img product-img-zoom">
                                                 <a href="shop-product-right.html">
-                                                    <img class="default-img" src="/productImages/<%= product.image[i].filename %>" alt="">
-                                                    <img class="hover-img" src="/productImages/<%= product.image[i].filename %>" alt="">
+                                                    <img class="default-img" src="/productImages/<%= product[i].image[0].filename %>" alt="">
+                                                    <img class="hover-img" src="/productImages/<%= product[i].image[0].filename %>" alt="">
                                                 </a>
                                             </div>
                                             <div class="product-action-1">
@@ -81,17 +81,17 @@
                                         </div>
                                         <div class="product-content-wrap">
                                             <div class="product-category">
-                                                <a href="shop-grid-right.html">Music</a>
+                                                <a href="shop-grid-right.html"></a>
                                             </div>
-                                            <h2><a href="shop-product-right.html">Colorful Pattern Shirts</a></h2>
+                                            <h2><a href="shop-product-right.html"><%= product[i].productName %></a></h2>
                                             <div class="rating-result" title="90%">
                                                 <span>
                                                     <span>90%</span>
                                                 </span>
                                             </div>
                                             <div class="product-price">
-                                                <span>$238.85 </span>
-                                                <span class="old-price">$245.8</span>
+                                                <span><%= product[i].salePrice %></span>
+                                                <span class="old-price"><%= product[i].orginalPrice %></span>
                                             </div>
                                             <div class="product-action-1 show">
                                                 <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
@@ -101,6 +101,9 @@
                                 </div>
                             <% } %>
                             <% } else { %>
+                                <div>
+                                    <H1 class="text-center m-50">All Products Are Blocked Or Unlisted By Admin</H1>
+                                </div>
                         <% } %>
                         
                         

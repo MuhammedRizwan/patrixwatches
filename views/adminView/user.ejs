@@ -21,7 +21,7 @@
                                             <th>Name</th>
                                             <th>E-mail</th>
                                             <th>Phone</th>
-                                            <th>Verified</th>
+                                            <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -39,16 +39,16 @@
                                                         <%= users[i].phone %>
                                                     </td>
                                                     <td>
-                                                        <% if (users[i].is_verified==0) { %>
-                                                            <button class="badge badge-pill badge-soft-danger ">Not
-                                                                verified</button>
+                                                        <% if (users[i].is_block==false) { %>
+                                                            <span
+                                                                class="badge badge-pill badge-soft-danger ">Unblocked</span>
                                                             <% } else { %>
-                                                                <button
-                                                                    class="badge badge-pill badge-soft-success">verified</button>
+                                                                <span
+                                                                    class="badge badge-pill badge-soft-success">Blocked</span>
                                                                 <% } %>
                                                     </td>
                                                     <td>
-                                                        <button type="submit"
+                                                        <button type="button"
                                                             class="toggle-user-btn btn btn-sm font-sm rounded <%= users[i].is_block ? 'btn-danger' : 'btn-success' %>"
                                                             data-user-id="<%= users[i]._id %>"
                                                             data-toggle-action="<%= users[i].is_block ? 'unblock' : 'block' %>">
@@ -56,7 +56,8 @@
                                                         </button>
                                                     </td>
                                                     <td>
-                                                        <button onclick="confirmDelete('<%= users[i]._id%>')"
+                                                        <button type="button"
+                                                            onclick="confirmDelete('<%= users[i]._id%>')"
                                                             class="btn btn-xs">Delete</a>
                                                     </td>
                                                 </tr>
@@ -75,7 +76,7 @@
             </div> <!-- card body .// -->
         </div> <!-- card .// -->
     </section> <!-- content-main end// -->
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Add a script for handling AJAX requests -->
     <script>
@@ -83,49 +84,93 @@
             $('.toggle-user-btn').click(function () {
                 const userId = $(this).data('user-id');
                 const toggleAction = $(this).data('toggle-action');
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: `Are you sure you want to ${toggleAction} this user?`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: `Yes,${toggleAction} it!`
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: 'PUT',
+                            url: `/admin/${toggleAction}-user`,
+                            data: { userId: userId },
+                            success: function (response) {
+                                // Handle success, you can show a success message or update UI
+                                Swal.fire({
+                                    position: "center",
+                                    icon: "success",
+                                    title: `user were ${toggleAction}.`,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                // Update the button color and text based on the action
+                                // const buttonText = toggleAction === 'block' ? 'Unblock' : 'Block';
+                                // const buttonColor = toggleAction === 'block' ? 'btn-danger' : 'btn-success';
 
-                $.ajax({
-                    type: 'PUT',
-                    url: `/admin/${toggleAction}-user`,
-                    data: { userId: userId },
-                    success: function (response) {
-                        // Handle success, you can show a success message or update UI
-                        console.log(response.message);
+                                // // Update button text and color
+                                // $(`.toggle-user-btn[data-user-id="${userId}"]`).text(buttonText).removeClass('btn-danger btn-success').addClass(buttonColor); 
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 1000);
+                            },
+                            error: function (error) {
+                                console.log(`Error ${toggleAction}ing user:`, error);
+                            },
+                        });
+                    } else {
+                        Swal.fire({
+                            title: `Canceled`,
+                            text: `canceled your Action.`,
+                            icon: "error"
+                        });
+                    }
 
-                        // Update the button color and text based on the action
-                        const buttonText = toggleAction === 'block' ? 'Unblock' : 'Block';
-                        const buttonColor = toggleAction === 'block' ? 'btn-danger' : 'btn-success';
-
-                        // Update button text and color
-                        $(`.toggle-user-btn[data-user-id="${userId}"]`).text(buttonText).removeClass('btn-danger btn-success').addClass(buttonColor);
-                    },
-                    error: function (error) {
-                        // Handle error, show an error message or log it
-                        console.log(`Error ${toggleAction}ing user:`, error);
-                    },
                 });
             });
         });
     </script>
     <script>
         function confirmDelete(userId) {
-            if (confirm("Are You Want Delete This User")) {
-                fetch(`/admin/delete/${userId}`, { method: 'DELETE' })
-                    .then((res) => {
-                        if (res.ok) {
-                            window.location.reload();
-                        }
-                        else {
-                            swal("unable to update user")
-                        }
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                        swal("internal server error")
-                    })
-            } else {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/delete/${userId}`, { method: 'DELETE' })
+                        .then((res) => {
+                            if (res.ok) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "user were Deleted.",
+                                    icon: "success"
+                                });
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 1000);
+                            } else {
+                                Swal.fire({
+                                    title: "eror!",
+                                    text: "cannot delete user.",
+                                    icon: "error"
+                                });
+                            }
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                            swal.fire("internal server error")
+                        })
 
-            }
+                }
+            })
         }
     </script>
     <%- include('../adminLayout/footer') %>

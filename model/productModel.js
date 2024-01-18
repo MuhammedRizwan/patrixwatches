@@ -39,6 +39,10 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: 0
     },
+    is_blocked: {
+        type: Boolean,
+        default: false
+    },
     image: [{
         filename: String,
     }]

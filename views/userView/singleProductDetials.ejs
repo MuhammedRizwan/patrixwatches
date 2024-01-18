@@ -20,14 +20,14 @@
                                     <span class="zoom-icon"><i class="fi-rs-search"></i></span>
                                     <!-- MAIN SLIDES -->
                                     <div class="zoom-container">
-                                        <figure class="border-radius-10">
-                                            <img id="myImage"  src="/productImages/<%= product.image[0].filename %>" alt="product image">
+                                        <figure class="border-radius-10" id="zoomImage" >
+                                            <img id="myImage" src="/productImages/<%= product.image[0].filename %>" alt="product image" style="width: 500px; height: 500px;">
                                         </figure>
                                     </div>
                                     <!-- THUMBNAILS -->
                                     <div class="slider-nav-thumbnails pl-15 pr-15">
                                         <% for( let i=0; i < product.image.length; i++ ) { %>
-                                            <div><img src="productImages/<%= product.image[i].filename %>"
+                                            <div><img src="/productImages/<%= product.image[i].filename %>"
                                                     alt="product image"
                                                     onclick="changeImage('productImages/<%= product.image[i].filename %>')"
                                                     style="width: 200px; height: 100px;"></div>
@@ -467,6 +467,19 @@
         </div>
     </section>
 </main>
+
+<script>
+   var options = {
+            width: 400,
+            height: 250,
+            zoomWidth: 100,
+            offset: { vertical:0, horizontal:10},
+            scale: 1
+        };
+
+        // Assuming ImageZoom is part of the library, adjust this accordingly
+        new ImageZoom(document.getElementById("zoomImage"), options);
+</script>
 <script>
     function changeImage(image) {
         // Get the reference to the img tag by its ID
@@ -478,7 +491,7 @@
     }
 
 </script>
-<script>
+<!-- <script>
     const zoomContainer = document.querySelector(".zoom-container");
     const zoomImage = document.getElementById("myImage");
 
@@ -494,5 +507,5 @@
     zoomContainer.addEventListener("mouseleave", () => {
         zoomImage.style.transform = "translate(-0%, -0%) scale(1)";
     });
-</script>
+</script> -->
 <%- include('../layout/footer') %>
