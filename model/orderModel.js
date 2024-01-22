@@ -6,10 +6,6 @@ const oderSchema = new mongoose.Schema({
     required: false,
     type: Number,
   },
-  id:{
-    type:Number,
-    required:true
-  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User", // Reference to the Address model

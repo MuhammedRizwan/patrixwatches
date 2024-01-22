@@ -64,7 +64,7 @@
                                     <div class="product-cart-wrap mb-30">
                                         <div class="product-img-action-wrap">
                                             <div class="product-img product-img-zoom">
-                                                <a href="shop-product-right.html">
+                                                <a href="/productShop?id=<%= product[i]._id %>">
                                                     <img class="default-img" src="/productImages/<%= product[i].image[0].filename %>" alt="">
                                                     <img class="hover-img" src="/productImages/<%= product[i].image[0].filename %>" alt="">
                                                 </a>
@@ -94,7 +94,7 @@
                                                 <span class="old-price"><%= product[i].orginalPrice %></span>
                                             </div>
                                             <div class="product-action-1 show">
-                                                <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                <button aria-label="Add To Cart" class="action-btn hover-up"  onclick="addToCart('<%= product[i]._id %>')"><i class="fi-rs-shopping-bag-add"></i></a>
                                             </div>
                                         </div>
                                     </div>
@@ -151,32 +151,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="list-group">
-                            <div class="list-group-item mb-10 mt-10">
-                                <label class="fw-900">Color</label>
-                                <div class="custome-checkbox">
-                                    <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox1" value="">
-                                    <label class="form-check-label" for="exampleCheckbox1"><span>Red (56)</span></label>
-                                    <br>
-                                    <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox2" value="">
-                                    <label class="form-check-label" for="exampleCheckbox2"><span>Green (78)</span></label>
-                                    <br>
-                                    <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox3" value="">
-                                    <label class="form-check-label" for="exampleCheckbox3"><span>Blue (54)</span></label>
-                                </div>
-                                <label class="fw-900 mt-15">Item Condition</label>
-                                <div class="custome-checkbox">
-                                    <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox11" value="">
-                                    <label class="form-check-label" for="exampleCheckbox11"><span>New (1506)</span></label>
-                                    <br>
-                                    <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox21" value="">
-                                    <label class="form-check-label" for="exampleCheckbox21"><span>Refurbished (27)</span></label>
-                                    <br>
-                                    <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox31" value="">
-                                    <label class="form-check-label" for="exampleCheckbox31"><span>Used (45)</span></label>
-                                </div>
-                            </div>
-                        </div>
                         <a href="shop-grid-right.html" class="btn btn-sm btn-default"><i class="fi-rs-filter mr-5"></i> Fillter</a>
                     </div>
                     <div class="banner-img wow fadeIn mb-45 animated d-lg-block d-none">
@@ -192,4 +166,32 @@
         </div>
     </section>
 </main>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function addToCart(productId) {
+        $.ajax({
+            url: `/addToCart?id=${productId}`,
+            method: "GET",
+            success: function (data) {
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Added To The Cart",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error("Error adding item to cart:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: `Error adding item to cart: ${error}`,
+                });
+            }
+        });
+    }
+
+</script>
     <%- include('../layout/footer') %>

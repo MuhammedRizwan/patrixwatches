@@ -62,7 +62,7 @@
                                                             alt="Profile Picture">
                                                     </div>
                                                     <div class="profile-details">
-                                                        <h5>Name: <%= user.name %>
+                                                        <h5>Name: <%= user.name %><a href="/editName?id=<%= user._id %>" class="text-decoration-none text-danger ml-50">edit</a>
                                                         </h5>
                                                         <p>Email: <%= user.email %>
                                                         </p>
@@ -103,7 +103,6 @@
                                                             <thead>
 
                                                                 <tr>
-                                                                    <th>Order Id</th>
                                                                     <th>productName</th>
                                                                     <th>Date</th>
                                                                     <th>Order Status</th>
@@ -115,11 +114,7 @@
                                                             </thead>
                                                             <tbody>
                                                                 <% for( let i=0; i < order.length; i++ ) { %>
-
-
                                                                     <tr>
-                                                                        <td>#<%=order[i].OrderId%>
-                                                                        </td>
                                                                         <td>
                                                                             <%= order[i].productName %>
                                                                         </td>
@@ -138,16 +133,23 @@
                                                                         <td>
                                                                             <%= order[i].paymentMethod %>
                                                                         </td>
-                                                                        <td><button
+                                                                        <% if (order[i].productStatus=="canceled") { %>
+                                                                           <td>Order Canceled</td>
+                                                                        <% } else { %>
+                                                                            <td><button
                                                                                 class="btn-danger btn-small border-1"
                                                                                 onclick="cancelOrder('<%=order[i].id%>','<%=order[i].productId%>')">Cancel</button>
                                                                         </td>
+                                                                        <% } %>
+                                                                     
                                                                     </tr>
                                                                     <% } %>
                                                             </tbody>
                                                         </table>
                                                         <% } else { %>
-
+                                                            <div>
+                                                                <h1 class="text-center">You Have No Orders </h1>
+                                                            </div>
                                                             <% } %>
 
                                                 </div>
@@ -222,6 +224,17 @@
                                                     </div>
 
                                                     <% } %>
+                                                    <% if (Address.length < 2) { %>
+                                                        <div class="col-lg-6">
+                                                            <div class="card mb-3 mb-lg-0">
+                                                                <div class="card-body">
+                                                                    <button><a href="/addAddress"
+                                                                            class="text-decoration-none">Add
+                                                                            Address</a></button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <% } %>
 
                                                         <% } else { %>
                                                             <div class="container text-center m-auto">
@@ -281,11 +294,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch(`/cancelOrder/${orderId}/${productId}`, { methord: 'DELETE' })
-                    swalWithBootstrapButtons.fire({
+                    .then(res=>{
+                        swalWithBootstrapButtons.fire({
                         title: "Order Cancelled!",
                         text: "Your order has been successfully cancelled.",
                         icon: "success"
                     });
+                    location.reload();
+                    })
                 } else if (result.dismiss === Swal.DismissReason.cancel) {
                     // User clicked "No, keep it" or closed the modal
                     swalWithBootstrapButtons.fire({

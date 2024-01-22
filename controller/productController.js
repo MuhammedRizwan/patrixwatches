@@ -170,7 +170,6 @@ const productShop = async (req, res) => {
         const categoryData = await Category.find({ is_unList: false });
         const categoryIds = categoryData.map(category => category._id);
         const relatedProduct = await Product.find({ category_id: { $in: categoryIds } });
-
         return res.status(200).render('singleProductDetials', { product: productData, productData: relatedProduct, cat: categoryData, loggedIn })
     } catch (error) {
         console.error(error.message);
@@ -182,7 +181,7 @@ const Shop = async (req, res) => {
         const loggedIn = req.cookies.token ? true : false;
         const categoryData = await Category.find({ is_unList: false }, { _id: 1 });
         const categoryIds = categoryData.map(category => category._id);
-        const productData = await Product.find({ category_id: { $in: categoryIds } });
+        const productData = await Product.find({ category_id: { $in: categoryIds },is_blocked:false });
         return res.status(200).render("productShop", { loggedIn, product: productData });
     } catch (error) {
         res.status(500).send('Internal Server Error');

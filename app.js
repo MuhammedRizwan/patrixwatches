@@ -25,5 +25,4 @@ app.use('/admin',admin_route);
 
 app.listen(PORT,()=>{
     console.log(`server on:http://localhost:${PORT}`);
-
 })

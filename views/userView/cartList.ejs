@@ -29,11 +29,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-
                                             <% for( let i=0; i < products.length; i++ ) { %>
-
-
-
                                                 <tr>
                                                     <td class="image product-thumbnail"><img
                                                             src="/productImages/<%= products[i].image[0].filename  %>"
@@ -58,13 +54,7 @@
                                                         <button class="btn btn-sm decrement-button"
                                                             onclick="updateQuantity('qtyDec', '<%= cartData[i].product_id %>', '<%= i %>')">-</button>
                                                     </td>
-
-
-
                                                     <td class="text-right" data-title="Cart">
-
-
-
                                                         <span id="subtotal<%= i %>">
                                                             <%= (products[i].salePrice *
                                                                 cartData[i].quantity).toFixed(2) %>
@@ -74,15 +64,11 @@
                                                     <td class="action" data-title="Remove"><a class="text-danger"
                                                             onclick="confirmDelete('<%= cartData[i].product_id %>')"><i
                                                                 class="fi-rs-trash"></i></a></td>
-
                                                 </tr>
                                                 <% totalSubTotal +=parseFloat(products[i].salePrice *
                                                     cartData[i].quantity) %>
                                                     <% } %>
-
-
                                         </tbody>
-
                                     </table>
                                     <% } else { %>
                                         <div class="container mt-5">
@@ -148,12 +134,10 @@
                 url: `/${action}?id=${productId}`,
                 success: function (data) {
                     console.log("Success:", data);
-
                     if (!data || typeof data !== 'object') {
                         console.error("Invalid data received from server.");
                         return;
                     }
-
                     if (data.error) {
                         // Handle specific errors
                         if (data.error === "Out of stock") {
@@ -172,7 +156,6 @@
                         }
                         return;
                     }
-
                     const newQuantity = Math.max(1, data[0].quantity);
 
                     const cartProductQty = $(`#cartProductqty${index}`);
@@ -184,7 +167,6 @@
                         console.error("Error: salePriceStr is null, undefined, or empty");
                         return;
                     }
-
                     const salePrice = parseFloat(salePriceStr);
 
                     if (isNaN(salePrice)) {
@@ -219,59 +201,54 @@
     </script>
 
 
-
-
-
-
-
     <script>
-      function confirmDelete(productId) {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Send a DELETE request using the Fetch API
-            fetch(`/delete-cartItem?id=${productId}`, {
-                method: "DELETE",
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Show success message
-                    Swal.fire({
-                        title: "Deleted!",
-                        text: "Your file has been deleted.",
-                        icon: "success"
-                    }).then(() => {
-                        // Redirect after successful deletion
-                        window.location.href = "/cartlist";
-                    });
-                } else {
-                    // Handle error response
-                    console.error("Error deleting cart item:", response.statusText);
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: `Error deleting cart item: ${response.statusText}`,
-                    });
+        function confirmDelete(productId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send a DELETE request using the Fetch API
+                    fetch(`/delete-cartItem?id=${productId}`, {
+                        method: "DELETE",
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                // Show success message
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "Your file has been deleted.",
+                                    icon: "success"
+                                }).then(() => {
+                                    // Redirect after successful deletion
+                                    window.location.href = "/cartlist";
+                                });
+                            } else {
+                                // Handle error response
+                                console.error("Error deleting cart item:", response.statusText);
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Oops...",
+                                    text: `Error deleting cart item: ${response.statusText}`,
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error deleting cart item:", error);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: `Error deleting cart item: ${error}`,
+                            });
+                        });
                 }
-            })
-            .catch(error => {
-                console.error("Error deleting cart item:", error);
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: `Error deleting cart item: ${error}`,
-                });
             });
         }
-    });
-}
 
     </script>
     <%- include('../layout/footer') %>

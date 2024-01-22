@@ -35,7 +35,7 @@ admin_route.delete('/deleteImg/:productImg/:productId', adminAuth, productContro
 admin_route.put('/Block-product/:productId', adminAuth, productController.blockProduct);
 admin_route.put('/Unblock-product/:productId', adminAuth, productController.unBlockProduct);
 
-
+//category
 admin_route.get('/categoryList', adminAuth, categoryController.category);
 admin_route.put('/List-category', adminAuth, categoryController.listCategory);
 admin_route.put('/UnList-category', adminAuth, categoryController.unListCategory);
@@ -47,6 +47,6 @@ admin_route.delete('/deleteCategory/:id', adminAuth, categoryController.deleteCa
 
 admin_route.get('/orderPage', adminAuth, orderController.adminOrderPage);
 admin_route.get('/orderDetials', adminAuth, orderController.adminOrderDetails);
-admin_route.get('/cancelOrder/:orderId/:productId', adminAuth, orderController.cancelOrder);
+admin_route.get('/cancelOrder/:orderId',adminAuth, orderController.adminCancelOrder);
 
 module.exports = admin_route;

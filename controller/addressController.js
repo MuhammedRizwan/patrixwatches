@@ -12,9 +12,7 @@ const addAddress = async (req, res) => {
     try {
         const { fullName, mobile, pincode, houseName, landMark, townCity, state, addressType } = req.body
         const userId = req.user.user._id;
-        console.log(req.body);
         const address = new Address({
-
             userId: userId,
             fullName: fullName,
             mobile: mobile,
@@ -38,8 +36,7 @@ const deletAddress = async (req, res) => {
         const addressType= req.query.id;
         const userId=req.user.user._id;
         const deleteResult = await Address.deleteOne({ userId: userId, addressType: addressType });
-        console.log(deleteResult);
-        
+
         if (deleteResult.deletedCount > 0) {
             return res.status(200).json("Deleted successfully");
         } else {
@@ -73,8 +70,6 @@ const editAddress = async (req, res) => {
     try {
         const addressType = req.query.id;
         const userId = req.user.user._id;
-        console.log(addressType);
-        console.log(userId);
         const addressData = await Address.updateOne(
             { userId: userId, addressType: addressType },
             {
@@ -89,7 +84,6 @@ const editAddress = async (req, res) => {
                 },
             }
         );
-        console.log(addressData);
         res.status(200).redirect("/account");
     } catch (error) {
         res.status(500).send("Internal Server Error. Please try again later.");

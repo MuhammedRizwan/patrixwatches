@@ -26,7 +26,8 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th colspan="2">Product</th>
+                                            <th>Product</th>
+                                            <th>quantity</th>
                                             <th>Total</th>
                                         </tr>
                                     </thead>
@@ -41,8 +42,9 @@
                                                         <td>
                                                             <h5><a href="/productShop?id=<%= product[i]._id %>">
                                                                     <%=product[i].name%>
-                                                                </a></h5> <span class="product-qty">x &nbsp; <%=
-                                                                    cart[i].quantity %></span>
+                                                                </a></h5> <span class="product-qty">
+                                                                <%= cart[i].quantity %>
+                                                            </span>
                                                         </td>
                                                         <%= subTotal.push((product[i].salePrice * cart[i].quantity))%>
                                                             <td>
@@ -53,7 +55,7 @@
                                                     <% } %>
                                                         <tr>
                                                             <th>SubTotal</th>
-                                                            <td class="product-subtotal" colspan="2">
+                                                            <td class="product-subtotal" colspan="2"  id="subTotal">
                                                                 <%= subTotal.reduce((sum,i)=>sum+=i,0) %>
                                                             </td>
                                                         </tr>
@@ -71,7 +73,6 @@
                                                             </div>
 
                                                             <% } %>
-
                                                                 <tr>
                                                                     <th>Shipping</th>
                                                                     <td colspan="2"><em>Free Shipping</em></td>
@@ -88,121 +89,129 @@
                             </div>
                             <div class="row">
                                 <form>
-
-
-
-                                    <form>
-                                        <!-- ... Your other form elements ... -->
-
-                                        <% if (Address.length> 0) { %>
-                                            <% for (let i=0; i < Address.length; i++) { %>
-                                                <div class="col-lg-6">
-                                                    <div class="card mb-3 mb-lg-0">
-                                                        <div class="card-header">
-                                                            <h5 class="mb-0">
-                                                                <%= Address[i].addressType %>
-                                                            </h5>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <!-- Radio button wrapped in a form-check container -->
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="radio"
-                                                                    name="selectedAddress" value="<%= Address[i]._id %>"
-                                                                    id="addressId" required checked>
-                                                                <!-- Address details -->
-                                                                <address>
-                                                                    <%= Address[i].houseName %><br>
-                                                                        <%= Address[i].landMark %>,<br>
-                                                                            <%= Address[i].townCity %>.<br>Phone:<%=
-                                                                                    Address[i].mobile %> <br>
-                                                                                    <%= Address[i].pincode %>
-                                                                </address>
-                                                                <p>
-                                                                    <%= Address[i].state %>
-                                                                </p><br>
-                                                                <a href="/editAddress?id=<%= Address[i].addressType %>"
-                                                                    class="btn-small">Edit</a><span> | </span>
-                                                                <button
-                                                                    onclick="deleteAddress('<%=Address[i].addressType %>')"
-                                                                    class="btn-small border-0 text-danger">Delete</button>
-                                                            </div>
+                                    <!-- ... Your other form elements ... -->
+                                    <% if (Address.length> 0) { %>
+                                        <% for (let i=0; i < Address.length; i++) { %>
+                                            <div class="col-lg-6">
+                                                <div class="card mb-3 mb-lg-0">
+                                                    <div class="card-header">
+                                                        <h5 class="mb-0">
+                                                            <%= Address[i].addressType %>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <!-- Radio button wrapped in a form-check container -->
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="selectedAddress" value="<%= Address[i]._id %>"
+                                                                id="addressId" required checked>
+                                                            <!-- Address details -->
+                                                            <address>
+                                                                <%= Address[i].houseName %><br>
+                                                                    <%= Address[i].landMark %>,<br>
+                                                                        <%= Address[i].townCity %>.<br>Phone:<%=
+                                                                                Address[i].mobile %> <br>
+                                                                                <%= Address[i].pincode %>
+                                                            </address>
+                                                            <p>
+                                                                <%= Address[i].state %>
+                                                            </p><br>
+                                                            <a href="/editAddress?id=<%= Address[i].addressType %>"
+                                                                class="btn-small">Edit</a><span> | </span>
+                                                            <button
+                                                                onclick="deleteAddress('<%=Address[i].addressType %>')"
+                                                                class="btn-small border-0 text-danger">Delete</button>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <% } %>
-                                                    <% } else { %>
-                                                        <div class="container text-center m-auto">
-                                                            <p>Please Goto add Address to display Address</p>
-                                                            <button><a href="/addAddress"
-                                                                    class="text-decoration-none">Add
-                                                                    Address</a></button>
+                                            </div>
+                                            <% } %>
+                                                <% if (Address.length < 2) { %>
+                                                    <div class="col-lg-6">
+                                                        <div class="card mb-3 mb-lg-0">
+                                                            <div class="card-body">
+                                                                <button><a href="/account"
+                                                                        class="text-decoration-none">Add
+                                                                        Address</a></button>
+                                                            </div>
                                                         </div>
-                                                        <% } %>
-                                    </form>
-
-                                    <div class="bt-1 border-color-1 mt-30 mb-30"></div>
-                                    <div class="payment_method">
-                                        <div class="mb-25">
-                                            <h5>Payment</h5>
+                                                    </div>
+                                                    <% } %>
+                                                        <% } else { %>
+                                                            <div class="container text-center m-auto">
+                                                                <p>Please Goto add Address to display Address</p>
+                                                                <button><a href="/account"
+                                                                        class="text-decoration-none">Add
+                                                                        Address</a></button>
+                                                            </div>
+                                                            <% } %>
+                                </form>
+                                <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                                <div class="payment_method">
+                                    <div class="mb-25">
+                                        <h5>Payment</h5>
+                                    </div>
+                                    <div class="payment_option">
+                                        <div class="custome-radio">
+                                            <input class="form-check-input" required="" type="radio"
+                                                name="payment_option" id="exampleRadios6" checked="" value="cod">
+                                            <label class="form-check-label" for="exampleRadios6"
+                                                data-bs-toggle="collapse" data-target="#cashOnDelivery"
+                                                aria-controls="cashOnDelivery">Cash On Delivery</label>
+                                            <div class="form-group collapse in" id="cashOnDelivery">
+                                                <p class="text-muted mt-5">the purchase of the customer will became
+                                                    cash on delivery. </p>
+                                            </div>
                                         </div>
-                                        <div class="payment_option">
-                                            <div class="custome-radio">
-                                                <input class="form-check-input" required="" type="radio"
-                                                    name="payment_option" id="exampleRadios6" checked="" value="cod">
-                                                <label class="form-check-label" for="exampleRadios6"
-                                                    data-bs-toggle="collapse" data-target="#cashOnDelivery"
-                                                    aria-controls="cashOnDelivery">Cash On Delivery</label>
-                                                <div class="form-group collapse in" id="cashOnDelivery">
-                                                    <p class="text-muted mt-5">the purchase of the customer will became
-                                                        cash on delivery. </p>
-                                                </div>
+                                        <div class="custome-radio">
+                                            <input class="form-check-input" required="" type="radio"
+                                                name="payment_option" id="exampleRadios3" checked=""
+                                                value="bankTransfer">
+                                            <label class="form-check-label" for="exampleRadios3"
+                                                data-bs-toggle="collapse" data-target="#bankTranfer"
+                                                aria-controls="bankTranfer">Direct Bank Transfer</label>
+                                            <div class="form-group collapse in" id="bankTranfer">
+                                                <p class="text-muted mt-5">There are many variations of passages of
+                                                    Lorem Ipsum available, but the majority have suffered
+                                                    alteration. </p>
                                             </div>
-                                            <div class="custome-radio">
-                                                <input class="form-check-input" required="" type="radio"
-                                                    name="payment_option" id="exampleRadios3" checked=""
-                                                    value="bankTransfer">
-                                                <label class="form-check-label" for="exampleRadios3"
-                                                    data-bs-toggle="collapse" data-target="#bankTranfer"
-                                                    aria-controls="bankTranfer">Direct Bank Transfer</label>
-                                                <div class="form-group collapse in" id="bankTranfer">
-                                                    <p class="text-muted mt-5">There are many variations of passages of
-                                                        Lorem Ipsum available, but the majority have suffered
-                                                        alteration. </p>
-                                                </div>
+                                        </div>
+                                        <div class="custome-radio">
+                                            <input class="form-check-input" required="" type="radio"
+                                                name="payment_option" id="exampleRadios4" checked="">
+                                            <label class="form-check-label" for="exampleRadios4"
+                                                data-bs-toggle="collapse" data-target="#checkPayment"
+                                                aria-controls="checkPayment">Check Payment</label>
+                                            <div class="form-group collapse in" id="checkPayment">
+                                                <p class="text-muted mt-5">Please send your cheque to Store Name,
+                                                    Store Street, Store Town, Store State / County, Store Postcode.
+                                                </p>
                                             </div>
-                                            <div class="custome-radio">
-                                                <input class="form-check-input" required="" type="radio"
-                                                    name="payment_option" id="exampleRadios4" checked="">
-                                                <label class="form-check-label" for="exampleRadios4"
-                                                    data-bs-toggle="collapse" data-target="#checkPayment"
-                                                    aria-controls="checkPayment">Check Payment</label>
-                                                <div class="form-group collapse in" id="checkPayment">
-                                                    <p class="text-muted mt-5">Please send your cheque to Store Name,
-                                                        Store Street, Store Town, Store State / County, Store Postcode.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="custome-radio">
-                                                <input class="form-check-input" required="" type="radio"
-                                                    name="payment_option" id="exampleRadios5" checked="">
-                                                <label class="form-check-label" for="exampleRadios5"
-                                                    data-bs-toggle="collapse" data-target="#paypal"
-                                                    aria-controls="paypal">Paypal</label>
-                                                <div class="form-group collapse in" id="paypal">
-                                                    <p class="text-muted mt-5">Pay via PayPal; you can pay with your
-                                                        credit card if you don't have a PayPal account.</p>
-                                                </div>
+                                        </div>
+                                        <div class="custome-radio">
+                                            <input class="form-check-input" required="" type="radio"
+                                                name="payment_option" id="exampleRadios5" checked="">
+                                            <label class="form-check-label" for="exampleRadios5"
+                                                data-bs-toggle="collapse" data-target="#paypal"
+                                                aria-controls="paypal">Paypal</label>
+                                            <div class="form-group collapse in" id="paypal">
+                                                <p class="text-muted mt-5">Pay via PayPal; you can pay with your
+                                                    credit card if you don't have a PayPal account.</p>
                                             </div>
                                         </div>
                                     </div>
-                                    <button class="btn btn-fill-out btn-block mt-30" onclick="placeOrder()">Place
-                                        Order</button>
+                                </div>
+                                <button type="button" class="btn btn-fill-out btn-block mt-30"
+                                    onclick="placeOrder()">Place
+                                    Order</button>
                             </div>
                         </div>
                     </div>
                 </div>
         </section>
     </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function deleteAddress(addressId) {
             fetch(`/deleteAddress?id=${addressId}`, {
@@ -220,57 +229,85 @@
                     // Handle the error case
                 });
         }
+    </script>
+    <script>
         function placeOrder() {
-            // Define variables to store selected values
-            var selectedPaymentOption;
+            // Confirm the order with a warning
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Are you Sure You Want Place The Order!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, place order!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var selectedPaymentOption;
 
-            // Listen for change events on radio buttons
-            var paymentOptions = document.getElementsByName('payment_option');
-            paymentOptions.forEach(function (option) {
-                if (option.checked) {
-                    selectedPaymentOption = option.value;
+                    // Listen for change events on radio buttons
+                    var paymentOptions = document.getElementsByName('payment_option');
+                    paymentOptions.forEach(function (option) {
+                        if (option.checked) {
+                            selectedPaymentOption = option.value;
+                        }
+                    });
+                    // Get other values
+                    const addressId = document.getElementById('addressId').value;
+                    // Construct data for the fetch request
+                    const requestData = {
+                        paymentOption: selectedPaymentOption,
+                        addressId: addressId
+                    };
+                    // If the user confirms, send a POST request to /orderComplete
+                    fetch('/orderComplete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestData),
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                // If the response is successful, show success message
+                                Swal.fire({
+                                    position: "center",
+                                    icon: "success",
+                                    title: "Your order has been placed successfully!",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                // Redirect to the homepage after a successful order
+                                setTimeout(()=>{
+                                    window.location.href = '/account';
+                                },1000)
+                                
+                            } else {
+                                // If there's an error in the response, show an error message
+                                Swal.fire({
+                                    position: "center",
+                                    icon: "error",
+                                    title: "Error placing the order",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                            }
+                            console.log(response); // Log the entire response
+                            return response.json();
+                        })
+                        .catch(error => {
+                            // If there's an error in the fetch, show an error message
+                            Swal.fire({
+                                position: "center",
+                                icon: "error",
+                                title: "Error placing the order",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            console.error(error);
+                        });
                 }
             });
-
-            // Get other values
-            const addressId = document.getElementById('addressId').value;
-            const totalAmount = document.getElementsByClassName('product-subtotal').value;
-
-            // Construct data for the fetch request
-            const requestData = {
-                paymentOption: selectedPaymentOption,
-                addressId: addressId,
-                totalAmount: totalAmount
-            };
-
-            fetch('/orderComplete', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestData),
-            })
-                .then(response => {
-                    Swal.fire({
-                        position: "center",
-                        icon: "success",
-                        title: "",
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                    window.location.href='/';
-                    console.log(response); // Log the entire response
-                    return response.json();
-                })
-                .catch(error => {
-                    Swal.fire({
-                        position: "center",
-                        icon: "error",
-                        title: "Your work has been saved",
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                });
         }
 
     </script>

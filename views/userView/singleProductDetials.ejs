@@ -69,28 +69,8 @@
                                             <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available</li>
                                         </ul>
                                     </div>
-                                    <div class="attr-detail attr-color mb-15">
-                                        <strong class="mr-10">Color</strong>
-                                        <ul class="list-filter color-filter">
-                                            <li><a href="#" data-color="Red"><span class="product-color-red"></span></a></li>
-                                            <li><a href="#" data-color="Yellow"><span class="product-color-yellow"></span></a></li>
-                                            <li class="active"><a href="#" data-color="White"><span class="product-color-white"></span></a></li>
-                                            <li><a href="#" data-color="Orange"><span class="product-color-orange"></span></a></li>
-                                            <li><a href="#" data-color="Cyan"><span class="product-color-cyan"></span></a></li>
-                                            <li><a href="#" data-color="Green"><span class="product-color-green"></span></a></li>
-                                            <li><a href="#" data-color="Purple"><span class="product-color-purple"></span></a></li>
-                                        </ul>
-                                    </div>
-                                    <div class="attr-detail attr-size">
-                                        <strong class="mr-10">Size</strong>
-                                        <ul class="list-filter size-filter font-small">
-                                            <li><a href="#">S</a></li>
-                                            <li class="active"><a href="#">M</a></li>
-                                            <li><a href="#">L</a></li>
-                                            <li><a href="#">XL</a></li>
-                                            <li><a href="#">XXL</a></li>
-                                        </ul>
-                                    </div>
+                                   
+                                    
                                     <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                     <form action="/addcart?id=<%= product._id%>" method="post">
                                         <div class="detail-extralink">
@@ -400,59 +380,7 @@
                             <div class="col-12">
                                 <h3 class="section-title style-1 mb-30">Related products</h3>
                             </div>
-                            <div class="col-12">
-                                <div class="row related-products">
-                                    <% for( let i=0; i < 4; i++ ) { %>
-                                        <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                                            <div class="product-cart-wrap small hover-up">
-                                                <div class="product-img-action-wrap">
-                                                    <div class="product-img product-img-zoom">
-                                                        <a href="shop-product-right.html" tabindex="0">
-                                                            <img class="default-img"
-                                                                src="productImages/<%= productData[i].image[0].filename %>"
-                                                                alt="" style="height: 200px;" id="">
-                                                            <img class="hover-img"
-                                                                src="productImages/<%= productData[i].image[0].filename %>"
-                                                                alt="" style="height: 200px;">
-                                                        </a>
-                                                    </div>
-                                                    <div class="product-action-1">
-                                                        <a aria-label="Quick view" class="action-btn small hover-up"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#quickViewModal"><i
-                                                                class="fi-rs-search"></i></a>
-                                                        <a aria-label="Add To Wishlist"
-                                                            class="action-btn small hover-up"
-                                                            href="shop-wishlist.html" tabindex="0"><i
-                                                                class="fi-rs-heart"></i></a>
-                                                        <a aria-label="Compare" class="action-btn small hover-up"
-                                                            href="shop-compare.html" tabindex="0"><i
-                                                                class="fi-rs-shuffle"></i></a>
-                                                    </div>
-                                                    <div
-                                                        class="product-badges product-badges-position product-badges-mrg">
-                                                        <span class="hot">Hot</span>
-                                                    </div>
-                                                </div>
-                                                <div class="product-content-wrap">
-                                                    <h2><a href="shop-product-right.html" tabindex="0">
-                                                            <%= productData[i].productName %>
-                                                        </a></h2>
-                                                    <div class="rating-result" title="90%">
-                                                        <span>
-                                                        </span>
-                                                    </div>
-                                                    <div class="product-price">
-                                                        <span>$<%= productData[i].salePrice %></span>
-                                                        <span class="old-price">$<%= productData[i].orginalPrice %>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <% } %>
-                                </div>
-                            </div>
+                            
                         </div>
                         <div class="banner-img banner-big wow fadeIn f-none animated mt-50">
                             <img class="border-radius-10" src="assets/imgs/banner/banner-4.png" alt="">

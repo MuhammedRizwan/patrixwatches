@@ -37,7 +37,6 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>#ID</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Email</th>
                                 <th scope="col">Total</th>
@@ -50,9 +49,6 @@
                             <tbody>
                                 <% for( let i=0; i < order.length; i++ ) { %>
                                     <tr>
-                                        <td>
-                                            <%= order[i].id %>
-                                        </td>
                                         <td><b>
                                                 <%= user[i].name%>
                                             </b></td>
@@ -72,17 +68,22 @@
                                         <td class="text-end">
                                             <a href="/admin/orderDetials?id=<%= order[i]._id %>"
                                                 class="btn btn-md rounded font-sm">Detail</a>
-                                            <button class=" btn-lg btn-md rounded font-sm btn-danger"
-                                                onclick="cancelOrder('<%=order[i].id%>','<%=order[i].productId%>')">Cancel</button>
+                                                <% if ( order[i].status==="Canceled") { %>
+                                                 <span class="text-danger">Canceled</span>
+                                                 <% } else { %>
+                                                    <button type="button" class=" btn-lg btn-md rounded font-sm btn-danger"
+                                                    onclick="cancelOrder('<%=order[i].id%>')">Cancel</button>
+                                                <% } %>
                                         </td>
                                     </tr>
                                     <% } %>
                             </tbody>
-
-                            <% } else { %>
-
-                                <% } %>
                     </table>
+                    <% } else { %>
+                        <div>
+                            <h1 class="text-center">No Order Have been Placed </h1>
+                        </div>
+                        <% } %>
                 </div> <!-- table-responsive //end -->
             </div> <!-- card-body end// -->
         </div> <!-- card end// -->
@@ -103,41 +104,47 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function cancelOrder(orderId, productId) {
-            const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: "btn btn-success",
-                    cancelButton: "btn btn-danger"
-                },
-                buttonsStyling: false
-            });
-
-            swalWithBootstrapButtons.fire({
+        function cancelOrder(orderId) {
+            console.log(orderId);
+            Swal.fire({
                 title: "Are you sure?",
                 text: "You won't be able to revert this!",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: "Yes, cancel the order!",
-                cancelButtonText: "No",
-                reverseButtons: true
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, cancel it!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`admin/cancelOrder/${orderId}/${productId}`, { methord: 'DELETE' })
-                    swalWithBootstrapButtons.fire({
-                        title: "Order Cancelled!",
-                        text: "Your order has been successfully cancelled.",
-                        icon: "success"
-                    });
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    // User clicked "No, keep it" or closed the modal
-                    swalWithBootstrapButtons.fire({
-                        title: "Cancelled",
-                        text: "Your order is safe :)",
-                        icon: "info"
-                    });
+                    fetch(`/admin/cancelOrder/${orderId}`, { method: "GET" })
+                        .then(res => {
+                            if (res.ok) {
+                                Swal.fire({
+                                    title: "cancelled!",
+                                    text: "Order been Canceled.",
+                                    icon: "success"
+                                });
+                                setTimeout(()=>{
+                                    location.reload()
+                                },1000);
+                            }else{
+                                Swal.fire({
+                                    title: "cannot cancel!",
+                                    text: "Somthing went Wroung.",
+                                    icon: "error"
+                                });
+                            }
+
+                        })
+                }else{
+                    Swal.fire({
+                                    title: "canceled Action!",
+                                    text: "cancel your Operation.",
+                                    icon: "error"
+                                });
                 }
             });
-
         }
     </script>
+
     <%- include('../adminlayout/footer') %>

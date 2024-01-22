@@ -16,6 +16,7 @@ const securePassword = async (password) => {
 
     } catch (error) {
         console.log(error.message);
+        return res.status(500).send('Internal Server Error');
     }
 
 }
@@ -42,14 +43,14 @@ const userRegisterPage = async (req, res) => {
         console.log(error.message)
     }
 }
-let  tempUser;
+let tempUser;
 const userRegister = async (req, res) => {
     try {
         const loggedIn = req.cookies.token ? true : false;
         const emailExist = await User.findOne({ email: req.body.email });
         if (!emailExist) {
             const sPassword = await securePassword(req.body.password);
-            tempUser= {
+            tempUser = {
                 name: req.body.name,
                 email: req.body.email,
                 phone: req.body.phone,
@@ -76,7 +77,7 @@ const verifyOtp = async (req, res) => {
     try {
         const loggedIn = req.cookies.token ? true : false;
         const userotp = req.body.otp;
-        const { name, email, phone, password } =tempUser;
+        const { name, email, phone, password } = tempUser;
         const otpData = await Otp.findOne({ email: email });
         if (!otpData) {
             return res.status(400).render('verification', { message: 'OTP Is Expired', loggedIn })
@@ -152,19 +153,6 @@ const userLogin = async (req, res) => {
         return res.status(500).send('Internal Server Error'); // 500: Internal Server Error
     }
 }
-const productShop = async (req, res) => {
-    try {
-        const loggedIn = req.cookies.token ? true : false;
-        const id = req.query.id;
-        const productData = await Product.findOne({ _id: id });
-        const relatedProduct = await Product.find();
-        const categoryData = await Category.find({ is_unList: false })
-        return res.status(200).render('singleProductDetials', { product: productData, productData: relatedProduct, cat: categoryData, loggedIn })
-    } catch (error) {
-        console.error(error.message);
-        return res.status(500).send('Internal Server Error');
-    }
-}
 const resendOtp = async (req, res) => {
     try {
         const loggedIn = req.cookies.token ? true : false;
@@ -186,6 +174,9 @@ const account = async (req, res) => {
         const addressData = await Address.find({ userId: userId });
         const userData = await User.findOne({ _id: userId });
         const orderData = await Order.findOne({ user: userId });
+        if (orderData == null) {
+            return res.status(200).render('account', { Address: addressData, loggedIn, user: userData, order: [] });
+        }
         const orderProduct = await Promise.all(orderData.products.map(async (products) => {
             const productData = await Product.findOne({ _id: products.product });
             return {
@@ -201,8 +192,6 @@ const account = async (req, res) => {
                 paymentMethod: orderData.payment,
             };
         }));
-
-        console.log(orderProduct);
         return res.status(200).render('account', { Address: addressData, loggedIn, user: userData, order: orderProduct });
     } catch (error) {
         console.log(error.message);
@@ -227,28 +216,29 @@ const changePasswordPage = async (req, res) => {
 }
 const changePassword = async (req, res) => {
     try {
+        const loggedIn = req.user ? true : false;
+        const oldPassword = req.body.password;
+        const newPassword = req.body.npassword;
         console.log(req.body);
-        const { oldPassword, newPassword } = req.body;
-        console.log(oldPassword, newPassword);
         const userData = await User.findOne({ _id: req.user.user._id }, { password: 1, _id: 0 });
 
         if (!userData) {
-            return res.status(400).json({ data: false, error: "User Not Found" });
+            return res.status(400).json({ success: false, error: "User Not Found" });
         } else {
             const matchPassword = await bcrypt.compare(oldPassword, userData.password);
-            console.log(matchPassword);
-
             if (!matchPassword) {
-                return res.status(400).json({ data: matchPassword });
+                return res.status(400).render('changePassword', { loggedIn, message: "current Password Doesnot Match Try Again" });
             } else {
                 const sPassword = await securePassword(newPassword);
-                const updatePassword = await User.updateOne({ _id: req.user.user._id }, { $set: { password: sPassword } });
-                console.log(updatePassword);
-
-                if (!updatePassword) {
-                    return res.status(404).json({ data: false, error: "something went wrong" });
+                if (!sPassword) {
+                    return res.status(400).json({ success: false, message: "hash password didn't work" })
                 } else {
-                    res.status(200).redirect('/account');
+                    const updatePassword = await User.updateOne({ _id: req.user.user._id }, { $set: { password: sPassword } }, { new: true });
+                    if (!updatePassword) {
+                        return res.status(404).json({ success: false, error: "something went wrong" });
+                    } else {
+                        return res.status(200).redirect('/account');
+                    }
                 }
             }
         }
@@ -266,11 +256,16 @@ const verifyEmailPage = async (req, res) => {
         return res.status(500).send('Internal Server Error');
     }
 }
+let emailOtpverify;
 const verifyEmail = async (req, res) => {
     try {
         const loggedIn = req.user ? true : false;
         const { email } = req.body;
+        emailOtpverify = email;
         const userData = await User.findOne({ email: email });
+        await otp(email);
+        const otpData = await Otp.findOne({ email: email });
+        const sendEmaildata = await sendEmail(userData.name, email, otpData.otp);
         if (!userData) {
             return res.status(404).render('email-verified', { message: "User not found " });
         } else {
@@ -281,15 +276,45 @@ const verifyEmail = async (req, res) => {
     }
 }
 
-const forgetPassword = async (req, res) => {
+
+const forgetOtpVerification = async (req, res) => {
     try {
         const loggedIn = req.user ? true : false;
-        console.log(req.body);
+        const userotp = req.body.otp;
+        const otpData = await Otp.findOne({ email: emailOtpverify });
+        if (!otpData) {
+            return res.status(400).render('forgetOtpVerification', { message: 'OTP Is Expired ', loggedIn })
+        } else {
+            if (userotp === otpData.otp) {
+                return res.status(200).render('newPassword', { loggedIn });
+            } else {
+                return res.status(400).render('forgetOtpVerification', { message: 'OTP Is Expired ', loggedIn })
+            }
+        }
     } catch (error) {
         return res.status(500).send('Internal Server Error');
     }
 }
-
+const newPasswordverify = async (req, res) => {
+    try {
+        const newPassword = req.body.npassword;
+        
+        const sPassword = await securePassword(newPassword);
+       
+        if (!sPassword) {
+            return res.status(400).json({ success: false, message: "hash password didn't work" })
+        } else {
+            const updatePassword = await User.updateOne({ email:emailOtpverify}, { $set: { password: sPassword } }, { new: true });
+            if (!updatePassword) {
+                return res.status(404).json({ success: false, error: "something went wrong" });
+            } else {
+                return res.status(200).redirect('/login');
+            }
+        }
+    } catch (error) {
+        return res.status(500).send('Internal Server Error');
+    }
+}
 module.exports = {
     Home,
     userLoginPage,
@@ -304,6 +329,6 @@ module.exports = {
     changePassword,
     verifyEmailPage,
     verifyEmail,
-    forgetPassword
-
+    forgetOtpVerification,
+    newPasswordverify,
 }

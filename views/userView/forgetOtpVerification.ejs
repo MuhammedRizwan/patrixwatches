@@ -9,7 +9,7 @@
                             class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5">
                             <div class="padding_eight_all bg-white">
                                 <div class="heading_s1">
-                                    <h3 class="mb-30">Email Verification</h3>
+                                    <h3 class="mb-30">Otp Verification</h3>
                                 </div>
                                 <div>
                                     <% if (typeof message !=='undefined' ) { %>
@@ -19,7 +19,7 @@
                                         <% } %>
                                 </div>
                                 <br>
-                                <form method="post" action="/verification" onsubmit="return validate()">
+                                <form method="post" action="/Forgetverification" onsubmit="return validate()">
                                     <div class="form-group">
                                         <input type="number" name="otp" placeholder="OTP Verification" id="verifyOtp">
                                         <a href="" id="verifyOtpError"></a>
