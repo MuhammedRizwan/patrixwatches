@@ -1,29 +1,22 @@
 const Address = require('../model/addressModel');
-const addAddressPage=async (req,res)=>{
+
+
+const addAddressPage = async (req, res) => {
 
     try {
-        const loggedIn = req.user? true : false;
-        return res.render('addAddress',{loggedIn})
+        const loggedIn = req.user ? true : false;
+        return res.render('addAddress', { loggedIn })
     } catch (error) {
-        return res.stautus(500).json({success:false,error:"Internal Server Error"})
+        return res.stautus(500).json({ success: false, error: "Internal Server Error" })
     }
 }
 const addAddress = async (req, res) => {
     try {
-        const { fullName, mobile, pincode, houseName, landMark, townCity, state, addressType } = req.body
-        const userId = req.user.user._id;
+        const { fullName, mobile, pincode, houseName, landMark, townCity, state } = req.body
+        const userId = req.user.user[0]._id;
         const address = new Address({
-            userId: userId,
-            fullName: fullName,
-            mobile: mobile,
-            pincode: pincode,
-            houseName: houseName,
-            landMark: landMark,
-            townCity: townCity,
-            state: state,
-            addressType: addressType
+            userId, fullName, mobile, pincode, houseName, landMark, townCity, state
         });
-
         await address.save();
         res.status(200).redirect("/account");
     } catch (error) {
@@ -33,8 +26,8 @@ const addAddress = async (req, res) => {
 
 const deletAddress = async (req, res) => {
     try {
-        const addressType= req.query.id;
-        const userId=req.user.user._id;
+        const addressType = req.query.id;
+        const userId = req.user.user[0]._id;
         const deleteResult = await Address.deleteOne({ userId: userId, addressType: addressType });
 
         if (deleteResult.deletedCount > 0) {
@@ -42,7 +35,7 @@ const deletAddress = async (req, res) => {
         } else {
             return res.status(404).json("Address not found or couldn't be deleted");
         }
-        
+
     } catch (error) {
         res.status(500).json("Internal Server Error. Please try again later.");
     }
@@ -51,17 +44,16 @@ const deletAddress = async (req, res) => {
 
 const loadEditAddress = async (req, res) => {
     try {
-        const userId = req.user.user._id;
-        const addressType = req.query.id;
-        const addressData = await Address.findOne({ userId: userId, addressType: addressType });
+        const userId = req.user.user[0]._id;
+        const addressData = await Address.findOne({ userId: userId });
 
-        const loggedIn = req.user.user._id ? true : false;
+        const loggedIn = req.user.user[0]._id ? true : false;
         return res.render("editAddress", {
             loggedIn,
             address: addressData,
         });
     } catch (error) {
-        res.status(500).send("Internal Server Error. Please try again later.");
+        return res.status(500).send("Internal Server Error. Please try again later.");
     }
 };
 
@@ -69,22 +61,16 @@ const loadEditAddress = async (req, res) => {
 const editAddress = async (req, res) => {
     try {
         const addressType = req.query.id;
-        const userId = req.user.user._id;
+        const userId = req.user.user[0]._id;
         const addressData = await Address.updateOne(
-            { userId: userId, addressType: addressType },
+            { userId: userId },
             {
                 $set: {
-                    fullName: req.body.fullName,
-                    mobile: req.body.mobile,
-                    pincode: req.body.pinCode,
-                    houseName: req.body.houseName,
-                    landMark: req.body.landmark,
-                    townCity: req.body.townCity,
-                    state: req.body.state,
+                    fullName, mobile, pinCode, houseName, landmark, townCity, state,
                 },
             }
         );
-        res.status(200).redirect("/account");
+        return res.status(200).redirect("/account");
     } catch (error) {
         res.status(500).send("Internal Server Error. Please try again later.");
     }

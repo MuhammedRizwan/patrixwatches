@@ -35,15 +35,9 @@ const addProduct = async (req, res) => {
         if (!categoryId) {
             return res.status(404).send('Category not found'); // Respond with a 404 status if category is not found
         } else {
+            const {productName,brandName,discription,orginalPrice,salePrice,stock}=req.body
             const newProduct = new Product({
-                productName: req.body.productName,
-                brand: req.body.brandName,
-                discription: req.body.discription,
-                category_id: categoryId._id,
-                orginalPrice: req.body.orginalPrice,
-                salePrice: req.body.salePrice,
-                image: req.files,
-                stock: req.body.stock,
+                productName,brand:brandName,discription,category_id: categoryId._id,orginalPrice,salePrice,image: req.files,stock
             })
             const productData = await newProduct.save();
             if (!productData) {
@@ -78,19 +72,12 @@ const editProductPage = async (req, res) => {
 }
 const editProduct = async (req, res) => {
     try {
-        const id = req.body.id;
+        const {id,productName,brandName,discription,orginalPrice,salePrice,stock} = req.body
         const editProductDta = await Product.findByIdAndUpdate({ _id: id }, {
-            $set: {
-                productName: req.body.productName,
-                brand: req.body.brandName,
-                discription: req.body.discription,
-                orginalPrice: req.body.orginalPrice,
-                salePrice: req.body.salePrice,
-                stock: req.body.stock
-            }
+            $set: {productName,brand:brandName,discription,orginalPrice,salePrice,stock}
         });
         const addImage = await Product.findByIdAndUpdate({ _id: id }, { $push: { image: req.files } })
-        res.redirect('/admin/productList')
+        return res.status(200).redirect('/admin/productList');
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Internal Server Error');

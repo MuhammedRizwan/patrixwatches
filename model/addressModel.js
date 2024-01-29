@@ -32,10 +32,6 @@ const addressSchema=mongoose.Schema({
     pincode:{
         type:Number,
         required:true
-    },
-    addressType:{
-        type:String,
-        required:true
     }
 });
 

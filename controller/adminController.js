@@ -60,14 +60,21 @@ const adminLogin = async (req,res) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
-        const adminData = await User.findOne({ email: email })
+        const adminData = await User.aggregate([
+            {
+                $match:{email:email}
+            },
+            {
+                $limit:1
+            }
+        ])
         if (adminData) {
-            const matchPassword = await bcrypt.compare(password, adminData.password);
+            const matchPassword = await bcrypt.compare(password, adminData[0].password);
             if (matchPassword) {
-                if (adminData.is_admin === 0) {
+                if (adminData[0].is_admin === 0) {
                     return res.status(404).render('adminLogin', { message: "your are not a admin" })
                 } else {
-                    const token=genarateToken(adminData);
+                    const token=genarateToken(adminData[0]);
                     const options = {
                         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
                         httpOnly: true
@@ -143,65 +150,6 @@ const unblockUser = async (req,res) => {
         return res.status(500).send('Internal Server Error');
     }
 };
-// const newUserPage=async (req,return res)=>{
-// //     try {
-//         return res.render('newUser')
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
-// const newUser=async (req,return res)=>{
-//     try {
-//         const name=req.body.name;
-//         const email=req.body.email;
-//         const phone=req.body.phone;
-//         const image=req.file.filename;
-//         const password=randomstring.generate(8);
-
-//         const spassword=await securePassword(password)
-//         const user=new User({
-//             name:name,
-//             email:email,
-//             phone:phone,
-//             image:image,
-//             password:spassword,
-//             is_admin:0
-//         })
-//         const userData=await user.save();
-//         if(userData){
-//             addUserMail(name,email,password,userData._id);
-//             return res.redirect('/admin/home')
-//         }else{
-//             return res.render('newUser',{message:"something Wrong"})
-//         }
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
-// const editUserPage=async(req,return res)=>{ 
-//     try {
-//         const id=req.query.id;
-//         const userData=await User.findById({_id:id});
-//         if(userData){
-//             return res.render('editUser',{users:userData})
-//         }else{
-//             return res.redirect('/admin/home')
-//         }
-
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
-// const editUser=async (req,return res)=>{
-//     try {
-//         const id=req.query.id;
-//         const UserData=await User.updateOne({_id:id},{$set:{name:req.body.name,
-//             email:req.body.email,phone:req.body.phone,is_verified:req.body.verify}});
-//         return res.redirect('/admin/home');
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
 const deleteUser = async (req,res) => {
     try {
         const id = req.params.userId;

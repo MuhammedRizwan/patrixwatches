@@ -10,10 +10,17 @@ const addCategoryPage = async (req, res) => {
 }
 const addCategory = async (req, res) => {
     try {
-        const catagoryExist=await Category.findOne({categoryName:req.body.categoryName});
-        if(catagoryExist){
-            return res.status(400).render('addCategory',{message:"Category Already Exist"})
-        }else{
+        const categoryExist = await Category.aggregate([
+            {
+                $match: { categoryName: req.body.categoryName }
+            },
+            {
+                $limit: 1
+            }
+        ])
+        if (categoryExist.length > 0) {
+            return res.status(400).render('addCategory', { message: "Category Already Exist" })
+        } else {
             const category = new Category({
                 categoryName: req.body.categoryName,
                 discription: req.body.discription,
@@ -36,10 +43,10 @@ const addCategory = async (req, res) => {
 const category = async (req, res) => {
     try {
         const categoryData = await Category.find({});
-        res.status(200).render('categoryList', { cat: categoryData });
+        return res.status(200).render('categoryList', { cat: categoryData });
     } catch (error) {
         console.log(error.message);
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }
 }
 const listCategory = async (req, res) => {
@@ -48,11 +55,11 @@ const listCategory = async (req, res) => {
         const categoryData = await Category.findByIdAndUpdate(userId, { is_unList: false });
         if (!categoryData) {
             return res.status(404).send('category  not updated'); // Respond with a 404 status if product is not found
-        }else{
-        return res.status(200).json({success:true, message: 'Category listed successfully' });
+        } else {
+            return res.status(200).json({ success: true, message: 'Category listed successfully' });
         }
     } catch (error) {
-        res.status(500).json({success:false, message: 'Error listing user', error });
+        res.status(500).json({ success: false, message: 'Error listing user', error });
     }
 };
 const unListCategory = async (req, res) => {
@@ -61,10 +68,10 @@ const unListCategory = async (req, res) => {
         const categoryData = await Category.findByIdAndUpdate(userId, { is_unList: true });
         if (!categoryData) {
             return res.status(404).send('category  not updated'); // Respond with a 404 status if product is not found
-        }else{
-            return res.status(200).json({success:true, message: 'User unlisted successfully' });
+        } else {
+            return res.status(200).json({ success: true, message: 'User unlisted successfully' });
         }
-        
+
     } catch (error) {
         res.status(500).json({ message: 'Error unlisting user', error });
     }
@@ -103,11 +110,11 @@ const editCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
     try {
         const id = req.params.id.trim();
-        const deleteCategory=await Category.deleteOne({ _id: id });
-        if(!deleteCategory){
-            return res.status(400).json({success:false,message:"category does not  Deleted"});
-        }else{
-            return res.status(200).json({success:true,message:"category Deleted"});
+        const deleteCategory = await Category.deleteOne({ _id: id });
+        if (!deleteCategory) {
+            return res.status(400).json({ success: false, message: "category does not  Deleted" });
+        } else {
+            return res.status(200).json({ success: true, message: "category Deleted" });
         }
     } catch (error) {
         console.log(error.message);
