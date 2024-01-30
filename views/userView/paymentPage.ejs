@@ -1,0 +1,140 @@
+<%- include('../layout/header') %>
+
+    <div class="bt-1 border-color-1 mt-40 mb-40"></div>
+    <div class="payment-container text-center" style="height: 400px; ">
+        <div class="payment_method mt-50">
+            <div class="mb-25">
+                <h5>Payment</h5>
+            </div>
+            <div class=" mb-20">
+                <h5>Total Price:</h5>
+                <p class="text-danger">
+                    <%= orderData.totalPrice %>
+                </p>
+            </div>
+            <div class="payment_option">
+                <div class="custome-radio">
+                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3"
+                        checked="">
+                    <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse"
+                        data-target="#bankTranfer" aria-controls="bankTranfer">Direct Bank Transfer</label>
+                    <div class="form-group collapse in" id="bankTranfer">
+                        <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but
+                            the majority have suffered alteration. </p>
+                    </div>
+                </div>
+                <div class="custome-radio">
+                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4"
+                        checked="">
+                    <label class="form-check-label" for="exampleRadios4" data-bs-toggle="collapse"
+                        data-target="#cashOnDelivery" aria-controls="cashOnDelivery">Cash On Delivery</label>
+                    <div class="form-group collapse in" id="cashOnDelivery">
+                        <p class="text-muted mt-5">Please send your cash on Delivery to Store Name, Store Street, Store
+                            Town, Store State / County, Store Postcode. </p>
+                    </div>
+                </div>
+                <div class="custome-radio">
+                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios5"
+                        checked="">
+                    <label class="form-check-label" for="exampleRadios5" data-bs-toggle="collapse"
+                        data-target="#razorPay" aria-controls="razorPay">Razor Pay</label>
+                    <div class="form-group collapse in" id="rozarPay">
+                        <p class="text-muted mt-5">Pay via RazorPay; you can pay with your credit card if you don't have
+                            a RazorPay account.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button onclick="Payment('<%= orderData.totalPrice %>')" class="btn btn-fill-out btn-block m-auto text-center"
+            id="paymentId">Payment</button>
+    </div>
+    <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        function Payment(Total) {
+            const paymentOptions = document.getElementsByName('payment_option');
+            let selectedPaymentOption = null;
+
+            // Loop through the payment options to find the selected one
+            for (let i = 0; i < paymentOptions.length; i++) {
+                if (paymentOptions[i].checked) {
+                    selectedPaymentOption = paymentOptions[i].nextElementSibling.textContent.trim(); // Get the text of the label
+                    break;
+                }
+            }
+            if (selectedPaymentOption) {
+                // Check if the selected payment option is Cash on Delivery
+                if (selectedPaymentOption === 'Cash On Delivery') {
+                    console.log('Selected payment option: Cash On Delivery');
+                    // Perform actions specific to Cash on Delivery
+                }
+                // Check if the selected payment option is RazorPay
+                else if (selectedPaymentOption === 'Razor Pay') {
+                    var orderId;
+                    var settings = {
+                        "url": "/paymentSection",
+                        "method": "POST",
+                        "timeout": 0,
+                        "headers": {
+                            "Content-Type": "application/json"
+                        },
+                        "data": JSON.stringify({
+                            "amount": Total+'00',
+                            paymentOption:"RozarPay-"
+                        }),
+                    };
+
+                    //creates new orderId everytime
+                    $.ajax(settings).done(function (response) {
+
+                        orderId = response.orderId;
+                        console.log(orderId);
+                        $("button").show();
+                    });
+                    document.getElementById('paymentId').onclick = function (e) {
+                        var options = {
+                            "key": 'rzp_test_ihsNz6lracNIu3', // Enter the Key ID generated from the Dashboard
+                            "amount": Total+'00', // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                            "currency": "INR",
+                            "name": "PATRIX Corp",
+                            "description": "Buy Watch",
+                            "image": "https://example.com/your_logo",
+                            "order_id":orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                            "handler": function (response) {
+                                alert(response.razorpay_payment_id);
+                                alert(response.razorpay_order_id);
+                                alert(response.razorpay_signature)
+                            }, "theme": {
+                                "color": "#45896cc"
+                            }
+                        };
+                        var rzp1 = new Razorpay(options);
+                        rzp1.on('payment.failed', function (response) {
+                            alert(response.error.code);
+                            alert(response.error.description);
+                            alert(response.error.source);
+                            alert(response.error.step);
+                            alert(response.error.reason);
+                            alert(response.error.metadata.order_id);
+                            alert(response.error.metadata.payment_id);
+                        });
+                        rzp1.open();
+                        e.preventDefault();
+                    }
+                }
+                // Handle other payment options if needed
+                else {
+                    // console.log('Selected payment option:', selectedPaymentOption);
+                    // Perform actions for other payment options
+                }
+            } else {
+                // No payment option selected
+                console.log('Please select a payment option.');
+
+            }
+        }
+    </script>
+    </script>
+
+    <%- include('../layout/footer') %>

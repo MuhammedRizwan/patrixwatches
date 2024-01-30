@@ -9946,3 +9946,11 @@ span.fi-rs-apps {
 
 
 /*# sourceMappingURL=main.css.map */
+.payment-container {
+  width: 50%; /* Adjust the width as needed */
+  margin: 0 auto; /* This will center the container horizontally */
+  padding: 20px;
+  border: 1px solid #ccc; /* Optional: Add border */
+  border-radius: 5px; /* Optional: Add border radius */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add box shadow */
+}

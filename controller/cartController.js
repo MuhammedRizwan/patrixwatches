@@ -6,7 +6,7 @@ const addCart = async (req, res) => {
     try {
         const qty = req.body.qty;
         const id = req.query.id;
-        const userId = req.user.user[0]._id;
+        const userId = req.user.user._id;
         const productData = await Product.findOne({ _id: id })
         if(productData.stock>qty){
             const userCart = await Cart.findOne({ user_id: userId });
@@ -22,7 +22,7 @@ const addCart = async (req, res) => {
             await userCart.save();
         } else {
             const cart = new Cart({
-                user_id: req.user.user._id,
+                user_id: req.user.user[0]._id,
                 cartItems: [
                     {
                         product_id: productData._id,
@@ -44,13 +44,11 @@ const addCart = async (req, res) => {
 const cartPage = async (req, res) => {
     try {
         const loggedIn = req.user ? true : false;
-        const userId = req.user.user[0]._id; // Assuming the user ID is available in req.user.user._id
+        const userId = req.user.user._id;// Assuming the user ID is available in req.user.user[0]._id
         const cartData = await Cart.findOne({ user_id: userId });
-
         if (!cartData) {
             return res.status(404).render('cartList', { cart: cartData, loggedIn });
         }
-
         // Fetch cart items based on the product_ids in the cart
         const productIds = cartData.cartItems.map(item => item.product_id);
         const productItems = await Product.find({ _id: { $in: productIds } });
@@ -66,7 +64,7 @@ const addQuantity = async (req, res) => {
     try {
         const loggedIn = req.user ? true : false;
         const id = req.query.id; // Corrected variable declaration
-        const userId = req.user.user[0]._id
+        const userId = req.user.user._id
         const cartData = await Cart.findOne({ user_id: userId }, { cartItems: 1, _id: 0 });
         const productStock = await Product.findOne({ _id: id }, { stock: 1, _id: 0 });
         if (!cartData) {
@@ -99,7 +97,7 @@ const subQuantity = async (req, res) => {
     try {
         const loggedIn = req.user ? true : false;
         const id = req.query.id; // Corrected variable declaration
-        const userId = req.user.user[0]._id;
+        const userId = req.user.user._id;
         const cartData = await Cart.findOne({ user_id: userId, 'cartItems.product_id': id });
         const cartDataItem = cartData.cartItems; // Access the first document and then get cartItems
         const existProduct = cartDataItem.find(item => item.product_id == id);
@@ -130,7 +128,7 @@ const addCartIcon = async (req, res) => {
         const id = req.query.id; // Corrected variable declaration
         const productData = await Product.findById(id);
         const quantity = 1;
-        const user_id = req.user.user[0]._id;
+        const user_id = req.user.user._id;
         const userExist = await Cart.findOne({
             user_id: user_id, // Corrected to use user_id 
         });
@@ -180,7 +178,7 @@ const deleteCartItem = async (req, res) => {
     try {
         // Find the user's cart and remove the item where product_id matches
         const updatedCart = await Cart.findOneAndUpdate(
-            { user_id: req.user.user[0]._id },
+            { user_id: req.user.user._id },
             { $pull: { cartItems: { product_id: productId } } },
             { new: true }
         );
@@ -198,15 +196,15 @@ const deleteCartItem = async (req, res) => {
 };
 const checkOut = async (req, res) => {
     try {
-        const userId = req.user.user[0]._id;
+        const userId = req.user.user._id;
         const cartData = await Cart.findOne({ user_id: userId });
         if(cartData){
-            const addressData = await Address.find({ userId: userId });
+            const addressData = await Address.findOne({ userId: userId });
             const cartItemData = cartData.cartItems;
             const productData = cartItemData.map(item => (item.product_id));
             const products = await Product.find({ _id: { $in: productData } })
             const loggedIn = req.user ? true : false;
-            res.render("checkOut", {loggedIn,
+            return res.status(200).render("checkOut", {loggedIn,
                 // category: categoryData,
                 Address: addressData,
                 cart: cartItemData,

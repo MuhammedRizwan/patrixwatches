@@ -51,7 +51,8 @@ user_route.delete('/deleteAddress',auth,addressController.deletAddress);
 // order
 user_route.post('/orderComplete',auth,orderController.orderComplete);
 user_route.get('/cancelOrder/:orderId/:productId',auth,orderController.cancelOrder);
-
+user_route.get('/payment',auth,orderController.paymentPage);
+user_route.post('/paymentSection',auth,orderController.PaymentSection);
 
 user_route.get('/logout', auth, userController.userLogout); // Logout endpoint accessible only if logged in
 

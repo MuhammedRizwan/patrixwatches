@@ -9,8 +9,8 @@ const Order = require('../model/orderModel');
 
 const orderComplete = async (req, res) => {
   try {
-    const { paymentOption, addressId } = req.body;
-    req.user.OrderData = { paymentOption, addressId };
+    const {fullName,mobile,houseName,landMark,townCity,state,pincode} = req.body;
+    const address={fullName,mobile,houseName,landMark,townCity,state,pincode}
     const user_id = req.user.user._id;
     const cartData = await Cart.findOne({ user_id: user_id }, { cartItems: 1, _id: 0 });
     const totalPrice = cartData.cartItems.reduce((total, item) => {
@@ -25,7 +25,7 @@ const orderComplete = async (req, res) => {
           product: item.product_id,
           quantity: item.quantity,
           price: item.quantity * item.price,
-          status: "confirmed",
+          status: "pending",
         };
       } else {
         return {
@@ -39,32 +39,39 @@ const orderComplete = async (req, res) => {
     if (products.status == "out of stock") {
       return res.status(400).json({ success: false, message: "product is Out of Stock" });
     } else {
-      const deleteCart = await Cart.deleteOne({ user_id: user_id });
-      if (!deleteCart) {
-        return res.status(400).json({ success: false, message: "Somthing went Wrong" });
-      } else {
-        const order = new Order({
-          user: user_id,
-          products,
-          payment: paymentOption,
-          address: addressId,
-          totalPrice: totalPrice,
-          status: "pending",
-        });
-        const orderData=await order.save();
-        if (paymentOption === 'cod') {
-
-        } else if(paymentOption==='rozarPay'){
-          const orderData=await Order.findOne({user:user_id});
-          const genarateOrder=await GenarateOrder()
-        }
-      }
+    const order=new Order({
+      totalPrice,
+      user:user_id,
+      products,
+      paymentStatus:"pending",
+      address
+    }) 
+    const orderData=await order.save();
+    return res.status(200).json({success:false,message:"placed an order and goes to Payment section "})
     }   
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+const paymentPage=async(req,res)=>{
+  try {
+    const loggedIn = req.user? true : false;
+    const orderData = await Order.find().sort({ createdOn: -1 }).limit(1);
+    if(orderData){
+      return res.status(200).render('PaymentPage',{orderData:orderData[0],loggedIn})
+    }
+  } catch (error) {
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+const PaymentSection=async(req,res)=>{
+  try {
+    
+  } catch (error) {
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
 const cancelOrder = async (req, res) => {
   try {
     const orderId = req.params.orderId;
@@ -161,7 +168,9 @@ module.exports = {
   cancelOrder,
   adminOrderPage,
   adminOrderDetails,
-  adminCancelOrder
+  adminCancelOrder,
+  paymentPage,
+  PaymentSection
 }
 
 

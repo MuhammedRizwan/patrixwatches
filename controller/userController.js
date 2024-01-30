@@ -27,7 +27,7 @@ const genarateToken = (user) => {
 const Home = async (req, res) => {
     try {
         const loggedIn = req.cookies.token ? true : false;
-        const categoryData = await Category.find({ is_unList: false }, { _id: 1 });
+        const categoryData = await Category.find({ is_unList: false });
         const categoryIds = categoryData.map(category => category._id);
         const productData = await Product.find({ category_id: { $in: categoryIds },is_blocked:false });
         return res.status(200).render('Home', { product: productData, category: categoryData, loggedIn });
@@ -146,7 +146,8 @@ const userLogin = async (req, res) => {
             if (passwordMatch) {
                 if (userData[0].is_block === false) {
                     userData[0].password = undefined;
-                    const token = genarateToken(userData);
+                    const userDatas=userData[0]
+                    const token = genarateToken(userDatas);
                     const options = {
                         expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
                         httpOnly: true

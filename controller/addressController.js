@@ -28,7 +28,7 @@ const deletAddress = async (req, res) => {
     try {
         const addressType = req.query.id;
         const userId = req.user.user[0]._id;
-        const deleteResult = await Address.deleteOne({ userId: userId, addressType: addressType });
+        const deleteResult = await Address.deleteOne({ userId: userId});
 
         if (deleteResult.deletedCount > 0) {
             return res.status(200).json("Deleted successfully");
@@ -60,7 +60,6 @@ const loadEditAddress = async (req, res) => {
 
 const editAddress = async (req, res) => {
     try {
-        const addressType = req.query.id;
         const userId = req.user.user[0]._id;
         const addressData = await Address.updateOne(
             { userId: userId },

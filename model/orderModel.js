@@ -34,23 +34,43 @@ const oderSchema = new mongoose.Schema({
       status: {
         type: String,
         required: true,
-        default: "confirmed",
       },
     },
   ],
-  payment: {
+  paymentStatus: {
     required: true,
-    type: String,
-  },
-  status: {
-    required: false,
     type: String,
   },
   address: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Address", // Reference to the Address model
-    required: true,
-  },
+    fullName: {
+      type: String,
+      required: true
+    },
+    mobile: {
+      type: Number,
+      required: true
+    },
+    houseName: {
+      type: String,
+      required: true
+    },
+    landMark: {
+      type: String,
+      required: true
+    },
+    townCity: {
+      type: String,
+      required: true
+    },
+    state: {
+      type: String,
+      required: true
+    },
+    pincode: {
+      type: Number,
+      required: true
+    }
+  }
 });
 
 //Export the model
