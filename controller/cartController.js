@@ -22,7 +22,7 @@ const addCart = async (req, res) => {
             await userCart.save();
         } else {
             const cart = new Cart({
-                user_id: req.user.user[0]._id,
+                user_id: userId,
                 cartItems: [
                     {
                         product_id: productData._id,

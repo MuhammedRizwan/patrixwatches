@@ -48,5 +48,6 @@ admin_route.delete('/deleteCategory/:id', adminAuth, categoryController.deleteCa
 admin_route.get('/orderPage', adminAuth, orderController.adminOrderPage);
 admin_route.get('/orderDetials', adminAuth, orderController.adminOrderDetails);
 admin_route.get('/cancelOrder/:orderId',adminAuth, orderController.adminCancelOrder);
+admin_route.get('/saleReport',adminAuth,orderController.saleReportPage);
 
 module.exports = admin_route;

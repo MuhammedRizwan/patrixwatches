@@ -1,6 +1,6 @@
-const {User} = require('../model/userModel');
+const { User } = require('../model/userModel');
 const bcrypt = require('bcrypt');
-const jwt=require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 // const randomstring=require('randomstring');
 // const nodemailer=require('nodemailer');
 
@@ -13,11 +13,11 @@ const jwt=require('jsonwebtoken');
 //     }
 // }
 
-const genarateToken=(user)=>{
-  
-    return jwt.sign({user},process.env.SECRETKEY,{expiresIn:'2h'})
+const genarateToken = (user) => {
+
+    return jwt.sign({ user }, process.env.SECRETKEY, { expiresIn: '2h' })
 }
-const adminLoginPage = async (req,res) => {
+const adminLoginPage = async (req, res) => {
     try {
         return res.status(200).render('adminLogin');
     } catch (error) {
@@ -56,25 +56,25 @@ const adminLoginPage = async (req,res) => {
 //     }
 // }
 
-const adminLogin = async (req,res) => {
+const adminLogin = async (req, res) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
         const adminData = await User.aggregate([
             {
-                $match:{email:email}
+                $match: { email: email }
             },
             {
-                $limit:1
+                $limit: 1
             }
         ])
-        if (adminData) {
+        if (adminData.length > 0) {
             const matchPassword = await bcrypt.compare(password, adminData[0].password);
             if (matchPassword) {
                 if (adminData[0].is_admin === 0) {
                     return res.status(404).render('adminLogin', { message: "your are not a admin" })
                 } else {
-                    const token=genarateToken(adminData[0]);
+                    const token = genarateToken(adminData[0]);
                     const options = {
                         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
                         httpOnly: true
@@ -94,7 +94,7 @@ const adminLogin = async (req,res) => {
         return res.status(500).send('Internal Server Error');
     }
 }
-const Dashboard = async (req,res) => {
+const Dashboard = async (req, res) => {
     try {
         const userData = await User.find({ is_admin: 0 });
         return res.status(200).render('adminDashboard', { users: userData });
@@ -103,16 +103,16 @@ const Dashboard = async (req,res) => {
         return res.status(500).send('Internal Server Error');
     }
 }
-const userList = async (req,res) => {
+const userList = async (req, res) => {
     try {
         const userData = await User.find({ is_admin: 0 });
         return res.status(200).render('user', { users: userData });
     } catch (error) {
         console.log(error.message);
-       return res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }
 }
-const Logout = async (req,res) => {
+const Logout = async (req, res) => {
     try {
         return res.clearCookie("token").redirect('/admin');
     } catch (error) {
@@ -125,8 +125,8 @@ const blockUser = async (req, res) => {
         const userId = req.body.userId; // Assuming you send the user ID in the request body
         const userData = await User.findByIdAndUpdate(userId, { is_block: true });
         if (!userData) {
-            return res.status(404).json({error:true,message:"somthing error occured"}); // Inform if the user was not found
-        }else{
+            return res.status(404).json({ error: true, message: "somthing error occured" }); // Inform if the user was not found
+        } else {
             return res.json({ success: true, message: 'User blocked successfully' });
         }
     } catch (error) {
@@ -135,13 +135,13 @@ const blockUser = async (req, res) => {
     }
 };
 
-const unblockUser = async (req,res) => {
+const unblockUser = async (req, res) => {
     try {
         const userId = req.body.userId;
         const userData = await User.findByIdAndUpdate(userId, { is_block: false });
         if (!userData) {
             return res.status(404).send('User not found');
-        }else{
+        } else {
             return res.json({ success: true, message: 'User Unblocked successfully' });
         }
 
@@ -150,21 +150,22 @@ const unblockUser = async (req,res) => {
         return res.status(500).send('Internal Server Error');
     }
 };
-const deleteUser = async (req,res) => {
+const deleteUser = async (req, res) => {
     try {
         const id = req.params.userId;
         console.log(id);
         const userData = await User.deleteOne({ _id: id });
         if (userData.deletedCount === 0) {
             return res.status(404).send('User not found or already deleted');
-        }else{
-           return res.status(200).json({ success: true, message: 'User deleted successfully' });
+        } else {
+            return res.status(200).json({ success: true, message: 'User deleted successfully' });
         }
     } catch (error) {
         console.log(error.message);
         return res.status(500).send('Internal Server Error');
     }
 }
+
 module.exports = {
     adminLoginPage,
     adminLogin,

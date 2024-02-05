@@ -1,0 +1,55 @@
+<%- include('../adminLayout/header') %>
+<div class="card-body">
+    <div class="table-responsive">
+        <div class="table-responsive">
+            <table class="table align-middle table-nowrap mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col" class="text-center">
+                            <div class="form-check align-middle">
+                                <input class="form-check-input" type="checkbox" id="transactionCheck01">
+                                <label class="form-check-label" for="transactionCheck01"></label>
+                            </div>
+                        </th>
+                        <th class="align-middle" scope="col">Order ID</th>
+                        <th class="align-middle" scope="col">Billing Name</th>
+                        <th class="align-middle" scope="col">Date</th>
+                        <th class="align-middle" scope="col">Total</th>
+                        <th class="align-middle" scope="col">Payment Status</th>
+                        <th class="align-middle" scope="col">Payment Method</th>
+                        <th class="align-middle" scope="col">View Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% orderData.forEach(element => { %>
+                        <tr>
+                            <td class="text-center">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="transactionCheck02">
+                                    <label class="form-check-label" for="transactionCheck02"></label>
+                                </div>
+                            </td>
+                            <td><a href="#" class="fw-bold"><%= element.orderId %></a> </td>
+                            <td><%= element.address.fullName %></td>
+                            <td>
+                                <%= element.createdOn.toLocaleDateString() %>
+                            </td>
+                            <td>
+                                <%= element.totalPrice %>
+                            </td>
+                            <td>
+                                <span class="badge badge-pill badge-soft-success"><%= element.paymentStatus %></span>
+                            </td>
+                          <td>
+                            <span class="badge badge-pill badge-soft-success"><%= element.paymentMethod %></span>
+                          </td>
+                        </tr>
+                    <% }) %>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div> <!-- table-responsive end// -->
+</div>
+
+<%- include('../adminLayout/footer') %>

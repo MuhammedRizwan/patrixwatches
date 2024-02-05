@@ -9954,3 +9954,14 @@ span.fi-rs-apps {
   border-radius: 5px; /* Optional: Add border radius */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add box shadow */
 }
+#orderSuccess{
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.section-padding {
+  width: 80%; /* Adjust as needed */
+}

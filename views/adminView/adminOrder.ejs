@@ -65,15 +65,16 @@
                                         <td>
                                             <%= order[i].createdOn.toLocaleDateString() %>
                                         </td>
+                                       
                                         <td class="text-end">
-                                            <a href="/admin/orderDetials?id=<%= order[i]._id %>"
-                                                class="btn btn-md rounded font-sm">Detail</a>
-                                                <% if ( order[i].status==="Canceled") { %>
-                                                 <span class="text-danger">Canceled</span>
-                                                 <% } else { %>
+                                            <% if (order[i].status!=="canceled") { %>
+                                                <a href="/admin/orderDetials?id=<%= order[i].orderId %>&userId=<%= user[i].id %>"
+                                                    class="btn btn-md rounded font-sm">Detail</a>
                                                     <button type="button" class=" btn-lg btn-md rounded font-sm btn-danger"
                                                     onclick="cancelOrder('<%=order[i].id%>')">Cancel</button>
-                                                <% } %>
+                                                    <% } else { %>
+                                                        <span class="text-danger">Canceled</span>
+                                                <% } %> 
                                         </td>
                                     </tr>
                                     <% } %>

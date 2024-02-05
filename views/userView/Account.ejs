@@ -24,7 +24,7 @@
                                                     class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders"
+                                            <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="/orderDetials"
                                                 role="tab" aria-controls="orders" aria-selected="false"><i
                                                     class="fi-rs-shopping-bag mr-10"></i>Orders</a>
                                         </li>
@@ -62,8 +62,7 @@
                                                             alt="Profile Picture">
                                                     </div>
                                                     <div class="profile-details">
-                                                        <h5>Name: <%= user.name %><a href="/editName?id=<%= user._id %>"
-                                                                    class="text-decoration-none text-danger ml-50">edit</a>
+                                                        <h5>Name: <%= user.name %>
                                                         </h5>
                                                         <p>Email: <%= user.email %>
                                                         </p>
@@ -89,71 +88,6 @@
                                                     </div>
                                                 </div>
 
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="mb-0">Your Orders</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="table-responsive">
-                                                    <% if (order.length>0) { %>
-                                                        <table class="table text-center">
-                                                            <thead>
-
-                                                                <tr>
-                                                                    <th>productName</th>
-                                                                    <th>Date</th>
-                                                                    <th>Order Status</th>
-                                                                    <th>Total</th>
-                                                                    <th>payment Status</th>
-                                                                    <th>payment Methord</th>
-                                                                    <td>Cancel Order</td>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <% for( let i=0; i < order.length; i++ ) { %>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <%= order[i].productName %>
-                                                                        </td>
-                                                                        <td>
-                                                                            <%=order[i].createdOn.toLocaleDateString()%>
-                                                                        </td>
-                                                                        <td>
-                                                                            <%=order[i].productStatus%>
-                                                                        </td>
-                                                                        <td>
-                                                                            <%=order[i].totalPrice%>
-                                                                        </td>
-                                                                        <td>
-                                                                            <%=order[i].paymentStatus%>
-                                                                        </td>
-                                                                        <td>
-                                                                            <%= order[i].paymentMethod %>
-                                                                        </td>
-                                                                        <% if (order[i].productStatus=="canceled" ) { %>
-                                                                            <td>Order Canceled</td>
-                                                                            <% } else { %>
-                                                                                <td><button
-                                                                                        class="btn-danger btn-small border-1"
-                                                                                        onclick="cancelOrder('<%=order[i].id%>','<%=order[i].productId%>')">Cancel</button>
-                                                                                </td>
-                                                                                <% } %>
-
-                                                                    </tr>
-                                                                    <% } %>
-                                                            </tbody>
-                                                        </table>
-                                                        <% } else { %>
-                                                            <div>
-                                                                <h1 class="text-center">You Have No Orders </h1>
-                                                            </div>
-                                                            <% } %>
-
-                                                </div>
                                             </div>
                                         </div>
                                     </div>

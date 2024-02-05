@@ -188,7 +188,7 @@ const resendOtp = async (req, res) => {
 const account = async (req, res) => {
     try {
         const loggedIn = req.user ? true : false;
-        const userId = req.user.user[0]._id;
+        const userId = req.user._id;
         const userData = await User.aggregate([
             {
                 $match: { _id: new mongoose.Types.ObjectId(userId) }
@@ -197,8 +197,8 @@ const account = async (req, res) => {
                 $limit: 1
             }
         ]);
-        if (!userData || userData.length === 0) {
-            return res.status(404).render('account', { Address: [], loggedIn, user: [], order: [] })
+        if (userData.length === 0) {
+            return res.status(404).render('account', { Address: [], loggedIn, user: [] })
         }
         const addressData = await Address.aggregate([
             {
@@ -208,39 +208,8 @@ const account = async (req, res) => {
                 $limit: 1
             }
         ]);
-        const orderData = await Order.aggregate([
-            {
-                $match: { user: new mongoose.Types.ObjectId(userId) }
-            },
-            {
-                $limit: 1
-            }
-        ])
-        if (orderData.length === 0) {
-            return res.status(200).render('account', { Address: addressData, loggedIn, user: userData[0], order: [] });
-        } else {
-
-            const orderProduct = await Promise.all(orderData.products.map(async (products) => {
-                const productData = await Product.aggregate([
-                    {
-                        $match: { _id: products.product }
-                    }
-                ]);
-                return {
-                    id: orderData._id,
-                    productId: products.product,
-                    OrderId: orderData.id,
-                    productName: productData.productName,
-                    quantity: products.quantity,
-                    productStatus: products.status,
-                    createdOn: orderData.createdOn,
-                    totalPrice: productData.salePrice * products.quantity,
-                    paymentStatus: orderData.status,
-                    paymentMethod: orderData.payment,
-                };
-            }));
-            return res.status(200).render('account', { Address: addressData, loggedIn, user: userData, order: orderProduct });
-        }
+            return res.status(200).render('account', { Address: addressData, loggedIn, user: userData[0] });
+        
     } catch (error) {
         console.log(error.message);
         return res.status(500).json("internal Server Error");
@@ -267,7 +236,7 @@ const changePassword = async (req, res) => {
     try {
         const loggedIn = req.user ? true : false;
         const { password, npassword } = req.body;
-        const userId = req.user.user[0]._id;
+        const userId = req.user._id;
         const userData = await User.aggregate([
             {
                 $match: { _id: new mongoose.Types.ObjectId(userId) }
@@ -287,7 +256,7 @@ const changePassword = async (req, res) => {
                 if (!sPassword) {
                     return res.status(400).json({ success: false, message: "hash password didn't work" })
                 } else {
-                    const updatePassword = await User.updateOne({ _id: req.user.user._id }, { $set: { password: sPassword } }, { new: true });
+                    const updatePassword = await User.updateOne({ _id: req.user._id }, { $set: { password: sPassword } }, { new: true });
                     if (!updatePassword) {
                         return res.status(404).json({ success: false, error: "something went wrong" });
                     } else {
@@ -383,6 +352,7 @@ const newPasswordverify = async (req, res) => {
         return res.status(500).send('Internal Server Error');
     }
 }
+ 
 module.exports = {
     Home,
     userLoginPage,

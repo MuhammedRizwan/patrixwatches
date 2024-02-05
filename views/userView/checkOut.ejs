@@ -110,33 +110,27 @@
                                                     <a id="fullNameError" class="text-danger"></a><br>
                                                 </div>
                                                 <div class="form-group">
-                                                    <input type="text" id="mobile"
-                                                        value="<%= Address.mobile %>">
+                                                    <input type="text" id="mobile" value="<%= Address.mobile %>">
                                                     <a id="mobileError" class="text-danger"></a><br>
                                                 </div>
                                                 <div class="form-group">
-                                                    <input type="text" id="houseName" 
-                                                        value="<%= Address.houseName %>">
+                                                    <input type="text" id="houseName" value="<%= Address.houseName %>">
                                                     <a id="houseNameError" class="text-danger"></a><br>
                                                 </div>
                                                 <div class="form-group">
-                                                    <input type="text" id="landMark" 
-                                                        value="<%= Address.landMark %>">
+                                                    <input type="text" id="landMark" value="<%= Address.landMark %>">
                                                     <a id="landmarkError" class="text-danger"></a><br>
                                                 </div>
                                                 <div class="form-group">
-                                                    <input  type="text" id="townCity"
-                                                        value="<%= Address.townCity %>">
+                                                    <input type="text" id="townCity" value="<%= Address.townCity %>">
                                                     <a id="townCityError" class="text-danger"></a><br>
                                                 </div>
                                                 <div class="form-group">
-                                                    <input  type="text" id="state"
-                                                        value="<%= Address.state %>">
+                                                    <input type="text" id="state" value="<%= Address.state %>">
                                                     <a id="stateError" class="text-danger"></a><br>
                                                 </div>
                                                 <div class="form-group">
-                                                    <input  type="text" id="pincode"
-                                                        value="<%= Address.pincode %>">
+                                                    <input type="text" id="pincode" value="<%= Address.pincode %>">
                                                     <a id="pincodeError" class="text-danger"></a><br>
                                                 </div>
                                             </div>
@@ -158,37 +152,31 @@
                                                 </div>
                                                 <div id="collapseAddress" class="different_address collapse in">
                                                     <div class="form-group">
-                                                        <input type="text"  id="fullName"
-                                                            placeholder="Full name *">
+                                                        <input type="text" id="fullName" placeholder="Full name *">
                                                         <a id="fullNameError" class="text-danger"></a><br>
                                                         <div class="form-group">
-                                                            <input type="text"  id="mobile"
-                                                                placeholder="Mobile *">
+                                                            <input type="text" id="mobile" placeholder="Mobile *">
                                                             <a id="mobileError" class="text-danger"></a><br>
                                                         </div>
                                                         <div class="form-group">
-                                                            <input type="text" id="houseName" 
-                                                                placeholder="House name*">
+                                                            <input type="text" id="houseName" placeholder="House name*">
                                                             <a id="houseNameError" class="text-danger"></a><br>
                                                         </div>
                                                         <div class="form-group">
-                                                            <input type="text" id="landMark" 
-                                                                placeholder="Land mark">
+                                                            <input type="text" id="landMark" placeholder="Land mark">
                                                             <a id="landmarkError" class="text-danger"></a><br>
                                                         </div>
                                                         <div class="form-group">
-                                                            <input  type="text" id="townCity"
+                                                            <input type="text" id="townCity"
                                                                 placeholder="City / Town *">
                                                             <a id="townCityError" class="text-danger"></a><br>
                                                         </div>
                                                         <div class="form-group">
-                                                            <input  type="text" id="state"
-                                                                placeholder="State *">
+                                                            <input type="text" id="state" placeholder="State *">
                                                             <a id="stateError" class="text-danger"></a><br>
                                                         </div>
                                                         <div class="form-group">
-                                                            <input  type="text" id="pincode"
-                                                                placeholder="Pincode *">
+                                                            <input type="text" id="pincode" placeholder="Pincode *">
                                                             <a id="pincodeError" class="text-danger"></a><br>
                                                         </div>
                                                     </div>
@@ -196,8 +184,51 @@
                                                 <% } %>
                                 </form>
                                 <div class="bt-1 border-color-1 mt-30 mb-30"></div>
-                                <button type="button" class="btn btn-fill-out btn-block mt-30 text-center"
-                                    onclick="placeOrder()">Place
+                                <div class="payment_method mt-50">
+                                    <div class="mb-25">
+                                        <h5>Payment</h5>
+                                    </div>
+                                    <div class="payment_option">
+                                        <div class="custome-radio">
+                                            <input class="form-check-input" required="" type="radio"
+                                                name="payment_option" id="exampleRadios3" checked="">
+                                            <label class="form-check-label" for="exampleRadios3"
+                                                data-bs-toggle="collapse" data-target="#bankTranfer"
+                                                aria-controls="bankTranfer">Direct Bank Transfer</label>
+                                            <div class="form-group collapse in" id="bankTranfer">
+                                                <p class="text-muted mt-5">There are many variations of passages of
+                                                    Lorem Ipsum available, but
+                                                    the majority have suffered alteration. </p>
+                                            </div>
+                                        </div>
+                                        <div class="custome-radio">
+                                            <input class="form-check-input" required="" type="radio"
+                                                name="payment_option" id="exampleRadios4" checked="">
+                                            <label class="form-check-label" for="exampleRadios4"
+                                                data-bs-toggle="collapse" data-target="#cashOnDelivery"
+                                                aria-controls="cashOnDelivery">Cash On Delivery</label>
+                                            <div class="form-group collapse in" id="cashOnDelivery">
+                                                <p class="text-muted mt-5">Please send your cash on Delivery to Store
+                                                    Name, Store Street, Store
+                                                    Town, Store State / County, Store Postcode. </p>
+                                            </div>
+                                        </div>
+                                        <div class="custome-radio">
+                                            <input class="form-check-input" required="" type="radio"
+                                                name="payment_option" id="exampleRadios5" checked="">
+                                            <label class="form-check-label" for="exampleRadios5"
+                                                data-bs-toggle="collapse" data-target="#razorPay"
+                                                aria-controls="razorPay">Razor Pay</label>
+                                            <div class="form-group collapse in" id="rozarPay">
+                                                <p class="text-muted mt-5">Pay via RazorPay; you can pay with your
+                                                    credit card if you don't have
+                                                    a RazorPay account.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" id="placeOrder"
+                                    class="btn btn-fill-out btn-block mt-30 text-center" onclick="placeOrder()">Place
                                     Order</button>
                             </div>
                         </div>
@@ -205,28 +236,12 @@
                 </div>
         </section>
     </main>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
-        function deleteAddress(addressId) {
-            fetch(`/deleteAddress?id=${addressId}`, {
-                method: "DELETE",
-            })
-                .then(response => {
-                    if (response.ok) {
-                        location.reload()
-                    } else {
-                        throw new Error('Error deleting address');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Handle the error case
-                });
-        }
-    </script>
-    <script>
-        function placeOrder() {
+        document.getElementById('placeOrder').onclick = function (e) {
             const checkbox = document.getElementById("differentaddress");
 
             // Function to validate the form
@@ -354,65 +369,151 @@
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, place order!"
+                    confirmButtonText: "Payment!"
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const requestData = {
-                            fullName:fullName.value,
-                            mobile:mobile.value,
-                             houseName:houseName.value ,
-                              landMark:landMark.value ,
-                               townCity:townCity.value ,
-                                state:state.value,
-                                pincode:pincode.value
+                            fullName: fullName.value,
+                            mobile: mobile.value,
+                            houseName: houseName.value,
+                            landMark: landMark.value,
+                            townCity: townCity.value,
+                            state: state.value,
+                            pincode: pincode.value
                         };
                         // If the user confirms, send a POST request to /orderComplete
-                        fetch('/orderComplete', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(requestData),
-                        })
-                            .then(response => {
-                                if (response.ok) {
-                                    // If the response is successful, show success message
-                                    Swal.fire({
-                                        position: "center",
-                                        icon: "success",
-                                        title: "Your order has been placed successfully!",
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    });
-                                    // Redirect to the homepage after a successful order
-                                    setTimeout(() => {
-                                        window.location.href = '/payment';
-                                    }, 1000)
+                        const paymentOptions = document.getElementsByName('payment_option');
+                        let selectedPaymentOption = null;
 
-                                } else {
-                                    // If there's an error in the response, show an error message
-                                    Swal.fire({
-                                        position: "center",
-                                        icon: "error",
-                                        title: "Error placing the order",
-                                        showConfirmButton: false,
-                                        timer: 1500
+                        // Loop through the payment options to find the selected one
+                        for (let i = 0; i < paymentOptions.length; i++) {
+                            if (paymentOptions[i].checked) {
+                                selectedPaymentOption = paymentOptions[i].nextElementSibling.textContent.trim(); // Get the text of the label
+                                break;
+                            }
+                        }
+                        if (selectedPaymentOption) {
+                            // Check if the selected payment option is Cash on Delivery
+                            if (selectedPaymentOption === 'Cash On Delivery') {
+                                fetch('/orderComplete', {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        paymentOption: "CashOnDelivery",
+                                        requestData
+                                    })
+                                }).then(res=>{
+                                        if(res.ok){
+                                             Swal.fire({
+                                                position: "center",
+                                                icon: "success",
+                                                title: "Your order has been placed successfully!",
+                                                showConfirmButton: false,
+                                                timer: 1500
+                                            });
+                                            setTimeout(()=>{
+                                                location.href='/orderSuccesspage'
+                                            },2000)
+                                        }
+                                    })
+
+                            }
+                            // Check if the selected payment option is RazorPay
+                            else if (selectedPaymentOption === 'Razor Pay') {
+                                var orderId;
+                                var amount;
+                                var settings = {
+                                    "url": '/orderComplete',
+                                    "method": "POST",
+                                    "timeout": 0,
+                                    "headers": {
+                                        "Content-Type": "application/json"
+                                    },
+                                    "data": JSON.stringify({
+                                        paymentOption: "RazorPay",
+                                        requestData
+                                    }),
+                                };
+
+                                // Perform the AJAX request
+                                $.ajax(settings).done(function (response) {
+                                    // This code will execute when the AJAX request is successful
+                                    orderId = response.orderId;
+                                    amount = response.amount; // Convert amount to smallest currency unit (paise)
+
+                                    // Construct Razorpay options after getting orderId and amount
+                                    var options = {
+                                        "key": 'rzp_test_ihsNz6lracNIu3',
+                                        "amount": amount,
+                                        "currency": "INR",
+                                        "name": "PATRIX Corp",
+                                        "description": "Buy Watch",
+                                        "image": "https://example.com/your_logo",
+                                        "order_id": orderId,
+                                        "handler": function (response) {
+                                            // Handle payment success
+                                            fetch('/razorOrderComplete', {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type": "application/json"
+                                                },
+                                                body: JSON.stringify({
+                                                    paymentOption: "Razorpay",
+                                                })
+                                            }).then(res => {
+                                                if (res.ok) {
+                                                    Swal.fire({
+                                                        position: "center",
+                                                        icon: "success",
+                                                        title: "Your order has been placed successfully!",
+                                                        showConfirmButton: false,
+                                                        timer: 1500
+                                                    });
+                                                    setTimeout(() => {
+                                                        location.href = '/orderSuccesspage'
+                                                    }, 2000)
+                                                }
+                                            })
+                                        },
+                                        "theme": {
+                                            "color": "#45896cc"
+                                        }
+                                    };
+
+                                    // Create a new instance of Razorpay with the constructed options
+                                    var rzp1 = new Razorpay(options);
+
+                                    // Add event listener for payment failure
+                                    rzp1.on('payment.failed', function (response) {
+                                        Swal.fire({
+                                            position: "top-end",
+                                            icon: "error",
+                                            title: "You canceled the Payment",
+                                            showConfirmButton: false,
+                                            timer: 1500
+                                        });
+                                        alert(response.error.code);
+                                        alert(response.error.description);
+                                        alert(response.error.source);
+                                        alert(response.error.step);
+                                        alert(response.error.reason);
+                                        alert(response.error.metadata.order_id);
+                                        alert(response.error.metadata.payment_id);
                                     });
-                                }
-                                console.log(response); // Log the entire response
-                                return response.json();
-                            })
-                            .catch(error => {
-                                // If there's an error in the fetch, show an error message
-                                Swal.fire({
-                                    position: "center",
-                                    icon: "error",
-                                    title: "Error placing the order",
-                                    showConfirmButton: false,
-                                    timer: 1500
+
+                                    // Open Razorpay payment modal
+                                    rzp1.open();
                                 });
-                                console.error(error);
-                            });
+
+                            }
+                            // Handle other payment options if needed
+                            else {
+                                // console.log('Selected payment option:', selectedPaymentOption);
+                                // Perform actions for other payment options
+                            }
+                        }
                     }
                 });
             }

@@ -1,17 +1,22 @@
 const express = require('express');
 const user_route = express();
+const session=require('express-session')
 const userController = require('../controller/userController');
 const cartController = require('../controller/cartController');
 const addressController=require('../controller/addressController');
 const orderController=require('../controller/orderCondroller');
-const productController=require('../controller/productController')
+const productController=require('../controller/productController');
 const auth = require('../middleware/auth');
 user_route.set('views', './views/userView');
 
-
+user_route.use(session({
+    secret: 'your-secret-key', // Change this to a long, random string
+    resave: false,
+    saveUninitialized: true
+}));
 
 // user route configurations
-user_route.get('/', userController.Home); // Home route  (accessible to all)
+user_route.get('/',auth,userController.Home); // Home route  (accessible to all)
 user_route.get('/login', userController.userLoginPage); // Login page accessible only if logged out
 user_route.post('/login', userController.userLogin); // User login endpoint;
 user_route.get('/verifyEmail',userController.verifyEmailPage);//getting verify email that email exist 
@@ -50,9 +55,13 @@ user_route.delete('/deleteAddress',auth,addressController.deletAddress);
 
 // order
 user_route.post('/orderComplete',auth,orderController.orderComplete);
-user_route.get('/cancelOrder/:orderId/:productId',auth,orderController.cancelOrder);
-user_route.get('/payment',auth,orderController.paymentPage);
-user_route.post('/paymentSection',auth,orderController.PaymentSection);
+user_route.get('/singleOrderDetials/:orderId',auth,orderController.singleOrderDetials);
+user_route.get('/orderSuccesspage',auth,orderController.orderSuccessPage);
+user_route.get('/orderDetials',auth,orderController.orderDetials);
+user_route.put('/cancelSingleProduct',auth,orderController.cancelSingleProduct);
+user_route.post('/razorOrderComplete',auth,orderController.razorOrderComplete);
+
+
 
 user_route.get('/logout', auth, userController.userLogout); // Logout endpoint accessible only if logged in
 

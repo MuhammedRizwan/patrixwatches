@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 // Declare the Schema of the Mongo model
 const oderSchema = new mongoose.Schema({
+  orderId: {
+    type: String,
+    required: true
+  },
   totalPrice: {
     required: false,
     type: Number,
@@ -37,9 +41,17 @@ const oderSchema = new mongoose.Schema({
       },
     },
   ],
-  paymentStatus: {
+  paymentMethod: {
     required: true,
     type: String,
+  },
+  paymentStatus: {
+    required: true,
+    type: String
+  },
+  status: {
+    required: true,
+    type: String
   },
   address: {
     fullName: {

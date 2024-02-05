@@ -13,7 +13,7 @@
                         <span>
                             <i class="material-icons md-calendar_today"></i> <b><%= order.createdOn.toLocaleDateString() %></b>
                         </span> <br>
-                        <small class="text-muted">Order ID: <%= order.id %></small>
+                        <small class="text-muted">Order ID: <%= order.orderId %></small>
                     </div>
                     <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                         <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
@@ -69,10 +69,10 @@
                             <div class="text">
                                 <h6 class="mb-1">Deliver to</h6>
                                 <p class="mb-1">
-                                    House:<%=address[0].houseName %> <br>
-                                    landMark:<%= address[0].landMark %> <br><%= address[0].landMark %> <br>
-                                    City: <%= address[0].townCity %>, <%= address[0].state %> <br>
-                                    Pincode: <%= address[0].pincode %>
+                                    House:<%=address.houseName %> <br>
+                                    landMark:<%= address.landMark %> <br>
+                                    City: <%= address.townCity %>, <%= address.state %> <br>
+                                    Pincode: <%= address.pincode %>
                                 </p>
                                 <a href="#">View profile</a>
                             </div>
@@ -82,7 +82,7 @@
                 <div class="row">
                     <div class="col-lg-7">
                         <div class="table-responsive">
-                            
+                           <% if (typeof product !== undefined) { %>
                             <table class="table">
                                 <% var subTotal =[] %>
                                 <thead>
@@ -144,6 +144,10 @@
                                             </tr>
                                 </tbody>
                             </table>
+                            <% } else { %>
+                             <p>No Order Were found</p>
+                           <% } %> 
+                            
                         </div> <!-- table-responsive// -->
                     </div> <!-- col// -->
                     <div class="col-lg-1"></div>

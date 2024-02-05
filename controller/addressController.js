@@ -13,7 +13,7 @@ const addAddressPage = async (req, res) => {
 const addAddress = async (req, res) => {
     try {
         const { fullName, mobile, pincode, houseName, landMark, townCity, state } = req.body
-        const userId = req.user.user[0]._id;
+        const userId = req.user.user._id;
         const address = new Address({
             userId, fullName, mobile, pincode, houseName, landMark, townCity, state
         });
@@ -27,7 +27,7 @@ const addAddress = async (req, res) => {
 const deletAddress = async (req, res) => {
     try {
         const addressType = req.query.id;
-        const userId = req.user.user[0]._id;
+        const userId = req.user.user._id;
         const deleteResult = await Address.deleteOne({ userId: userId});
 
         if (deleteResult.deletedCount > 0) {
@@ -44,15 +44,15 @@ const deletAddress = async (req, res) => {
 
 const loadEditAddress = async (req, res) => {
     try {
-        const userId = req.user.user[0]._id;
+        const userId = req.user.user._id;
         const addressData = await Address.findOne({ userId: userId });
-
-        const loggedIn = req.user.user[0]._id ? true : false;
+        const loggedIn = req.user.user._id ? true : false;
         return res.render("editAddress", {
             loggedIn,
             address: addressData,
         });
     } catch (error) {
+    console.log(error);
         return res.status(500).send("Internal Server Error. Please try again later.");
     }
 };
@@ -60,7 +60,7 @@ const loadEditAddress = async (req, res) => {
 
 const editAddress = async (req, res) => {
     try {
-        const userId = req.user.user[0]._id;
+        const userId = req.user.user._id;
         const addressData = await Address.updateOne(
             { userId: userId },
             {

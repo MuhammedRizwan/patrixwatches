@@ -1,0 +1,134 @@
+<%- include('../layout/header') %>
+    <section class="content-main">
+        <div class="content-header mt-20">
+            <div>
+                <h2 class="content-title card-title text-center">Your Orders</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Your Orders</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <% if (Datas.length>0) { %>
+                                <table class="table text-center">
+                                    <thead>
+
+                                        <tr>
+                                            <th>Image</th>
+                                            <th>productName</th>
+                                            <th>quantity</th>
+                                            <th>Date</th>
+                                            <th>Order Status</th>
+                                            <th>Total</th>
+                                            <td>Cancel Order</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% for( let i=0; i < Datas.length; i++ ) { %>
+                                            <tr>
+                                                <td>
+                                                    <img src="/productImages/<%= Datas[i].image[0].filename %>" alt=""
+                                                        style="height: 100px;width: 100px;">
+                                                </td>
+                                                <td>
+                                                    <%= Datas[i].productName %>
+                                                </td>
+                                                <td >
+                                                    <span id="quantity"><%= Datas[i].quantity %></span>
+                                                </td>
+                                                <td>
+                                                    <%= `${Datas[i].createdOn.getDate()}-${Datas[i].createdOn.getMonth()
+                                                        + 1}-${Datas[i].createdOn.getFullYear()}`%>
+                                                </td>
+                                                <td>
+                                                    <%=Datas[i].status%>
+                                                </td>
+                                                <td>
+                                                    <%=Datas[i].price%>
+                                                </td>
+                                                <% if (Datas[i].status=="canceled" ) { %>
+                                                    <td>Order Canceled</td>
+                                                    <% } else { %>
+                                                        <td><button class="btn-danger btn-small border-1"
+                                                                onclick="cancelSingleProduct('<%=Datas[i].orderId%>','<%=Datas[i].productId%>')">Cancel</button>
+                                                        </td>
+                                                        <% } %>
+
+                                            </tr>
+                                            <% } %>
+                                    </tbody>
+                                </table>
+                                <% } else { %>
+                                    <div>
+                                        <h1 class="text-center">You Have No Orders </h1>
+                                    </div>
+                                    <% } %>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function cancelSingleProduct(orderId, productId) {
+            const quantity = document.getElementById('quantity').textContent
+            console.log(quantity); 
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, cancel it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/cancelSingleProduct', {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            orderId: orderId,
+                            productId: productId,
+                            quantity:quantity
+                        })
+                    })
+                        .then(res => {
+                            if (res.ok) {
+                                Swal.fire({
+                                    title: "cancelled!",
+                                    text: "Order been Canceled.",
+                                    icon: "success"
+                                });
+                                setTimeout(() => {
+                                    location.reload()
+                                }, 1000);
+                            } else {
+                                Swal.fire({
+                                    title: "cannot cancel!",
+                                    text: "Somthing went Wroung.",
+                                    icon: "error"
+                                });
+                            }
+
+                        })
+                } else {
+                    Swal.fire({
+                        title: "canceled Action!",
+                        text: "cancel your Operation.",
+                        icon: "error"
+                    });
+                }
+            });
+        }
+
+    </script>
+    <%- include('../layout/footer') %>

@@ -1,0 +1,70 @@
+<%- include('../layout/header') %>
+    <section class="content-main">
+        <div class="content-header mt-20">
+            <div>
+                <h2 class="content-title card-title text-center">Your Orders</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover text-center">
+                                <% if (orderData) { %>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Payment Method</th>
+                                            <th>Payment Status</th>
+                                            <th> Total Price</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                            <th class="text-center"> Action </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% orderData.forEach(order=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= order.orderId %>
+                                                </td>
+                                                <td><b>
+                                                        <%= order.paymentMethod %>
+                                                    </b></td>
+                                                <td><span class="badge rounded-pill alert-success">
+                                                    <%= order.paymentStatus %>
+                                                </span>
+                                                </td>
+                                                <td>
+                                                    <%= order.totalPrice %>
+                                                </td>
+                                                <td><span class="badge rounded-pill alert-success">
+                                                        <%= order.status %>
+                                                    </span></td>
+                                                <td>
+                                                    <%= `${order.createdOn.getDate()}-${order.createdOn.getMonth() +
+                                                        1}-${order.createdOn.getFullYear()}`%>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a href='/singleOrderDetials/<%= order.orderId %>' class="btn btn-md rounded font-sm ">view
+                                                        Orders</a>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+
+                                    </tbody>
+                                    <% } else { %>
+                                        <h3 class="text-dark">No orders were placed</h3>
+                                        <% } %>
+
+                            </table>
+                        </div> <!-- table-responsive //end -->
+                    </div> <!-- card-body end// -->
+                </div> <!-- card end// -->
+            </div>
+        </div>
+    </section>
+
+    <%- include('../layout/footer') %>
