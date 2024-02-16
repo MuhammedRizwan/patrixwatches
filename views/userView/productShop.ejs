@@ -65,8 +65,8 @@
                                         <div class="product-img-action-wrap">
                                             <div class="product-img product-img-zoom">
                                                 <a href="/productShop?id=<%= product[i]._id %>">
-                                                    <img class="default-img" src="/productImages/<%= product[i].image[0].filename %>" alt="">
-                                                    <img class="hover-img" src="/productImages/<%= product[i].image[0].filename %>" alt="">
+                                                    <img class="default-img" src="/productImages/<%= product[i].image[0].filename %>" alt="" style="height: 200px;">
+                                                    <img class="hover-img" src="/productImages/<%= product[i].image[0].filename %>" alt="" style="height: 200px;">
                                                 </a>
                                             </div>
                                             <div class="product-action-1">
@@ -90,8 +90,8 @@
                                                 </span>
                                             </div>
                                             <div class="product-price">
-                                                <span><%= product[i].salePrice %></span>
-                                                <span class="old-price"><%= product[i].orginalPrice %></span>
+                                                <span>&#8377;<%= product[i].salePrice %></span>
+                                                <span class="old-price">&#8377;<%= product[i].orginalPrice %></span>
                                             </div>
                                             <div class="product-action-1 show">
                                                 <button aria-label="Add To Cart" class="action-btn hover-up"  onclick="addToCart('<%= product[i]._id %>')"><i class="fi-rs-shopping-bag-add"></i></a>

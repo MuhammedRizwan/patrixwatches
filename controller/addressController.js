@@ -4,7 +4,7 @@ const Address = require('../model/addressModel');
 const addAddressPage = async (req, res) => {
 
     try {
-        const loggedIn = req.user ? true : false;
+        const loggedIn = req.session.user ? true : false;
         return res.render('addAddress', { loggedIn })
     } catch (error) {
         return res.stautus(500).json({ success: false, error: "Internal Server Error" })
@@ -13,7 +13,7 @@ const addAddressPage = async (req, res) => {
 const addAddress = async (req, res) => {
     try {
         const { fullName, mobile, pincode, houseName, landMark, townCity, state } = req.body
-        const userId = req.user.user._id;
+        const userId = req.session.user._id;
         const address = new Address({
             userId, fullName, mobile, pincode, houseName, landMark, townCity, state
         });
@@ -26,8 +26,7 @@ const addAddress = async (req, res) => {
 
 const deletAddress = async (req, res) => {
     try {
-        const addressType = req.query.id;
-        const userId = req.user.user._id;
+        const userId = req.session.user._id;
         const deleteResult = await Address.deleteOne({ userId: userId});
 
         if (deleteResult.deletedCount > 0) {
@@ -44,9 +43,9 @@ const deletAddress = async (req, res) => {
 
 const loadEditAddress = async (req, res) => {
     try {
-        const userId = req.user.user._id;
+        const userId = req.session.user._id;
         const addressData = await Address.findOne({ userId: userId });
-        const loggedIn = req.user.user._id ? true : false;
+        const loggedIn = req.session.user ? true : false;
         return res.render("editAddress", {
             loggedIn,
             address: addressData,
@@ -60,17 +59,19 @@ const loadEditAddress = async (req, res) => {
 
 const editAddress = async (req, res) => {
     try {
-        const userId = req.user.user._id;
+        const userId = req.session.user._id;
+        const{ fullName, mobile, pinCode, houseName, landmark, townCity, state}=req.body
         const addressData = await Address.updateOne(
             { userId: userId },
             {
                 $set: {
-                    fullName, mobile, pinCode, houseName, landmark, townCity, state,
+                    fullName, mobile, pinCode, houseName, landmark, townCity, state
                 },
             }
         );
         return res.status(200).redirect("/account");
     } catch (error) {
+        console.log(error.message);
         res.status(500).send("Internal Server Error. Please try again later.");
     }
 };

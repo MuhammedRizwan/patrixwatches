@@ -46,9 +46,9 @@
                                                                 <%= cart[i].quantity %>
                                                             </span>
                                                         </td>
-                                                        <%= subTotal.push((product[i].salePrice * cart[i].quantity))%>
+                                                        <% subTotal.push((product[i].salePrice * cart[i].quantity))%>
                                                             <td>
-                                                                <%=(product[i].salePrice *
+                                                                &#8377; <%=(product[i].salePrice *
                                                                     cart[i].quantity).toFixed(2)%>
                                                             </td>
                                                     </tr>
@@ -56,7 +56,7 @@
                                                         <tr>
                                                             <th>SubTotal</th>
                                                             <td class="product-subtotal" colspan="2" id="subTotal">
-                                                                <%= subTotal.reduce((sum,i)=>sum+=i,0) %>
+                                                                &#8377; <%= subTotal.reduce((sum,i)=>sum+=i,0) %>
                                                             </td>
                                                         </tr>
                                                         <% } else { %>
@@ -81,7 +81,7 @@
                                                                     <th>Total</th>
                                                                     <td colspan="2" class="product-subtotal"><span
                                                                             class="font-xl text-brand fw-900">
-                                                                            <%= subTotal.reduce((sum,i)=>sum+=i,0) %>
+                                                                            &#8377;<%= subTotal.reduce((sum,i)=>sum+=i,0) %>
                                                                         </span></td>
                                                                 </tr>
                                         </tbody>
@@ -494,13 +494,6 @@
                                             showConfirmButton: false,
                                             timer: 1500
                                         });
-                                        alert(response.error.code);
-                                        alert(response.error.description);
-                                        alert(response.error.source);
-                                        alert(response.error.step);
-                                        alert(response.error.reason);
-                                        alert(response.error.metadata.order_id);
-                                        alert(response.error.metadata.payment_id);
                                     });
 
                                     // Open Razorpay payment modal

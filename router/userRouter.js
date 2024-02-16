@@ -6,7 +6,7 @@ const cartController = require('../controller/cartController');
 const addressController=require('../controller/addressController');
 const orderController=require('../controller/orderCondroller');
 const productController=require('../controller/productController');
-const auth = require('../middleware/auth');
+const {isUser,guestUser,isLoggedUser} = require('../middleware/auth');
 user_route.set('views', './views/userView');
 
 user_route.use(session({
@@ -16,54 +16,56 @@ user_route.use(session({
 }));
 
 // user route configurations
-user_route.get('/',auth,userController.Home); // Home route  (accessible to all)
-user_route.get('/login', userController.userLoginPage); // Login page accessible only if logged out
-user_route.post('/login', userController.userLogin); // User login endpoint;
-user_route.get('/verifyEmail',userController.verifyEmailPage);//getting verify email that email exist 
-user_route.post('/verifyEmail',userController.verifyEmail);//check the email
+user_route.get('/',guestUser,userController.Home); // Home route  (accessible to all)
+user_route.get('/login',isLoggedUser, userController.userLoginPage); // Login page accessible only if logged out
+user_route.post('/login',isLoggedUser, userController.userLogin); // User login endpoint;
+user_route.get('/verifyEmail',isLoggedUser,userController.verifyEmailPage);//getting verify email that email exist 
+user_route.post('/verifyEmail',isLoggedUser,userController.verifyEmail);//check the email
 
-user_route.get('/register', userController.userRegisterPage); // Register page accessible only if logged out
-user_route.post('/register', userController.userRegister); // User registration endpoint
-user_route.post('/verification', userController.verifyOtp); // Verify OTP accessible only if logged in
-user_route.post('/resendOtp', userController.resendOtp); // Resend OTP accessible only if logged 
-user_route.get('/account',auth,userController.account);
-user_route.get('/changePassword',auth,userController.changePasswordPage);
-user_route.post('/changepassword',auth,userController.changePassword);
+user_route.get('/register',isLoggedUser, userController.userRegisterPage); // Register page accessible only if logged out
+user_route.post('/register',isLoggedUser, userController.userRegister); // User registration endpoint
+user_route.post('/verification',isLoggedUser, userController.verifyOtp); // Verify OTP accessible only if logged in
+user_route.post('/resendOtp',isLoggedUser, userController.resendOtp); // Resend OTP accessible only if logged 
+user_route.get('/account',isUser,guestUser,userController.account);
+user_route.get('/changePassword',isUser,guestUser,userController.changePasswordPage);
+user_route.post('/changepassword',isUser,guestUser,userController.changePassword);
 user_route.post('/Forgetverification',userController.forgetOtpVerification);
 user_route.post('/newPassword',userController.newPasswordverify);
+user_route.get('/editProfile',isUser,guestUser,userController.editProfilePage);
+user_route.post('/editProfile',isUser,guestUser,userController.editProfile)
 
 //product
-user_route.get('/productShop', productController.productShop); 
-user_route.get('/Shop',productController.Shop);
+user_route.get('/productShop',guestUser, productController.productShop); 
+user_route.get('/Shop',guestUser,productController.Shop);
 
 //cart 
-user_route.get('/cartlist', auth, cartController.cartPage);
-user_route.post('/addcart',auth, cartController.addCart);
-user_route.post('/qtyInc',auth,cartController.addQuantity);
-user_route.post('/qtyDec',auth,cartController.subQuantity);
-user_route.get('/addToCart',auth,cartController.addCartIcon);
-user_route.delete('/delete-cartItem',auth,cartController.deleteCartItem);
-user_route.get('/checkout',auth,cartController.checkOut);
+user_route.get('/cartlist', isUser,guestUser, cartController.cartPage);
+user_route.post('/addcart',isUser,guestUser, cartController.addCart);
+user_route.post('/qtyInc',isUser,guestUser,cartController.addQuantity);
+user_route.post('/qtyDec',isUser,guestUser,cartController.subQuantity);
+user_route.get('/addToCart',isUser,guestUser,cartController.addCartIcon);
+user_route.delete('/delete-cartItem',isUser,guestUser,cartController.deleteCartItem);
+user_route.get('/checkout',isUser,guestUser,cartController.checkOut);
 
 //address
-user_route.get('/addAddress',auth,addressController.addAddressPage)
-user_route.post('/addAddress',auth,addressController.addAddress);
-user_route.get('/editAddress',auth,addressController.loadEditAddress);
-user_route.post('/editAdrdress',auth,addressController.editAddress);
-user_route.delete('/deleteAddress',auth,addressController.deletAddress);
+user_route.get('/addAddress',isUser,guestUser,addressController.addAddressPage)
+user_route.post('/addAddress',isUser,guestUser,addressController.addAddress);
+user_route.get('/editAddress',isUser,guestUser,addressController.loadEditAddress);
+user_route.post('/editAdrdress',isUser,guestUser,addressController.editAddress);
+user_route.delete('/deleteAddress',isUser,guestUser,addressController.deletAddress);
 
 
 // order
-user_route.post('/orderComplete',auth,orderController.orderComplete);
-user_route.get('/singleOrderDetials/:orderId',auth,orderController.singleOrderDetials);
-user_route.get('/orderSuccesspage',auth,orderController.orderSuccessPage);
-user_route.get('/orderDetials',auth,orderController.orderDetials);
-user_route.put('/cancelSingleProduct',auth,orderController.cancelSingleProduct);
-user_route.post('/razorOrderComplete',auth,orderController.razorOrderComplete);
+user_route.post('/orderComplete',isUser,guestUser,orderController.orderComplete);
+user_route.get('/singleOrderDetials/:orderId',isUser,guestUser,orderController.singleOrderDetials);
+user_route.get('/orderSuccesspage',isUser,guestUser,orderController.orderSuccessPage);
+user_route.get('/orderDetials',isUser,guestUser,orderController.orderDetials);
+user_route.put('/cancelSingleProduct',isUser,guestUser,orderController.cancelSingleProduct);
+user_route.post('/razorOrderComplete',isUser,guestUser,orderController.razorOrderComplete);
 
 
 
-user_route.get('/logout', auth, userController.userLogout); // Logout endpoint accessible only if logged in
+user_route.get('/logout',isUser,userController.userLogout); // Logout endpoint accessible only if logged in
 
 module.exports = user_route;
 

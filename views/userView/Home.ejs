@@ -182,8 +182,8 @@
                                                             </span>
                                                         </div>
                                                         <div class="product-price">
-                                                            <span>$<%= product[i].salePrice %></span>
-                                                            <span class="old-price">$<%= product[i].orginalPrice %>
+                                                            <span>&#8377;<%= product[i].salePrice %></span>
+                                                            <span class="old-price">&#8377;<%= product[i].orginalPrice %>
                                                             </span>
                                                         </div>
                                                         <div class="product-action-1 show">
@@ -479,6 +479,7 @@
                     url: `/addToCart?id=${productId}`,
                     method: "GET",
                     success: function (data) {
+                        console.log(data,"data");
                         Swal.fire({
                             position: "center",
                             icon: "success",

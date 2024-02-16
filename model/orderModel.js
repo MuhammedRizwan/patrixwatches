@@ -12,7 +12,7 @@ const oderSchema = new mongoose.Schema({
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // Reference to the Address model
+    ref: "userDetials", // Reference to the Address model
     required: true,
   },
   createdOn: {
@@ -24,7 +24,7 @@ const oderSchema = new mongoose.Schema({
     {
       product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Products",
+        ref: "ProductDetials",
         required: true,
       },
       quantity: {

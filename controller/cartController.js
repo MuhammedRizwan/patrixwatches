@@ -6,35 +6,35 @@ const addCart = async (req, res) => {
     try {
         const qty = req.body.qty;
         const id = req.query.id;
-        const userId = req.user.user._id;
+        const userId = req.session.user._id;
         const productData = await Product.findOne({ _id: id })
-        if(productData.stock>qty){
+        if (productData.stock > qty) {
             const userCart = await Cart.findOne({ user_id: userId });
-        if (userCart) {
-            const cartItem = userCart.cartItems.find(item => item.product_id == id);
-            if (cartItem) {
-                // Update the quantity for the found cart item
-                const updatedQuantity = cartItem.quantity + parseInt(qty);
-                cartItem.quantity = updatedQuantity;// Set `updatedQuantity` to the new quantity value
+            if (userCart) {
+                const cartItem = userCart.cartItems.find(item => item.product_id == id);
+                if (cartItem) {
+                    // Update the quantity for the found cart item
+                    const updatedQuantity = cartItem.quantity + parseInt(qty);
+                    cartItem.quantity = updatedQuantity;// Set `updatedQuantity` to the new quantity value
+                } else {
+                    userCart.cartItems.push({ product_id: id, quantity: qty, price: productData.salePrice }); // Add a new item to cartItems
+                }
+                await userCart.save();
             } else {
-                userCart.cartItems.push({ product_id: id, quantity: qty, price: productData.salePrice }); // Add a new item to cartItems
+                const cart = new Cart({
+                    user_id: userId,
+                    cartItems: [
+                        {
+                            product_id: productData._id,
+                            quantity: qty,
+                            price: productData.salePrice
+                        }
+                    ],
+                });
+                const cartData = await cart.save();
             }
-            await userCart.save();
-        } else {
-            const cart = new Cart({
-                user_id: userId,
-                cartItems: [
-                    {
-                        product_id: productData._id,
-                        quantity: qty,
-                        price: productData.salePrice
-                    }
-                ],
-            });
-            const cartData = await cart.save();
         }
-        }
-        
+
         return res.redirect('/cartlist');
     } catch (error) {
         console.error(error);
@@ -43,8 +43,8 @@ const addCart = async (req, res) => {
 }
 const cartPage = async (req, res) => {
     try {
-        const loggedIn = req.user ? true : false;
-        const userId = req.user.user._id;// Assuming the user ID is available in req.user.user[0]._id
+        const loggedIn = req.session.user ? true : false;
+        const userId = req.session.user._id;// Assuming the user ID is available in req.user.user[0]._id
         const cartData = await Cart.findOne({ user_id: userId });
         if (!cartData) {
             return res.status(404).render('cartList', { cart: cartData, loggedIn });
@@ -62,9 +62,9 @@ const cartPage = async (req, res) => {
 
 const addQuantity = async (req, res) => {
     try {
-        const loggedIn = req.user ? true : false;
+        const loggedIn = req.session.user ? true : false;
         const id = req.query.id; // Corrected variable declaration
-        const userId = req.user.user._id
+        const userId = req.session.user._id
         const cartData = await Cart.findOne({ user_id: userId }, { cartItems: 1, _id: 0 });
         const productStock = await Product.findOne({ _id: id }, { stock: 1, _id: 0 });
         if (!cartData) {
@@ -95,9 +95,9 @@ const addQuantity = async (req, res) => {
 };
 const subQuantity = async (req, res) => {
     try {
-        const loggedIn = req.user ? true : false;
+        const loggedIn = req.session.user ? true : false;
         const id = req.query.id; // Corrected variable declaration
-        const userId = req.user.user._id;
+        const userId = req.session.user._id;
         const cartData = await Cart.findOne({ user_id: userId, 'cartItems.product_id': id });
         const cartDataItem = cartData.cartItems; // Access the first document and then get cartItems
         const existProduct = cartDataItem.find(item => item.product_id == id);
@@ -127,8 +127,11 @@ const addCartIcon = async (req, res) => {
     try {
         const id = req.query.id; // Corrected variable declaration
         const productData = await Product.findById(id);
+        if(productData.stock==0){
+            return res.status(400).json({success:false,message:"Out Of Stock"})
+        }
         const quantity = 1;
-        const user_id = req.user.user._id;
+        const user_id = req.session.user._id;
         const userExist = await Cart.findOne({
             user_id: user_id, // Corrected to use user_id 
         });
@@ -163,9 +166,8 @@ const addCartIcon = async (req, res) => {
                 ]
             });
             await cart.save();
-
         }
-        return res.status(200).send("added to the cart")
+        return res.status(200).json({ success: true, message: "Added to the cart" })
     } catch (error) {
         console.log(error.message);
         return res.status(500).send('Internal Server Error');
@@ -178,7 +180,7 @@ const deleteCartItem = async (req, res) => {
     try {
         // Find the user's cart and remove the item where product_id matches
         const updatedCart = await Cart.findOneAndUpdate(
-            { user_id: req.user.user._id },
+            { user_id: req.session.user._id },
             { $pull: { cartItems: { product_id: productId } } },
             { new: true }
         );
@@ -196,15 +198,16 @@ const deleteCartItem = async (req, res) => {
 };
 const checkOut = async (req, res) => {
     try {
-        const userId = req.user.user._id;
+        const userId = req.session.user._id;
         const cartData = await Cart.findOne({ user_id: userId });
-        if(cartData){
+        if (cartData) {
             const addressData = await Address.findOne({ userId: userId });
             const cartItemData = cartData.cartItems;
             const productData = cartItemData.map(item => (item.product_id));
             const products = await Product.find({ _id: { $in: productData } })
-            const loggedIn = req.user ? true : false;
-            return res.status(200).render("checkOut", {loggedIn,
+            const loggedIn = req.session.user ? true : false;
+            return res.status(200).render("checkOut", {
+                loggedIn,
                 // category: categoryData,
                 Address: addressData,
                 cart: cartItemData,
@@ -212,7 +215,7 @@ const checkOut = async (req, res) => {
             });
         }
         //const categoryData = await Category.find({ is_active: false });
-     
+
     } catch (error) {
         console.error("Error in checkoutPage:", error);
         return res.status(500).send('Internal Server Error');

@@ -4,8 +4,7 @@
         <div class="container">
             <div class="breadcrumb">
                 <a href="index.html" rel="nofollow">Home</a>
-                <span></span> Fashion
-                <span></span> Abstract Print Patchwork Dress
+                <span></span> product detials
             </div>
         </div>
     </div>
@@ -21,7 +20,7 @@
                                     <!-- MAIN SLIDES -->
                                     <div class="zoom-container">
                                         <figure class="border-radius-10" id="zoomImage" >
-                                            <img id="myImage" src="/productImages/<%= product.image[0].filename %>" alt="product image" style="width: 500px; height: 500px;">
+                                            <img id="myImage" onchange="changeImage()" src="/productImages/<%= product.image[0].filename %>" alt="product image" style="width: 500px; height: 500px;">
                                         </figure>
                                     </div>
                                     <!-- THUMBNAILS -->
@@ -38,7 +37,7 @@
                             </div>
                             <div class="col-md-6 col-sm-12 col-xs-12">
                                 <div class="detail-info">
-                                    <h2 class="title-detail">Colorful Pattern Shirts HD450</h2>
+                                    <h2 class="title-detail"><%= product.productName %></h2>
                                     <div class="product-detail-rating">
                                         <div class="pro-details-brand">
                                             <span> Brands: <a href="shop-grid-right.html">Bootstrap</a></span>
@@ -53,8 +52,8 @@
                                     </div>
                                     <div class="clearfix product-price-cover">
                                         <div class="product-price primary-color float-left">
-                                            <ins><span class="text-brand"><%= product.salePrice %></span></ins>
-                                            <ins><span class="old-price font-md ml-15"><%= product.orginalPrice %></span></ins>
+                                            <ins><span class="text-brand">&#8377;<%= product.salePrice %></span></ins>
+                                            <ins><span class="old-price font-md ml-15">&#8377;<%= product.orginalPrice %></span></ins>
                                             <span class="save-price  font-md color3 ml-15">20% Off</span>
                                         </div>
                                     </div>
@@ -397,16 +396,17 @@
 </main>
 
 <script>
-   var options = {
+        var options = {
             width: 400,
-            height: 250,
-            zoomWidth: 100,
+            height: 450,
+            zoomWidth: 50,
             offset: { vertical:0, horizontal:10},
             scale: 1
         };
 
         // Assuming ImageZoom is part of the library, adjust this accordingly
         new ImageZoom(document.getElementById("zoomImage"), options);
+ 
 </script>
 <script>
     function changeImage(image) {

@@ -5,7 +5,7 @@ const Category = require('../model/categoryModel');
 const Address = require('../model/addressModel');
 const Order = require('../model/orderModel');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
 const otp = require('../util/genarateOtp');
 const sendEmail = require('../util/sendEmail');
 
@@ -21,15 +21,15 @@ const securePassword = async (password) => {
 
 }
 
-const genarateToken = (user) => {
-    return jwt.sign({ user }, process.env.SECRETKEY, { expiresIn: 2 * 60 * 60 * 1000 })
-}
+// const genarateToken = (user) => {
+//     return jwt.sign({ user }, process.env.SECRETKEY, { expiresIn: 2 * 60 * 60 * 1000 })
+// }
 const Home = async (req, res) => {
     try {
-        const loggedIn = req.cookies.token ? true : false;
+        const loggedIn = req.session.user ? true : false;
         const categoryData = await Category.find({ is_unList: false });
         const categoryIds = categoryData.map(category => category._id);
-        const productData = await Product.find({ category_id: { $in: categoryIds },is_blocked:false });
+        const productData = await Product.find({ category_id: { $in: categoryIds }, is_blocked: false });
         return res.status(200).render('Home', { product: productData, category: categoryData, loggedIn });
     } catch (error) {
         console.log(error.message);
@@ -38,16 +38,15 @@ const Home = async (req, res) => {
 }
 const userRegisterPage = async (req, res) => {
     try {
-        const loggedIn = req.cookies.token ? true : false;
+        const loggedIn = req.session.user ? true : false;
         return res.render('userRegister', { loggedIn })
     } catch (error) {
         console.log(error.message)
     }
 }
-let tempUser;
 const userRegister = async (req, res) => {
     try {
-        const loggedIn = req.cookies.token ? true : false;
+        const loggedIn = req.session.user ? true : false;
         const emailExist = await User.aggregate([
             {
                 $match: { email: req.body.email }
@@ -61,9 +60,9 @@ const userRegister = async (req, res) => {
         }
         const { name, email, phone, password } = req.body;
         const sPassword = await securePassword(password);
-        tempUser = { name, email, phone, password: sPassword };
+        req.session.tempUser = { name, email, phone, password: sPassword };
         const clearOtp = await Otp.deleteOne({ email: email });
-        await otp(req.body.email);
+        await otp(email);
         const otpData = await Otp.aggregate([
             {
                 $match: { email: req.body.email }
@@ -81,9 +80,9 @@ const userRegister = async (req, res) => {
 }
 const verifyOtp = async (req, res) => {
     try {
-        const loggedIn = req.cookies.token ? true : false;
+        const loggedIn = req.session.user ? true : false;
         const userotp = req.body.otp;
-        const { name, email, phone, password } = tempUser;
+        const { name, email, phone, password } = req.session.tempUser;
         const otpData = await Otp.aggregate([
             {
                 $match: { email: email }
@@ -106,12 +105,15 @@ const verifyOtp = async (req, res) => {
                 const user = await userData.save()
                 if (user) {
                     user.password = undefined
-                    const token = genarateToken(user);
-                    const options = {
-                        expires: new Date(Date.now() + 60 * 60 * 1000),
-                        httpOnly: true
-                    }
-                    return res.status(201).cookie("token", token, options).redirect('/');
+                    req.session.LoggedUser = true
+                    req.session.user = user
+                    // const token = genarateToken(user);
+                    // const options = {
+                    //     expires: new Date(Date.now() + 60 * 60 * 1000),
+                    //     httpOnly: true
+                    // }
+                    // return res.status(201).cookie("token", token, options).redirect('/');
+                    return res.status(201).redirect('/');
                 }
             } else {
                 return res.status(400).render('verification', { message: 'OTP Is Not Matching', loggedIn });
@@ -126,7 +128,7 @@ const verifyOtp = async (req, res) => {
 }
 const userLoginPage = async (req, res) => {
     try {
-        const loggedIn = req.cookies.token ? true : false;
+        const loggedIn = req.session.user ? true : false;
         return res.status(200).render('userLogin', { loggedIn });
     } catch (error) {
         console.log(error.message);
@@ -135,7 +137,7 @@ const userLoginPage = async (req, res) => {
 }
 const userLogin = async (req, res) => {
     try {
-        const loggedIn = req.cookies.token ? true : false;
+        const loggedIn = req.session.user ? true : false;
         const { email, password } = req.body;
         const userData = await User.aggregate([
             { $match: { email: email } },
@@ -146,13 +148,16 @@ const userLogin = async (req, res) => {
             if (passwordMatch) {
                 if (userData[0].is_block === false) {
                     userData[0].password = undefined;
-                    const userDatas=userData[0]
-                    const token = genarateToken(userDatas);
-                    const options = {
-                        expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
-                        httpOnly: true
-                    }
-                    return res.status(200).cookie("token", token, options).redirect('/');
+                    const userDatas = userData[0]
+                    req.session.LoggedUser = true;
+                    req.session.user = userDatas;
+                    // const token = genarateToken(userDatas);
+                    // const options = {
+                    //     expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
+                    //     httpOnly: true
+                    // }
+                    // return res.status(200).cookie("token", token, options).redirect('/');
+                    return res.status(200).redirect('/');
                 } else {
                     return res.status(403).render('userLogin', { message: 'You are blocked', loggedIn }); // 403: Forbidden
                 }
@@ -169,8 +174,8 @@ const userLogin = async (req, res) => {
 }
 const resendOtp = async (req, res) => {
     try {
-        const loggedIn = req.cookies.token ? true : false;
-        const { name, email } = tempUser;
+        const loggedIn = req.session.user_id ? true : false;
+        const { name, email } = req.session.tempUser;
         const deleteExistOtp = await Otp.deleteOne({ email: email });
         await otp(email);
         const otpData = await Otp.aggregate([
@@ -187,8 +192,8 @@ const resendOtp = async (req, res) => {
 }
 const account = async (req, res) => {
     try {
-        const loggedIn = req.user ? true : false;
-        const userId = req.user._id;
+        const loggedIn = req.session.user ? true : false;
+        const userId = req.session.user._id;
         const userData = await User.aggregate([
             {
                 $match: { _id: new mongoose.Types.ObjectId(userId) }
@@ -208,8 +213,8 @@ const account = async (req, res) => {
                 $limit: 1
             }
         ]);
-            return res.status(200).render('account', { Address: addressData, loggedIn, user: userData[0] });
-        
+        return res.status(200).render('account', { Address: addressData, loggedIn, user: userData[0] });
+
     } catch (error) {
         console.log(error.message);
         return res.status(500).json("internal Server Error");
@@ -217,8 +222,9 @@ const account = async (req, res) => {
 }
 const userLogout = async (req, res) => {
     try {
-
-        return res.clearCookie("token").redirect('/');
+        req.session.LoggedUser = false
+        req.session.user = undefined;
+        return res.status(200).redirect('/');
     } catch (error) {
         console.log(error.message);
         return res.status(500).json({ success: false, error: 'Internal Server Error' });
@@ -226,7 +232,7 @@ const userLogout = async (req, res) => {
 }
 const changePasswordPage = async (req, res) => {
     try {
-        const loggedIn = req.user ? true : false;
+        const loggedIn = req.session.user ? true : false;
         return res.status(200).render('changePassword', { loggedIn });
     } catch (error) {
         return res.status(500).jason({ success: false, error: "internal server error" })
@@ -234,9 +240,9 @@ const changePasswordPage = async (req, res) => {
 }
 const changePassword = async (req, res) => {
     try {
-        const loggedIn = req.user ? true : false;
+        const loggedIn = req.session.user ? true : false;
         const { password, npassword } = req.body;
-        const userId = req.user._id;
+        const userId = req.session.user._id;
         const userData = await User.aggregate([
             {
                 $match: { _id: new mongoose.Types.ObjectId(userId) }
@@ -256,7 +262,7 @@ const changePassword = async (req, res) => {
                 if (!sPassword) {
                     return res.status(400).json({ success: false, message: "hash password didn't work" })
                 } else {
-                    const updatePassword = await User.updateOne({ _id: req.user._id }, { $set: { password: sPassword } }, { new: true });
+                    const updatePassword = await User.updateOne({ _id: req.session.user._id }, { $set: { password: sPassword } }, { new: true });
                     if (!updatePassword) {
                         return res.status(404).json({ success: false, error: "something went wrong" });
                     } else {
@@ -273,7 +279,7 @@ const changePassword = async (req, res) => {
 
 const verifyEmailPage = async (req, res) => {
     try {
-        const loggedIn = req.user ? true : false;
+        const loggedIn = req.session.user ? true : false;
         return res.status(200).render('email-verified', { loggedIn })
     } catch (error) {
         return res.status(500).send('Internal Server Error');
@@ -282,7 +288,7 @@ const verifyEmailPage = async (req, res) => {
 let emailOtpverify;
 const verifyEmail = async (req, res) => {
     try {
-        const loggedIn = req.user ? true : false;
+        const loggedIn = req.session.user ? true : false;
         const { email } = req.body;
         emailOtpverify = email;
         const userData = await User.aggregate([{
@@ -313,7 +319,7 @@ const verifyEmail = async (req, res) => {
 }
 const forgetOtpVerification = async (req, res) => {
     try {
-        const loggedIn = req.user ? true : false;
+        const loggedIn = req.session.user ? true : false;
         const userotp = req.body.otp;
         const otpData = await Otp.aggregate([
             {
@@ -352,7 +358,36 @@ const newPasswordverify = async (req, res) => {
         return res.status(500).send('Internal Server Error');
     }
 }
- 
+const editProfilePage=async(req,res)=>{
+    try {
+        const loggedIn = req.session.user ? true : false;
+        const userData=await User.findOne({_id:req.session.user._id})
+        return res.status(200).render('editProfile', { loggedIn ,userData});
+        
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).send('Internal Server Error');
+    }
+}
+const editProfile=async(req,res)=>{
+    try {
+        const userId=req.session.user._id;
+        const {name,phone}=req.body;
+        const userData = await User.updateOne(
+            { _id: userId },
+            {
+                $set: {
+                    name,phone
+                },
+            }
+        );
+        return res.status(200).redirect('/account')
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).send('Internal Server Error');
+
+    }
+}
 module.exports = {
     Home,
     userLoginPage,
@@ -369,4 +404,6 @@ module.exports = {
     verifyEmail,
     forgetOtpVerification,
     newPasswordverify,
+    editProfilePage,
+    editProfile
 }

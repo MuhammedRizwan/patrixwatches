@@ -71,10 +71,19 @@
         </div>
         <div class="row">
             <div class="col-xl-8 col-lg-12">
+                <div class="input-group">
+                    <select name="selectTime" id="timeRangeFilter">
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                    <button class="btn btn-light bg" id="fetchDataButton" type="button"> <i
+                            class="material-icons md-search"></i></button>
+                </div>
                 <div class="card mb-4">
                     <article class="card-body">
                         <h5 class="card-title">Sale statistics</h5>
-                        <canvas id="myChart" height="120px"></canvas>
+                        <canvas id="myChart"></canvas>
                     </article>
                 </div>
                 <div class="row">
@@ -483,5 +492,68 @@
             </nav>
         </div>
     </section> <!-- content-main end// -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const timeRangeFilter = document.getElementById('timeRangeFilter');
+    const fetchDataButton = document.getElementById('fetchDataButton');
+    console.log(timeRangeFilter.value);
+    let myChart = null; // Variable to hold the chart instance
+
+    // Call fetchData() function immediately after DOM content is loaded
+    fetchData();
+
+    fetchDataButton.addEventListener('click', fetchData);
+
+    function fetchData() {
+        const selectedTimeRange = timeRangeFilter.value;
+        fetch(`/admin/sales-chart?timeRange=${selectedTimeRange}`,{method:"GET"})
+            .then(response => response.json())
+            .then(data => {
+                // Destroy existing chart if it exists
+                if (myChart) {
+                myChart.destroy();
+            }
+                // Render chart with fetched data
+                renderChart(data);
+            })
+            .catch(error => console.error('Error fetching sales chart data:', error));
+    }
+
+    function renderChart(data) {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Sales',
+                    data: data.datasets[0].data,
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false // Hide legend for simplicity
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1 // Set the step size to 2 for integer values only
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+
+       
+        </script>
 
     <%- include('../adminLayout/footer') %>

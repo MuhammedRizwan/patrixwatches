@@ -150,7 +150,7 @@ const unBlockProduct = async (req, res) => {
 }
 const productShop = async (req, res) => {
     try {
-        const loggedIn = req.cookies.token ? true : false;
+        const loggedIn = req.session.user ? true : false;
         const id = req.query.id;
         const productData = await Product.findOne({ _id: id });
 
@@ -165,7 +165,7 @@ const productShop = async (req, res) => {
 }
 const Shop = async (req, res) => {
     try {
-        const loggedIn = req.cookies.token ? true : false;
+        const loggedIn = req.session.user ? true : false;
         const categoryData = await Category.find({ is_unList: false }, { _id: 1 });
         const categoryIds = categoryData.map(category => category._id);
         const productData = await Product.find({ category_id: { $in: categoryIds },is_blocked:false });
