@@ -22,7 +22,7 @@
                         <form action="/admin/addCategory" method="post" onsubmit="return validate()">
                             <div class="mb-8">
                                 <label for="product_name" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="category_name" name="categoryName" />
+                                <input type="text" class="form-control" id="category_name" name="categoryName" oninput="this.value=this.value.toUpperCase()" />
                                 <a href="" id="categoryNameError"></a>
                             </div>
                             <div class="mb-8">

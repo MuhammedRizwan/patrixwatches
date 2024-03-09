@@ -1,14 +1,18 @@
 const express = require('express');
 const user_route = express();
-const session=require('express-session')
+const session=require('express-session');
 const userController = require('../controller/userController');
 const cartController = require('../controller/cartController');
 const addressController=require('../controller/addressController');
 const orderController=require('../controller/orderCondroller');
 const productController=require('../controller/productController');
+const couponController=require('../controller/couponController');
+const wishlistController=require('../controller/wishListController');
 const {isUser,guestUser,isLoggedUser} = require('../middleware/auth');
+const errorHandler=require('../middleware/errorHandler');
 user_route.set('views', './views/userView');
 
+user_route.use(errorHandler)
 user_route.use(session({
     secret: 'your-secret-key', // Change this to a long, random string
     resave: false,
@@ -32,7 +36,7 @@ user_route.post('/changepassword',isUser,guestUser,userController.changePassword
 user_route.post('/Forgetverification',userController.forgetOtpVerification);
 user_route.post('/newPassword',userController.newPasswordverify);
 user_route.get('/editProfile',isUser,guestUser,userController.editProfilePage);
-user_route.post('/editProfile',isUser,guestUser,userController.editProfile)
+user_route.post('/editProfile',isUser,guestUser,userController.editProfile);
 
 //product
 user_route.get('/productShop',guestUser, productController.productShop); 
@@ -43,7 +47,7 @@ user_route.get('/cartlist', isUser,guestUser, cartController.cartPage);
 user_route.post('/addcart',isUser,guestUser, cartController.addCart);
 user_route.post('/qtyInc',isUser,guestUser,cartController.addQuantity);
 user_route.post('/qtyDec',isUser,guestUser,cartController.subQuantity);
-user_route.get('/addToCart',isUser,guestUser,cartController.addCartIcon);
+user_route.get('/addToCart',guestUser,cartController.addCartIcon);
 user_route.delete('/delete-cartItem',isUser,guestUser,cartController.deleteCartItem);
 user_route.get('/checkout',isUser,guestUser,cartController.checkOut);
 
@@ -52,7 +56,7 @@ user_route.get('/addAddress',isUser,guestUser,addressController.addAddressPage)
 user_route.post('/addAddress',isUser,guestUser,addressController.addAddress);
 user_route.get('/editAddress',isUser,guestUser,addressController.loadEditAddress);
 user_route.post('/editAdrdress',isUser,guestUser,addressController.editAddress);
-user_route.delete('/deleteAddress',isUser,guestUser,addressController.deletAddress);
+user_route.put('/deleteAddress',isUser,guestUser,addressController.deletAddress);
 
 
 // order
@@ -62,6 +66,18 @@ user_route.get('/orderSuccesspage',isUser,guestUser,orderController.orderSuccess
 user_route.get('/orderDetials',isUser,guestUser,orderController.orderDetials);
 user_route.put('/cancelSingleProduct',isUser,guestUser,orderController.cancelSingleProduct);
 user_route.post('/razorOrderComplete',isUser,guestUser,orderController.razorOrderComplete);
+user_route.put('/returnSingleProduct',isUser,guestUser,orderController.returnSingleProduct);
+user_route.get('/walletTransactions',isUser,guestUser,userController.walletTransaction);
+user_route.get('/Orderpayment',isUser,guestUser,orderController.PaymentOrderPage);
+user_route.post('/paymentOrder',isUser,guestUser,orderController.paymentOrder);
+user_route.get('/Invoice',isUser,guestUser,orderController.saveInvoice);
+
+user_route.post('/applyCoupon',isUser,guestUser,couponController.applyCoupon);
+
+user_route.get('/wishList',isUser,guestUser,wishlistController.wishListPage);
+user_route.get('/addToWishlist',guestUser,wishlistController.addToWishList);
+user_route.delete('/delete-wishitem',isUser,guestUser,wishlistController.deleteWishItem);
+
 
 
 

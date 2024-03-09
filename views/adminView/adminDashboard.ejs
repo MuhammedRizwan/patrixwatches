@@ -18,7 +18,7 @@
                                 class="text-primary material-icons md-monetization_on"></i></span>
                         <div class="text">
                             <h6 class="mb-1 card-title">Revenue</h6>
-                            <span>$13,456.5</span>
+                            <span><%= totalRevenue.reduce((sum,i)=>sum+i,0) %></span>
                             <span class="text-sm">
                                 Shipping fees are not included
                             </span>
@@ -32,7 +32,7 @@
                         <span class="icon icon-sm rounded-circle bg-success-light"><i
                                 class="text-success material-icons md-local_shipping"></i></span>
                         <div class="text">
-                            <h6 class="mb-1 card-title">Orders</h6> <span>53.668</span>
+                            <h6 class="mb-1 card-title">Orders</h6> <span><%= countOrders %></span>
                             <span class="text-sm">
                                 Excluding orders in transit
                             </span>
@@ -46,23 +46,9 @@
                         <span class="icon icon-sm rounded-circle bg-warning-light"><i
                                 class="text-warning material-icons md-qr_code"></i></span>
                         <div class="text">
-                            <h6 class="mb-1 card-title">Products</h6> <span>9.856</span>
+                            <h6 class="mb-1 card-title">Products</h6> <span><%= countProduct %></span>
                             <span class="text-sm">
-                                In 19 Categories
-                            </span>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="card card-body mb-4">
-                    <article class="icontext">
-                        <span class="icon icon-sm rounded-circle bg-info-light"><i
-                                class="text-info material-icons md-shopping_basket"></i></span>
-                        <div class="text">
-                            <h6 class="mb-1 card-title">Monthly Earning</h6> <span>$6,982</span>
-                            <span class="text-sm">
-                                Based in your local time.
+                                In <%= countCategory %> Categories
                             </span>
                         </div>
                     </article>
@@ -71,197 +57,29 @@
         </div>
         <div class="row">
             <div class="col-xl-8 col-lg-12">
-                <div class="input-group">
-                    <select name="selectTime" id="timeRangeFilter">
-                        <option value="weekly">Weekly</option>
+                <div class="mb-3">
+                    <label for="intervalSelector" class="form-label">Select Interval:</label>
+                    <select id="intervalSelector" class="form-select">
+                        <option value="daily">Daily</option>
                         <option value="monthly">Monthly</option>
                         <option value="yearly">Yearly</option>
+                        <!-- Add more options as needed -->
                     </select>
-                    <button class="btn btn-light bg" id="fetchDataButton" type="button"> <i
-                            class="material-icons md-search"></i></button>
                 </div>
-                <div class="card mb-4">
-                    <article class="card-body">
-                        <h5 class="card-title">Sale statistics</h5>
-                        <canvas id="myChart"></canvas>
-                    </article>
-                </div>
+
                 <div class="row">
-                    <div class="col-lg-5">
-                        <div class="card mb-4">
+                    <div class="col-12"> <!-- Use col-12 to make it full width on all screen sizes -->
+                        <div class="card mb-12">
                             <article class="card-body">
-                                <h5 class="card-title">New Members</h5>
-                                <div class="new-member-list">
-                                    <div class="d-flex align-items-center justify-content-between mb-4">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/admin-assets/imgs/people/avatar4.jpg" alt="" class="avatar">
-                                            <div>
-                                                <h6>Patric Adams</h6>
-                                                <p class="text-muted font-xs">
-                                                    Sanfrancisco
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <a href="#" class="btn btn-xs"><i class="material-icons md-add"></i> Add</a>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between mb-4">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/admin-assets/imgs/people/avatar2.jpg" alt="" class="avatar">
-                                            <div>
-                                                <h6>Dilan Specter</h6>
-                                                <p class="text-muted font-xs">
-                                                    Sanfrancisco
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <a href="#" class="btn btn-xs"><i class="material-icons md-add"></i> Add</a>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between mb-4">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/admin-assets/imgs/people/avatar3.jpg" alt="" class="avatar">
-                                            <div>
-                                                <h6>Tomas Baker</h6>
-                                                <p class="text-muted font-xs">
-                                                    Sanfrancisco
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <a href="#" class="btn btn-xs"><i class="material-icons md-add"></i> Add</a>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                    </div>
-                    <div class="col-lg-7">
-                        <div class="card mb-4">
-                            <article class="card-body">
-                                <h5 class="card-title">Recent activities</h5>
-                                <ul class="verti-timeline list-unstyled font-sm">
-                                    <li class="event-list">
-                                        <div class="event-timeline-dot">
-                                            <i class="material-icons md-play_circle_outline font-xxl"></i>
-                                        </div>
-                                        <div class="media">
-                                            <div class="me-3">
-                                                <h6><span>Today</span> <i
-                                                        class="material-icons md-trending_flat text-brand ml-15 d-inline-block"></i>
-                                                </h6>
-                                            </div>
-                                            <div class="media-body">
-                                                <div>
-                                                    Lorem ipsum dolor sit amet consectetur
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li class="event-list active">
-                                        <div class="event-timeline-dot">
-                                            <i
-                                                class="material-icons md-play_circle_outline font-xxl animation-fade-right"></i>
-                                        </div>
-                                        <div class="media">
-                                            <div class="me-3">
-                                                <h6><span>17 May</span> <i
-                                                        class="material-icons md-trending_flat text-brand ml-15 d-inline-block"></i>
-                                                </h6>
-                                            </div>
-                                            <div class="media-body">
-                                                <div>
-                                                    Debitis nesciunt voluptatum dicta reprehenderit
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li class="event-list">
-                                        <div class="event-timeline-dot">
-                                            <i class="material-icons md-play_circle_outline font-xxl"></i>
-                                        </div>
-                                        <div class="media">
-                                            <div class="me-3">
-                                                <h6><span>13 May</span> <i
-                                                        class="material-icons md-trending_flat text-brand ml-15 d-inline-block"></i>
-                                                </h6>
-                                            </div>
-                                            <div class="media-body">
-                                                <div>
-                                                    Accusamus voluptatibus voluptas.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li class="event-list">
-                                        <div class="event-timeline-dot">
-                                            <i class="material-icons md-play_circle_outline font-xxl"></i>
-                                        </div>
-                                        <div class="media">
-                                            <div class="me-3">
-                                                <h6><span>05 April</span> <i
-                                                        class="material-icons md-trending_flat text-brand ml-15 d-inline-block"></i>
-                                                </h6>
-                                            </div>
-                                            <div class="media-body">
-                                                <div>
-                                                    At vero eos et accusamus et iusto odio dignissi
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li class="event-list">
-                                        <div class="event-timeline-dot">
-                                            <i class="material-icons md-play_circle_outline font-xxl"></i>
-                                        </div>
-                                        <div class="media">
-                                            <div class="me-3">
-                                                <h6><span>26 Mar</span> <i
-                                                        class="material-icons md-trending_flat text-brand ml-15 d-inline-block"></i>
-                                                </h6>
-                                            </div>
-                                            <div class="media-body">
-                                                <div>
-                                                    Responded to need “Volunteer Activities
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
+                                <!-- Your new canvas for the chart -->
+                                <canvas id="salesChartCanvas" height="100px"></canvas>
                             </article>
                         </div>
                     </div>
                 </div>
+                
             </div>
-            <div class="col-xl-4 col-lg-12">
-                <div class="card mb-4">
-                    <article class="card-body">
-                        <h5 class="card-title">Revenue Base on Area</h5>
-                        <canvas id="myChart2" height="217"></canvas>
-                    </article>
-                </div>
-                <div class="card mb-4">
-                    <article class="card-body">
-                        <h5 class="card-title">Marketing Chanel</h5>
-                        <span class="text-muted font-xs">Facebook</span>
-                        <div class="progress mb-3">
-                            <div class="progress-bar" role="progressbar" style="width: 15%">15%</div>
-                        </div>
-                        <span class="text-muted font-xs">Instagram</span>
-                        <div class="progress mb-3">
-                            <div class="progress-bar" role="progressbar" style="width: 65%">65% </div>
-                        </div>
-                        <span class="text-muted font-xs">Google</span>
-                        <div class="progress mb-3">
-                            <div class="progress-bar" role="progressbar" style="width: 51%"> 51% </div>
-                        </div>
-                        <span class="text-muted font-xs">Twitter</span>
-                        <div class="progress mb-3">
-                            <div class="progress-bar" role="progressbar" style="width: 80%"> 80%</div>
-                        </div>
-                        <span class="text-muted font-xs">Other</span>
-                        <div class="progress mb-3">
-                            <div class="progress-bar" role="progressbar" style="width: 80%"> 80%</div>
-                        </div>
-                    </article>
-                </div>
-            </div>
+            
         </div>
         <div class="card mb-4">
             <header class="card-header">
@@ -493,7 +311,7 @@
         </div>
     </section> <!-- content-main end// -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-    <script>
+    <!-- <script>
 document.addEventListener('DOMContentLoaded', function () {
     const timeRangeFilter = document.getElementById('timeRangeFilter');
     const fetchDataButton = document.getElementById('fetchDataButton');
@@ -554,6 +372,99 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
        
-        </script>
+        </script> -->
+        <script>
+          let myChart; // Declare myChart outside the function to make it accessible globally
+
+          async function fetchSalesData(interval) {
+              try {
+                  console.log("Selected interval: " + interval);
+
+                  const response = await fetch(`/admin/sales-data?interval=${interval}`);
+
+                  if (!response.ok) {
+                      console.error('Error fetching sales data. Server responded with:', response.status);
+                      throw new Error('Failed to fetch sales data');
+                  }
+
+                  const data = await response.json();
+                  console.log("Fetched data:", data);
+
+                  return data;
+              } catch (error) {
+                  console.error('Error fetching sales data:', error.message);
+                  throw error;
+              }
+          }
+
+          async function renderSalesChart(interval) {
+              try {
+                  const salesData = await fetchSalesData(interval);
+                  console.log('salesData', salesData);
+
+                  const ctx = document.getElementById('salesChartCanvas').getContext('2d');
+
+                  if (myChart) {
+                      // If myChart exists, update its data
+                      myChart.data.labels = salesData.labels;
+                      myChart.data.datasets[0].data = salesData.values;
+                      myChart.update();
+                  } else {
+                      // If myChart doesn't exist, create a new chart
+                      myChart = new Chart(ctx, {
+                          type: 'line',
+                          data: {
+                              labels: salesData.labels,
+                              datasets: [{
+                                  label: 'Total Sales',
+                                  data: salesData.values,
+                                  fill: true,
+                                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                  borderColor: 'rgba(75, 192, 192, 1)',
+
+                                  tension: 0.2,
+                              }],
+                          },
+                          options: {
+                              plugins: {
+                                  legend: {
+                                      labels: {
+                                          usePointStyle: true,
+                                      },
+                                  }
+                              }
+                          }
+                      });
+                  }
+              } catch (error) {
+                  console.error('Error rendering sales chart:', error.message);
+              }
+          }
+
+          function handleFilterChange() {
+              try {
+                  const intervalSelector = document.getElementById('intervalSelector');
+                  const selectedInterval = intervalSelector.value;
+
+                  console.log("Selected interval changed: " + selectedInterval);
+
+                  if (!['daily', 'monthly', 'yearly'].includes(selectedInterval)) {
+                      console.error('Error: Invalid time interval');
+                      return;
+                  }
+                  renderSalesChart(selectedInterval);
+
+              } catch (error) {
+                  console.error('Error handling filter change:', error.message);
+              }
+          }
+
+          const intervalSelector = document.getElementById('intervalSelector');
+          intervalSelector.addEventListener('change', handleFilterChange);
+
+          const defaultInterval = intervalSelector.options[0].value;
+          renderSalesChart(defaultInterval);
+      </script>
+
 
     <%- include('../adminLayout/footer') %>

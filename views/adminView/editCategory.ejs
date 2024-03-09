@@ -12,6 +12,9 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 m-auto">
+                        <% if (typeof message!= undefined) { %>
+                         <span>category Exist</span>
+                        <% } %>
                         <form action="/admin/edit" method="post" onsubmit="return validate()">
                             <div class="mb-8">
                                 <label for="product_name" class="form-label">Name</label>

@@ -1,0 +1,77 @@
+<%- include('../adminLayout/header') %>
+    <section class="content-main">
+        <div class="content-header">
+            <h2 class="content-title">Banner list</h2>
+            <div>
+                <a href="/admin/addBanner" class="btn btn-primary"><i class="material-icons md-plus"></i> Create new</a>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <div class="row gx-3">
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <input type="text" placeholder="Search..." class="form-control">
+                    </div>
+                    <div class="col-lg-2 col-md-3 col-6">
+                        <select class="form-select">
+                            <option>Status</option>
+                            <option>Active</option>
+                            <option>Disabled</option>
+                            <option>Show all</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-3 col-6">
+                        <select class="form-select">
+                            <option>Show 20</option>
+                            <option>Show 30</option>
+                            <option>Show 40</option>
+                        </select>
+                    </div>
+                </div>
+            </header> <!-- card-header end// -->
+            <div class="row">
+                <% if (banner.length> 0) { %>
+                    <% for (let i=0; i < banner.length; i++) { %>
+                        <div class="col-xl-5 col-lg-5 col-md-5">
+                            <div class="card card-product-grid">
+                                <a href="#" class="img-wrap"> <img
+                                        src="/admin-asset/productImage/<%=banner[i].image %>" alt="Product"
+                                        style="height: 14rem;"> </a>
+                                <div class="info-wrap">
+                                    <div class="dropdown float-end">
+                                        <a href="/admin/editBanner?id=<%= banner[i]._id %>"
+                                            class="btn btn-sm btn-brand rounded">
+                                            <i class="material-icons md-edit mr-5"></i>Edit
+                                        </a>
+                                        <a href="#" onclick="deleteItem('<%= banner[i]._id %>')"
+                                            class="btn btn-sm font-sm btn-light rounded">
+                                            <i class="material-icons md-delete_forever"></i> Delete
+                                        </a>
+                                    </div>
+                                    <a href="#" class="title"></a>
+                                    <div class="price mt-1">
+                                        <%= banner[i].title %>
+                                    </div>
+
+                                    <p>
+                                        <%= banner[i].discription %>
+                                    </p><!-- price-wrap.// -->
+                                </div>
+                            </div> <!-- card-product  end// -->
+                        </div> <!-- col.// -->
+
+                        <% } %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="2">Banner not found</td>
+                                </tr>
+                                <% } %>
+
+
+
+
+
+            </div> <!-- row.// -->
+    </section> <!-- content-main end// -->
+
+    <%- include('../adminLayout/footer') %>

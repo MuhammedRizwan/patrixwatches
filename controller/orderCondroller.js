@@ -1,13 +1,15 @@
 const { User } = require('../model/userModel');
 const Product = require('../model/productModel');
 const Category = require('../model/categoryModel');
+const mongoose = require('mongoose')
 const Address = require('../model/addressModel');
 const Cart = require('../model/cartModel');
 const Order = require('../model/orderModel');
+const Wallet = require('../model/walletModel');
 const Razorpay = require('razorpay');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
-const easyinvoice=require('easyinvoice');
+const easyinvoice = require('easyinvoice');
 const { Readable } = require('stream');
 const moment = require('moment');
 
@@ -20,22 +22,18 @@ const instance = new Razorpay({
 
 const orderComplete = async (req, res) => {
   try {
-    const { requestData, paymentOption } = req.body;
-    const { fullName, mobile, houseName, landMark, townCity, state, pincode } = requestData
-    const address = { fullName, mobile, houseName, landMark, townCity, state, pincode }
+    console.log(req.body);
+    const { AddressType, paymentOption, Price, coupon } = req.body;
     const user_id = req.session.user._id;
     const addressData = await Address.findOne({ userId: user_id });
-    if (!addressData) {
-      const addNewAddress = new Address({
-        userId: user_id, fullName, mobile, houseName, landMark, townCity, state, pincode
-      })
-      const add = await addNewAddress.save();
+    let AddressArray;
+    if (AddressType == "Address 1") {
+      AddressArray = addressData.address[0]
+    } else {
+      AddressArray = addressData.address[1]
     }
     const cartData = await Cart.findOne({ user_id: user_id }, { cartItems: 1, _id: 0 });
-    const totalPrice = cartData.cartItems.reduce((total, item) => {
-      const numericPrice = parseFloat(item.price);
-      return total + numericPrice * item.quantity;
-    }, 0);
+    const totalPrice = parseInt(Price);
     const products = await Promise.all(cartData.cartItems.map(async (item) => {
       const stockCheck = await Product.findOne({ _id: item.product_id });
       if (stockCheck.stock >= item.quantity) {
@@ -60,7 +58,18 @@ const orderComplete = async (req, res) => {
       return res.status(400).json({ success: false, message: "product is Out of Stock" });
     } else {
       const count = await Order.countDocuments();
-      req.session.paymentRazor = { totalPrice, products, address, count };
+
+      const order = new Order({
+        orderId: String(count),
+        totalPrice, products, address: AddressArray,
+        user: user_id,
+        couponId: coupon,
+        paymentMethod:"pending",
+        paymentStatus: "pending",
+        status: "pending"
+      });
+      const orderData = await order.save();
+      req.session.razorOrderId = orderData._id;
       if (paymentOption == "RazorPay") {
         var options = {
           amount: totalPrice * 100,  // amount in the smallest currency unit
@@ -71,27 +80,33 @@ const orderComplete = async (req, res) => {
           return res.status(200).json({ orderId: order.id, amount: order.amount });
         });
       } else if (paymentOption == 'CashOnDelivery') {
-        const deleteCart = await Cart.deleteOne({ user_id: user_id })
-        const order = new Order({
-          orderId: String(count),
-          totalPrice, products, address,
-          user: user_id,
-          paymentMethod: "CashOnDelivery",
-          paymentStatus: "pending",
-          status: "pending"
-        });
-        const orderData = await order.save();
-        if (!orderData) {
-          return res.status(400).json({ success: false, message: "cannot place order something went Wrong" })
+        if (1000 <= totalPrice) {
+          return res.status(400).json({ success: false, message: "cannot order above 1000" })
         } else {
+          orderData.paymentMethod=paymentOption
+          await orderData.save()
+          const deleteCart = await Cart.deleteOne({ user_id: user_id })
           return res.status(200).json({ success: true, message: "order Placed successfully " })
         }
+      } else if (paymentOption == 'wallet') {
+        const walletData = await Wallet.findOne({ user: user_id });
+        if (walletData.walletBalance < totalPrice) {
+          return res.status(400).json({ success: false, message: "insufficient balance" })
+        }
+        walletData.walletBalance -= totalPrice;
+        walletData.transaction.push({ amount: totalPrice, reson: "product payment", transactionType: "Debit" });
+        walletData.save();
+        orderData.paymentMethod=paymentOption
+        orderData.paymentStatus = "Paid";
+        orderData.save()
+        const deleteCart = await Cart.deleteOne({ user_id: user_id })
+        return res.status(200).json({ success: true, message: "order Placed successfully " })
       } else {
         return res.status(400).json({ success: false, message: "cannot order" })
       }
     }
   } catch (error) {
-    console.error();
+    console.log(error.message);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -123,7 +138,7 @@ const orderDetials = async (req, res) => {
         const updateData = await Order.updateOne({ orderId: item.orderId }, { $set: { status: "canceled" } })
       }
     })
-    const orderDatas = await Order.find({ user: userId, }, { _id: 0, address: 0 })
+    const orderDatas = await Order.find({ user: userId, }, { address: 0 }).sort({ _id: -1 })
     return res.status(200).render('orderDetialsPage', { orderData: orderDatas, loggedIn });
   } catch (error) {
     console.log(error);
@@ -133,30 +148,22 @@ const orderDetials = async (req, res) => {
 const singleOrderDetials = async (req, res) => {
   try {
     const loggedIn = req.session.user ? true : false;
+    const userId = req.session.user._id
+    const userData = await User.findOne({ _id: userId })
     const orderId = req.params.orderId;
-    const orderData = await Order.findOne({ orderId: orderId }, { _id: 0, address: 0 });
+    const orderData = await Order.findOne({ _id: orderId }).populate("products.product");
+    const walletData =await Wallet.findOne({code:orderData.couponId})
+    if(walletData){
+      
+    }
     if (!orderData) {
       return res.status(500).json({ success: false, message: "no orders are found" });
     }
-    const Datas = await Promise.all(orderData.products.map(async (item) => {
-      const productData = await Product.findOne({ _id: item.product });
-      return {
-        orderId: orderData.orderId,
-        productName: productData.productName,
-        productId: item.product,
-        quantity: item.quantity,
-        price: item.quantity * item.price,
-        status: item.status,
-        image: productData.image,
-        createdOn: orderData.createdOn,
-      };
-    })
-    )
     const updateStatus = orderData.products.filter(item => item.status !== "canceled")
     if (updateStatus.length == 0) {
       return res.status(200).redirect('/orderDetials');
     } else {
-      return res.status(200).render('orderDetials', { Datas, loggedIn });
+      return res.status(200).render('orderDetials', { order: orderData, loggedIn, user: userData, address: orderData.address, product: orderData.products });
     }
   } catch (error) {
     console.log(error);
@@ -167,9 +174,19 @@ const cancelSingleProduct = async (req, res) => {
   try {
     const { orderId, productId, quantity } = req.body;
     const result = await Order.updateOne(
-      { orderId: orderId, "products.product": productId },
+      { _id: orderId, "products.product": productId },
       { $set: { "products.$.status": "canceled" } }
     );
+    const resultData = await Order.findOne({ _id: orderId });
+    console.log(resultData)
+    if (resultData.paymentStatus == "Paid") {
+      const product = resultData.products.find(item => item.product == productId)
+      const productPrice = product.price
+      const wallet = await Wallet.findOne({ user: resultData.user });
+      wallet.walletBalance += productPrice;
+      wallet.transaction.push({ amount: productPrice, reason: "cancel a product", transactionType: "credit" });
+      const walletData = await wallet.save();
+    }
     if (result) {
       const UpdateStock = await Product.updateOne({ _id: productId }, { $inc: { stock: quantity } })
       if (!UpdateStock) {
@@ -187,20 +204,37 @@ const cancelSingleProduct = async (req, res) => {
 
 const adminOrderPage = async (req, res) => {
   try {
-    const orders = await Order.find().sort({ createdOn: -1 });
+    const PAGE_SIZE = 10;
+        const { page } = req.query;
+        const pageNumber = parseInt(page) || 1;
+        const totalorders = await Order.countDocuments()
+        const totalPages = Math.ceil(totalorders / PAGE_SIZE);
+    const orders = await Order.find().sort({ createdOn: -1 }).skip((pageNumber - 1) * PAGE_SIZE)
+    .limit(PAGE_SIZE);;
     const users = await Promise.all(orders.map(async (data) => {
       const userData = await User.findOne({ _id: data.user });
-      return {
-        id: userData._id,
-        name: userData.name,
-        email: userData.email
-      };
+      if (userData) {
+        return {
+          id: userData._id,
+          name: userData.name,
+          email: userData.email
+        };
+      } else {
+        return {
+          id: new mongoose.Types.ObjectId,
+          name: 'Deleted User',
+          email: 'deleted User Email'
+        };
+      }
     }));
     return res.status(200).render("adminOrder", {
       user: users,
-      order: orders
+      order: orders,
+      totalPages: totalPages,
+       currentPage: pageNumber 
     });
   } catch (error) {
+    console.log(error.message);
     return res.status(500).send("Internal Server Error. Please try again later.");
   }
 };
@@ -208,7 +242,12 @@ const adminOrderDetails = async (req, res) => {
   try {
     const orderId = req.query.id;
     const user_id = req.query.userId;
-    const userData = await User.findById(user_id);
+    let userData = await User.findById(user_id);
+    if (!userData) {
+      userData = {
+        name: "deleted user", email: "deleted user", phone: "deleted user"
+      }
+    }
     const orderData = await Order.findOne({ orderId: orderId });
     if (!orderData) {
       console.error("Order not found");
@@ -279,6 +318,14 @@ const adminCancelOrder = async (req, res) => {
     if (!updatedOrder) {
       return res.status(400).json({ success: false, message: "Somthing went Wroung" });
     } else {
+      if (orderData.paymentStatus == "Paid") {
+        const product = orderData.products.find(item => item.product == productId)
+        const productPrice = product.price
+        const wallet = await Wallet.findOne({ user: orderData.user });
+        wallet.walletBalance += productPrice;
+        wallet.transaction.push({ amount: productPrice, reason: "cancel a product", transactionType: "credit" });
+        const walletData = await wallet.save();
+      }
       const UpdateStock = await Product.updateOne({ _id: productId }
         , { $inc: { quantity: quantity } },
         { new: true })
@@ -286,7 +333,7 @@ const adminCancelOrder = async (req, res) => {
         return res.status(400).json({ success: false, message: "Somthing went Wroung on updating Stock" });
       } else {
         const statusArray = orderData.products.filter(data => data.status != 'canceled');
-        if (statusArray.length > 0) {
+        if (statusArray.length == 0) {
           orderData.status = 'canceled';
           orderData.save();
           return res.status(200).json({ success: true, message: "Order successfully " })
@@ -302,21 +349,109 @@ const razorOrderComplete = async (req, res) => {
   try {
     const paymentOption = req.body.paymentOption;
     const user_id = req.session.user._id;
-    const { totalPrice, products, address, count } = req.session.paymentRazor;
-    const deleteCart = await Cart.deleteOne({ user_id: user_id })
-    const order = new Order({
-      orderId: String(count),
-      totalPrice, products, address,
-      user: user_id,
-      paymentMethod: paymentOption,
-      paymentStatus: "Paid",
-      status: "pending"
-    });
-    const OrderData = await order.save()
-    return res.status(200).json({ success: true, message: "Payment successfully completed" })
+    const orderId = req.session.razorOrderId;
+    const orderData = await Order.findOne({ _id: orderId });
+    orderData.paymentStatus = "Paid"
+    await orderData.save()
+    if (orderData) {
+      const deleteCart = await Cart.deleteOne({ user_id: user_id })
+      return res.status(200).json({ success: true, message: "Payment successfully completed" })
+    } else {
+      return res.status(400).json({ success: false, message: "something went wrong" })
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).send("Internal Server Error. Please try again later.");
+  }
+}
+const returnSingleProduct = async (req, res) => {
+  try {
+    const { orderId, productId, quantity } = req.body;
+    const orderData = await Order.findOne({ orderId: orderId });
+    const productData = orderData.products.find((item) => item.product == productId);
+    const productPrice = productData.price * quantity;
+    const wallet = await Wallet.findOne({ user: orderData.user });
+    wallet.walletBalance += productPrice;
+    wallet.transaction.push({ amount: productPrice, reason: "return a product", transactionType: "credit" });
+    const walletData = await wallet.save();
+    if (!walletData) {
+      return res.status(400).json({ success: false, message: "cannot refund something wrong" })
+    }
+    const result = await Order.updateOne(
+      { orderId: orderId, "products.product": productId },
+      { $set: { "products.$.status": "Returned" } }
+    );
+    const resultData=await Order.findOne({ orderId: orderId });
+    const returnedArray=resultData.products.find(item=>item.status !="Returned")
+    if(returnedArray.length==0){
+      const changeAsReturn = await Order.updateOne(
+        { orderId: orderId },
+        { $set: { status : "Returned" } }
+      );
+    }
+    return res.status(200).json({ success: true, message: `${productPrice} is refunded in your wallet` });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).send("Internal Server Error. Please try again later.");
+
+  }
+}
+const PaymentOrderPage=async(req,res)=>{
+  try {
+    const orderId=req.query.id;
+    req.session.orderId=orderId;
+    const loggedIn = req.session.user ? true : false;
+    const orderData=await Order.findOne({_id:orderId}).populate("products.product")
+    return res.status(200).render('paymentOrderPage',{orderData,loggedIn});
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).send("Internal Server Error. Please try again later.");
+  }
+}
+const paymentOrder=async(req,res)=>{
+  try {
+    console.log(req.body);
+    const {paymentOption}=req.body
+    const user_id=req.session.user._id
+    const count = await Order.countDocuments();
+    const orderData=await Order.findOne({_id:req.session.orderId})
+    const totalPrice=orderData.totalPrice;
+    req.session.razorOrderId = orderData._id
+      if (paymentOption == "RazorPay") {
+        var options = {
+          amount: totalPrice * 100,  // amount in the smallest currency unit
+          currency: "INR",
+          receipt: String(count)
+        };
+        instance.orders.create(options, function (err, order) {
+          return res.status(200).json({ orderId: order.id, amount: order.amount });
+        });
+      } else if (paymentOption == 'CashOnDelivery') {
+        if (1000 <= totalPrice) {
+          return res.status(400).json({ success: false, message: "cannot order above 1000" })
+        } else {
+          orderData.paymentMethod=paymentOption
+          await orderData.save()
+          return res.status(200).json({ success: true, message: "order Placed successfully " })
+        }
+      } else if (paymentOption == 'wallet') {
+        const walletData = await Wallet.findOne({ user: user_id });
+        console.log(walletData);
+        if (walletData.walletBalance < totalPrice) {
+          return res.status(400).json({ success: false, message: "insufficient balance" })
+        }
+        walletData.walletBalance -= totalPrice;
+        walletData.transaction.push({ amount: totalPrice, reson: "product payment", transactionType: "Debit" });
+        walletData.save();
+        orderData.paymentMethod=paymentOption
+        orderData.paymentStatus = "Paid";
+        orderData.save()
+        return res.status(200).json({ success: true, message: "order Placed successfully " })
+      } else {
+        return res.status(400).json({ success: false, message: "cannot order" })
+      }
+  } catch (error) {
+    console.log(error.message);
   }
 }
 const saleReportPage = async (req, res) => {
@@ -324,7 +459,7 @@ const saleReportPage = async (req, res) => {
     const orderData = await Order.aggregate([
       {
         $match: {
-          status: "Delivered",
+          paymentStatus: "Paid",
         } // Filter delivered orders
       },
       {
@@ -350,7 +485,7 @@ const saleReportPage = async (req, res) => {
           orders: { $push: "$orders" } // Group orders back into an array
         }
       },
-      { $sort: { "_id": 1 } }
+      { $sort: { "_id": -1 } }
     ]);
     if (orderData.length === 0) {
       return res.status(400).json({ success: false, message: "something went wrong" })
@@ -372,7 +507,7 @@ const saleReport = async (req, res) => {
       var Report = await Order.aggregate([
         {
           $match: {
-            status: "Delivered",
+            paymentStatus: "Paid",
             createdOn: {
               $gte: startDate, // Orders created on or after January 1st of the current year
               $lte: endDate // Orders created on or before December 31st of the current year
@@ -402,7 +537,7 @@ const saleReport = async (req, res) => {
             orders: { $push: "$orders" } // Group orders back into an array
           }
         },
-        { $sort: { "_id": 1 } }
+        { $sort: { _id: -1 } }
       ]);
     } else if (option == 'Month') {
       const currentYear = new Date().getFullYear();
@@ -412,7 +547,7 @@ const saleReport = async (req, res) => {
       Report = await Order.aggregate([
         {
           $match: {
-            status: "Delivered",
+            paymentStatus: "Paid",
             createdOn: {
               $gte: startDate, // Orders created on or after January 1st of the current year
               $lte: endDate // Orders created on or before December 31st of the current year
@@ -463,7 +598,7 @@ const saleReport = async (req, res) => {
       Report = await Order.aggregate([
         {
           $match: {
-            status: "Delivered",
+            paymentStatus: "Paid",
             $or: [
               {
                 createdOn: {
@@ -527,7 +662,7 @@ const downloadPdf = async (req, res) => {
       var deliveredOrders = await Order.aggregate([
         {
           $match: {
-            status: "Delivered",
+            paymentStatus: "Paid",
             createdOn: {
               $gte: startDate, // Orders created on or after January 1st of the current year
               $lte: endDate // Orders created on or before December 31st of the current year
@@ -567,7 +702,7 @@ const downloadPdf = async (req, res) => {
       deliveredOrders = await Order.aggregate([
         {
           $match: {
-            status: "Delivered",
+            paymentStatus: "Paid",
             createdOn: {
               $gte: startDate, // Orders created on or after January 1st of the current year
               $lte: endDate // Orders created on or before December 31st of the current year
@@ -618,7 +753,7 @@ const downloadPdf = async (req, res) => {
       deliveredOrders = await Order.aggregate([
         {
           $match: {
-            status: "Delivered",
+            paymentStatus: "Paid",
             $or: [
               {
                 createdOn: {
@@ -759,17 +894,17 @@ const downloadExcel = async (req, res) => {
 
     // Add data to the worksheet
     orders.forEach((order) => {
-     
-        worksheet.addRow([
-          order.orderId,
-          order.createdOn.toISOString().split("T")[0],
-          order.user[0].name,
-          order.user[0].email,
-          order.totalPrice,
-          order.status, // Assuming a static status for simplicity
-          order.paymentMethod,
-          order.paymentStatus
-        ]);
+
+      worksheet.addRow([
+        order.orderId,
+        order.createdOn.toISOString().split("T")[0],
+        order.user[0].name,
+        order.user[0].email,
+        order.totalPrice,
+        order.status, // Assuming a static status for simplicity
+        order.paymentMethod,
+        order.paymentStatus
+      ]);
     });
 
     // Set headers for the response
@@ -803,7 +938,7 @@ async function fetchSaleReportData(option) {
       var orders = await Order.aggregate([
         {
           $match: {
-            status: "Delivered",
+            paymentStatus: "Paid",
             createdOn: {
               $gte: startDate, // Orders created on or after January 1st of the current year
               $lte: endDate // Orders created on or before December 31st of the current year
@@ -843,7 +978,7 @@ async function fetchSaleReportData(option) {
       orders = await Order.aggregate([
         {
           $match: {
-            status: "Delivered",
+            paymentStatus: "Paid",
             createdOn: {
               $gte: startDate, // Orders created on or after January 1st of the current year
               $lte: endDate // Orders created on or before December 31st of the current year
@@ -894,7 +1029,7 @@ async function fetchSaleReportData(option) {
       orders = await Order.aggregate([
         {
           $match: {
-            status: "Delivered",
+            paymentStatus: "Paid",
             $or: [
               {
                 createdOn: {
@@ -949,20 +1084,19 @@ const saveInvoice = async (req, res) => {
     const orderId = req.query.id;
 
     // Fetch the order details with product and address information
-    const order = await Order.findOne({orderId:orderId})
+    const order = await Order.findOne({ orderId: orderId })
       .populate({
         path: "products.product",
-        model: "ProductDetials",
       })
-      const userId = order.user
+    const userId = order.user
     // Fetch user details
     const user = await User.findById(userId);
     // Extract relevant information from the order
     const invoiceData = {
       id: orderId,
-      total: order.products.reduce((salePrice,i)=>{
-        salePrice=salePrice+(i.price*i.quantity)
-      },0), // Assuming there's only one product in the order
+      total: order.products.reduce((salePrice, i) => {
+        salePrice = salePrice + (i.price * i.quantity)
+      }, 0), // Assuming there's only one product in the order
       date: order.createdOn.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
@@ -990,6 +1124,8 @@ const saveInvoice = async (req, res) => {
       },
       client: {
         company: "Customer Address",
+        name:order.address.fullName,
+        house:order.address.houseName,
         zip: order.address.pincode, // Using pinCode as zip
         city: order.address.townCity,
         address: order.address.addressLine,
@@ -1029,67 +1165,141 @@ const saveInvoice = async (req, res) => {
 
 const saleschart = async (req, res) => {
   try {
-      // Get the time range (e.g., monthly, weekly, daily) from query params
-      const timeRange = req.query.timeRange || 'monthly'; // Default to monthly if not provided
-    
+    // Get the time range (e.g., monthly, weekly, daily) from query params
+    const timeRange = req.query.timeRange || 'monthly'; // Default to monthly if not provided
 
-      // Calculate the start date based on the specified time range
-      let startDate;
+
+    // Calculate the start date based on the specified time range
+    let startDate;
+    if (timeRange === 'weekly') {
+      startDate = moment().subtract(1, 'weeks').startOf('week').toDate();
+    } else if (timeRange === 'daily') {
+      startDate = moment().subtract(1, 'days').startOf('day').toDate();
+    } else {
+      startDate = moment().subtract(2, 'months').startOf('month').toDate();
+    }
+
+    // Aggregate orders data based on the specified time range and start date
+    const salesData = await Order.aggregate([
+      {
+        $match: {
+          $or: [
+            { status: "Delivered" },
+            { paymentStatus: "paid" }
+          ],
+          createdOn: { $gte: startDate } // Filter orders placed after the start date
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $cond: [ // Group by month, week, or day based on the specified time range
+              { $eq: [timeRange, 'weekly'] },
+              { $isoWeek: "$createdOn" }, // Group by ISO week for weekly data
+              { $cond: [{ $eq: [timeRange, 'daily'] }, { $dayOfMonth: "$createdOn" }, { $month: "$createdOn" }] } // Group by day for daily data, month for monthly data
+            ]
+          },
+          totalSales: { $sum: 1 } // Count the number of orders
+        }
+      },
+      { $sort: { "_id": 1 } } // Sort by month, week, or day
+    ]);
+    // Format the fetched data as needed for the frontend chart
+    const labels = salesData.map(item => {
       if (timeRange === 'weekly') {
-          startDate = moment().subtract(1, 'weeks').startOf('week').toDate();
+        return `Week ${item._id}`;
       } else if (timeRange === 'daily') {
-          startDate = moment().subtract(1, 'days').startOf('day').toDate();
+        return `Day ${item._id}`;
       } else {
-          startDate = moment().subtract(2, 'months').startOf('month').toDate();
+        return moment().month(item._id - 1).format('MMMM');
       }
+    });
+    const datasets = [{
+      label: 'Sales',
+      data: salesData.map(item => item.totalSales)
+    }];
 
-      // Aggregate orders data based on the specified time range and start date
-      const salesData = await Order.aggregate([
-          {
-              $match: {
-                  $or: [
-                      { status: "Delivered" },
-                      { paymentStatus: "paid" }
-                  ],
-                  createdOn: { $gte: startDate } // Filter orders placed after the start date
-              }
-          },
-          {
-              $group: {
-                  _id: {
-                      $cond: [ // Group by month, week, or day based on the specified time range
-                          { $eq: [timeRange, 'weekly'] },
-                          { $isoWeek: "$createdOn" }, // Group by ISO week for weekly data
-                          { $cond: [{ $eq: [timeRange, 'daily'] }, { $dayOfMonth: "$createdOn" }, { $month: "$createdOn" }] } // Group by day for daily data, month for monthly data
-                      ]
-                  },
-                  totalSales: { $sum: 1 } // Count the number of orders
-              }
-          },
-          { $sort: { "_id": 1 } } // Sort by month, week, or day
-      ]);
-      // Format the fetched data as needed for the frontend chart
-      const labels = salesData.map(item => {
-          if (timeRange === 'weekly') {
-              return `Week ${item._id}`;
-          } else if (timeRange === 'daily') {
-              return `Day ${item._id}`;
-          } else {
-              return moment().month(item._id - 1).format('MMMM');
-          }
-      }); 
-      const datasets = [{
-          label: 'Sales',
-          data: salesData.map(item => item.totalSales)
-      }];
-
-      // Send the formatted sales data as a response
-      res.json({ labels, datasets });
+    // Send the formatted sales data as a response
+    res.json({ labels, datasets });
   } catch (error) {
-      console.error('Error fetching sales chart data:', error);
-      res.status(500).json({ error: 'Failed to fetch sales chart data' });
+    console.error('Error fetching sales chart data:', error);
+    res.status(500).json({ error: 'Failed to fetch sales chart data' });
   }
 }
+
+
+
+const saleChart = async (req, res) => {
+  try {
+    if (!req.query.interval) {
+      console.error("Error: Missing interval parameter in the request");
+      return res.status(400).json({ error: "Missing interval parameter" });
+    }
+
+    const interval = req.query.interval.toLowerCase();
+
+    let dateFormat, groupByFormat;
+
+    switch (interval) {
+      case "yearly":
+        dateFormat = "%Y";
+        groupByFormat = { $dateToString: { format: "%Y", date: "$createdOn" } };
+        break;
+
+      case "monthly":
+        dateFormat = "%m-%Y"; // Use %m for numeric month
+        groupByFormat = {
+          $dateToString: { format: "%m-%Y", date: "$createdOn" },
+        };
+        break;
+
+      case "daily":
+        dateFormat = "%Y-%m-%d";
+        groupByFormat = {
+          $dateToString: { format: "%Y-%m-%d", date: "$createdOn" },
+        };
+        break;
+
+      default:
+        console.error("Error: Invalid time interval");
+        return res.status(400).json({ error: "Invalid time interval" });
+    }
+
+    const salesData = await Order.aggregate([
+      {
+        $group: {
+          _id: groupByFormat,
+          totalSales: { $sum: "$totalPrice" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    // Map numeric months to month names
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    const labels = salesData.map((item) => {
+      if (interval === "monthly") {
+        const [month, year] = item._id.split('-');
+        return `${monthNames[parseInt(month) - 1]} ${year}`;
+      }
+      return item._id; // For other intervals, keep the original value
+    });
+
+    const values = salesData.map((item) => item.totalSales);
+    console.log(labels, values);
+
+    res.json({ labels, values });
+  } catch (error) {
+    console.error("Internal Server Error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
 module.exports = {
   orderComplete,
   adminOrderPage,
@@ -1106,5 +1316,9 @@ module.exports = {
   downloadPdf,
   downloadExcel,
   saveInvoice,
-  saleschart
+  saleschart,
+  returnSingleProduct,
+  PaymentOrderPage,
+  paymentOrder,
+  saleChart
 }

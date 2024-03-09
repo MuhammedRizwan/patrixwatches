@@ -35,7 +35,7 @@ const isUser = async (req, res, next) => {
 }
 const isLoggedUser=async (req, res, next) => {
   try {
-    if (req.session.isLoggedUser) {
+    if (req.session.LoggedUser) {
       return res.redirect('/');
     }
     else {

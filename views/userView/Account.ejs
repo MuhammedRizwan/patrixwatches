@@ -28,16 +28,17 @@
                                                 role="tab" aria-controls="orders" aria-selected="false"><i
                                                     class="fi-rs-shopping-bag mr-10"></i>Orders</a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab"
-                                                href="#track-orders" role="tab" aria-controls="track-orders"
-                                                aria-selected="false"><i
-                                                    class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
-                                        </li>
+
                                         <li class="nav-item">
                                             <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address"
                                                 role="tab" aria-controls="address" aria-selected="true"><i
                                                     class="fi-rs-marker mr-10"></i>My Address</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab"
+                                                href="#wallet" role="tab" aria-controls="wallet"
+                                                aria-selected="false"><i
+                                                    class="fi-rs-shopping-cart-check mr-10"></i>Wallet</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="/logout"><i
@@ -51,7 +52,7 @@
                                     <div class="tab-pane fade active show" id="dashboard" role="tabpanel"
                                         aria-labelledby="dashboard-tab">
                                         <div class="card">
-                                            
+
                                             <div class="card-header">
                                                 <h5 class="mb-0">Hello <%= user.name %>
                                                 </h5>
@@ -93,35 +94,21 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="tab-pane fade" id="track-orders" role="tabpanel"
-                                        aria-labelledby="track-orders-tab">
+                                    <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
                                         <div class="card">
                                             <div class="card-header">
-                                                <h5 class="mb-0">Orders tracking</h5>
+                                                <h5 class="mb-0">Wallet</h5>
                                             </div>
                                             <div class="card-body contact-from-area">
-                                                <p>To track your order please enter your OrderID in the box below and
-                                                    press "Track" button. This was given to you on your receipt and in
-                                                    the confirmation email you should have received.</p>
                                                 <div class="row">
                                                     <div class="col-lg-8">
-                                                        <form class="contact-form-style mt-30 mb-50" action="#"
-                                                            method="post">
-                                                            <div class="input-style mb-20">
-                                                                <label>Order ID</label>
-                                                                <input name="order-id"
-                                                                    placeholder="Found in your order confirmation email"
-                                                                    type="text" class="square">
-                                                            </div>
-                                                            <div class="input-style mb-20">
-                                                                <label>Billing email</label>
-                                                                <input name="billing-email"
-                                                                    placeholder="Email you used during checkout"
-                                                                    type="email" class="square">
-                                                            </div>
-                                                            <button class="submit submit-auto-width"
-                                                                type="submit">Track</button>
-                                                        </form>
+                                                        <div class="input-style mb-20">
+                                                            <label class="font-xl">Wallet :</label><span> &#8377; <%=
+                                                                    wallet.walletBalance %></span>
+                                                        </div>
+
+                                                        <a href="/walletTransactions"
+                                                            class="btn submit submit-auto-width">Wallet transactions</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -132,8 +119,7 @@
                                         <div class="row">
                                             <% if (Address.length> 0) { %>
                                                 <% for( let i=0; i < Address.length; i++ ) { %>
-
-                                                    <div class="col-lg-12">
+                                                    <div class="col-lg-6">
                                                         <div class="card mb-3 mb-lg-0">
                                                             <div class="card-header">
                                                                 <h5 class="mb-0">
@@ -150,27 +136,30 @@
                                                                 </address>
                                                                 <p>
                                                                     <%= Address[i].state %>
-                                                                </p><br>
-                                                                <a href="/editAddress" class="btn-small">Edit</a><span>
+                                                                </p>
+                                                                <a href="/editAddress?id=<%= Address[i]._id%>"
+                                                                    class="btn-small">Edit</a><span>
                                                                     | </span>
-                                                                <button onclick="deleteAddress()"
+                                                                <button onclick="deleteAddress('<%= Address[i]._id%>')"
                                                                     class="btn-small border-0 text-danger">Delete</button>
                                                             </div>
                                                         </div>
                                                     </div>
-
-                                                    <% } %>
-
-
-                                                        <% } else { %>
-                                                            <div class="container text-center m-auto">
-                                                                <p>Please Goto add
-                                                                    Address to display Address</p>
-                                                                <button><a href="/addAddress"
-                                                                        class="text-decoration-none">Add
-                                                                        Address</a></button>
-                                                            </div>
+                                                    <% if (Address.length>0 && Address.length <2) { %>
+                                                            <button><a href="/addAddress"
+                                                                    class="text-decoration-none">Add
+                                                                    Address</a></button>
                                                             <% } %>
+                                                                <% } %>
+                                                                    <% } else { %>
+                                                                        <div class="container text-center m-auto">
+                                                                            <p>Please Goto add
+                                                                                Address to display Address</p>
+                                                                            <button><a href="/addAddress"
+                                                                                    class="text-decoration-none">Add
+                                                                                    Address</a></button>
+                                                                        </div>
+                                                                        <% } %>
                                         </div>
                                     </div>
                                 </div>
@@ -186,11 +175,14 @@
     <script>
         function deleteAddress(addressId) {
             fetch(`/deleteAddress?id=${addressId}`, {
-                method: "DELETE",
+                method: "PUT",
+            }).then(res => {
+                return res.json()
             })
-                .then(response => {
-                    if (response.ok) {
-                        location.reload()
+                .then(data => {
+                    console.log(data);
+                    if (data.success) {
+                        window.location.reload()
                     } else {
                         throw new Error('Error deleting address');
                     }
@@ -242,7 +234,7 @@
     </script>
     <script>
         function goto() {
-          window.location.href='/orderDetials'  
+            window.location.href = '/orderDetials'
         }
     </script>
     <%- include('../layout/footer') %>

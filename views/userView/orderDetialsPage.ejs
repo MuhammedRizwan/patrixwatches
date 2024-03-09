@@ -15,7 +15,7 @@
                                 <% if (orderData) { %>
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
+                                            <th>SL no.</th>
                                             <th>Payment Method</th>
                                             <th>Payment Status</th>
                                             <th> Total Price</th>
@@ -25,10 +25,10 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <% orderData.forEach(order=> { %>
+                                        <% orderData.forEach((order,index)=> { %>
                                             <tr>
                                                 <td>
-                                                    <%= order.orderId %>
+                                                    <%= index+1 %>
                                                 </td>
                                                 <td><b>
                                                         <%= order.paymentMethod %>
@@ -46,11 +46,22 @@
                                                 <td>
                                                     <%= `${order.createdOn.getDate()}-${order.createdOn.getMonth() +
                                                         1}-${order.createdOn.getFullYear()}`%>
-                                                </td>
-                                                <td class="text-center">
-                                                    <a href='/singleOrderDetials/<%= order.orderId %>' class="btn btn-md rounded font-sm ">view
-                                                        Orders</a>
-                                                </td>
+                                                </td>                                                   
+                                                    <%  if (order.status=="canceled" ) { %>
+                                                        <td class="text-center">
+                                                            <span class="text-hover-grey-5">canceled</span>
+                                                        </td> 
+                                                        <% } else if (order.status=="Return") { %>
+                                                            <td class="text-center">
+                                                                <span class="text-hover-grey-5">product Returned</span>
+                                                            </td>
+                                                        <% } else { %>
+                                                            <td class="text-center">
+                                                                <a href='/singleOrderDetials/<%= order._id%>' class="btn btn-md rounded font-sm ">view
+                                                                    Orders</a>
+                                                            </td>
+                                                <% } %>
+                                              
                                             </tr>
                                             <% }) %>
 

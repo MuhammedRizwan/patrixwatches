@@ -1,146 +1,159 @@
 <%- include('../layout/header') %>
-<div class="card col-6 m-auto">
-    <div class="card-header">
-        <h5>Add Address</h5>
+    <div class="card col-6 m-auto">
+        <div class="card-header">
+            <h5>Add Address</h5>
+        </div>
+        <div class="card-body">
+            <form action="/addAddress" method="POST" onsubmit="return validate()">
+                <input type="hidden" id="userId" name="userId"><br>
+
+                <label for="fullName">Full Name:</label>
+                <input type="text" id="fullName" name="fullName">
+                <a id="fullNameError" class="text-danger"></a><br>
+
+                <label for="mobile">Mobile:</label>
+                <input type="text" id="mobile" name="mobile">
+                <a id="mobileError" class="text-danger"></a><br>
+
+                <label for="houseName">House Name:</label>
+                <input type="text" id="houseName" name="houseName">
+                <a id="houseNameError" class="text-danger"></a><br>
+
+                <label for="landMark">Landmark:</label>
+                <input type="text" id="landMark" name="landMark">
+                <a id="landMarkError" class="text-danger"></a><br>
+
+                <label for="townCity">Town/City:</label>
+                <input type="text" id="townCity" name="townCity">
+                <a id="townCityError" class="text-danger"></a><br>
+
+                <label for="state">State:</label>
+                <input type="text" id="state" name="state">
+                <a id="stateError" class="text-danger"></a><br>
+
+                <label for="pincode">Pincode:</label>
+                <input type="text" id="pincode" name="pincode">
+                <a id="pincodeError" class="text-danger"></a><br><br>
+                <label for="addressType">Type</label>
+                <select class="form-select" name="select">
+                    <% if (addressData) { %>
+                        <% if (addressData.address.length>=1) { %>
+                            <option value="shipping">Address 2</option>
+                            <% } else { %>
+                                <option value="default">Address 1</option>
+                                <% } %>
+                                <% } else { %>
+                                    <option value="default">Address 1</option>
+                    <% } %>
+                    
+                </select>
+                <hr>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
     </div>
-    <div class="card-body">
-        <form action="/addAddress" method="POST" onsubmit="return validate()">
-            <input type="hidden" id="userId" name="userId"><br>
+    <script>
+        function validate() {
+            // Input fields
+            const fullName = document.getElementById('fullName');
+            const mobile = document.getElementById('mobile');
+            const houseName = document.getElementById('houseName');
+            const landMark = document.getElementById('landMark');
+            const townCity = document.getElementById('townCity');
+            const state = document.getElementById('state');
+            const pincode = document.getElementById('pincode');
 
-            <label for="fullName">Full Name:</label>
-            <input type="text" id="fullName" name="fullName">
-            <a id="fullNameError" class="text-danger"></a><br>
+            // Error fields
+            const fullNameError = document.getElementById('fullNameError');
+            const mobileError = document.getElementById('mobileError');
+            const houseNameError = document.getElementById('houseNameError');
+            const landMarkError = document.getElementById('landMarkError');
+            const townCityError = document.getElementById('townCityError');
+            const stateError = document.getElementById('stateError');
+            const pincodeError = document.getElementById('pincodeError');
 
-            <label for="mobile">Mobile:</label>
-            <input type="text" id="mobile" name="mobile">
-            <a id="mobileError" class="text-danger"></a><br>
+            // Regular expressions (modify as needed)
+            const fullNameRegex = /^[A-Za-z\s]+$/;
+            const mobileRegex = /^[0-9]{10}$/;
+            const pincodeRegex = /^\d{6}$/;
+            // Add other regex validations as needed...
 
-            <label for="houseName">House Name:</label>
-            <input type="text" id="houseName" name="houseName">
-            <a id="houseNameError" class="text-danger"></a><br>
+            // Validation logic for each field (similar to the previous script)
 
-            <label for="landMark">Landmark:</label>
-            <input type="text" id="landMark" name="landMark">
-            <a id="landMarkError" class="text-danger"></a><br>
+            // Full Name field
+            if (fullName.value.trim() === '') {
+                fullNameError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    fullNameError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            if (!fullNameRegex.test(fullName.value)) {
+                fullNameError.innerHTML = 'Please enter a valid name';
+                setTimeout(() => {
+                    fullNameError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
 
-            <label for="townCity">Town/City:</label>
-            <input type="text" id="townCity" name="townCity">
-            <a id="townCityError" class="text-danger"></a><br>
-
-            <label for="state">State:</label>
-            <input type="text" id="state" name="state">
-            <a id="stateError" class="text-danger"></a><br>
-
-            <label for="pincode">Pincode:</label>
-            <input type="text" id="pincode" name="pincode">
-            <a id="pincodeError" class="text-danger"></a><br><br>
-
-            <input type="submit" value="Submit" class="mt-5">
-        </form>
-    </div>
-</div>
-<script>
-    function validate() {
-        // Input fields
-        const fullName = document.getElementById('fullName');
-        const mobile = document.getElementById('mobile');
-        const houseName = document.getElementById('houseName');
-        const landMark = document.getElementById('landMark');
-        const townCity = document.getElementById('townCity');
-        const state = document.getElementById('state');
-        const pincode = document.getElementById('pincode');
-
-        // Error fields
-        const fullNameError = document.getElementById('fullNameError');
-        const mobileError = document.getElementById('mobileError');
-        const houseNameError = document.getElementById('houseNameError');
-        const landMarkError = document.getElementById('landMarkError');
-        const townCityError = document.getElementById('townCityError');
-        const stateError = document.getElementById('stateError');
-        const pincodeError = document.getElementById('pincodeError');
-
-        // Regular expressions (modify as needed)
-        const fullNameRegex = /^[A-Za-z\s]+$/;
-        const mobileRegex = /^[0-9]{10}$/;
-        const pincodeRegex = /^\d{6}$/;
-        // Add other regex validations as needed...
-
-        // Validation logic for each field (similar to the previous script)
-
-        // Full Name field
-        if (fullName.value.trim() === '') {
-            fullNameError.innerHTML = 'Field is required';
-            setTimeout(() => {
-                fullNameError.innerHTML = '';
-            }, 5000);
-            return false;
+            // Mobile field
+            if (mobile.value.trim() === '') {
+                mobileError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    mobileError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            if (!mobileRegex.test(mobile.value)) {
+                mobileError.innerHTML = 'Please enter a valid mobile number';
+                setTimeout(() => {
+                    mobileError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            if (houseName.value.trim() === '') {
+                houseNameError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    houseNameError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            if (landMark.value.trim() === '') {
+                landMarkError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    landMarkError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            if (townCity.value.trim() === '') {
+                townCityError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    townCityError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            if (state.value.trim() === '') {
+                stateError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    stateError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            if (pincode.value.trim() === '') {
+                pincodeError.innerHTML = 'Field is required';
+                setTimeout(() => {
+                    pincodeError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            if (!pincodeRegex.test(pincode.value)) {
+                pincodeError.innerHTML = 'Please enter a valid name';
+                setTimeout(() => {
+                    pincodeError.innerHTML = '';
+                }, 5000);
+                return false;
+            }
+            return true;
         }
-        if (!fullNameRegex.test(fullName.value)) {
-            fullNameError.innerHTML = 'Please enter a valid name';
-            setTimeout(() => {
-                fullNameError.innerHTML = '';
-            }, 5000);
-            return false;
-        }
-
-        // Mobile field
-        if (mobile.value.trim() === '') {
-            mobileError.innerHTML = 'Field is required';
-            setTimeout(() => {
-                mobileError.innerHTML = '';
-            }, 5000);
-            return false;
-        }
-        if (!mobileRegex.test(mobile.value)) {
-            mobileError.innerHTML = 'Please enter a valid mobile number';
-            setTimeout(() => {
-                mobileError.innerHTML = '';
-            }, 5000);
-            return false;
-        }
-        if (houseName.value.trim() === '') {
-            houseNameError.innerHTML = 'Field is required';
-            setTimeout(() => {
-                houseNameError.innerHTML = '';
-            }, 5000);
-            return false;
-        }
-        if (landMark.value.trim() === '') {
-            landMarkError.innerHTML = 'Field is required';
-            setTimeout(() => {
-                landMarkError.innerHTML = '';
-            }, 5000);
-            return false;
-        }
-        if (townCity.value.trim() === '') {
-            townCityError.innerHTML = 'Field is required';
-            setTimeout(() => {
-                townCityError.innerHTML = '';
-            }, 5000);
-            return false;
-        }
-        if (state.value.trim() === '') {
-            stateError.innerHTML = 'Field is required';
-            setTimeout(() => {
-                stateError.innerHTML = '';
-            }, 5000);
-            return false;
-        }
-        if (pincode.value.trim() === '') {
-            pincodeError.innerHTML = 'Field is required';
-            setTimeout(() => {
-                pincodeError.innerHTML = '';
-            }, 5000);
-            return false;
-        }
-        if (!pincodeRegex.test(pincode.value)) {
-            pincodeError.innerHTML = 'Please enter a valid name';
-            setTimeout(() => {
-                pincodeError.innerHTML = '';
-            }, 5000);
-            return false;
-        }
-        return true;
-    }
-</script>
-<%- include('../layout/footer')%>
+    </script>
+    <%- include('../layout/footer')%>

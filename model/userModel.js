@@ -28,24 +28,30 @@ const userSchema = new mongoose.Schema({
     is_block: {
         type: Boolean,
         default: false
-    }
-})
-const User= mongoose.model('userDetials', userSchema);
+    },
+},
+    {
+        timestamps: true
+    })
+const User = mongoose.model('userDetials', userSchema);
 
 const otpSchema = new mongoose.Schema({
-    email:{
-        type:String
+    email: {
+        type: String
     },
-    otp:{
-        type:String
+    otp: {
+        type: String
     },
-    createdAt:{
-        type:Date,
-        default:Date.now,
-        expires:30
-    }    
-});
-const Otp= mongoose.model('OTP',otpSchema);
-module.exports ={
-    User,Otp
+    createdAt: {
+        type: Date,
+        default: Date.now,
+        expires: 30
+    }
+},
+    {
+        timestamps: true
+    });
+const Otp = mongoose.model('OTP', otpSchema);
+module.exports = {
+    User, Otp
 }

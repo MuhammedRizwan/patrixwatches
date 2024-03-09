@@ -53,7 +53,13 @@ const oderSchema = new mongoose.Schema({
     required: true,
     type: String
   },
+  couponId: {
+    type: String,
+  },
   address: {
+    addressType: {
+      type: String,
+    },
     fullName: {
       type: String,
       required: true
@@ -82,8 +88,14 @@ const oderSchema = new mongoose.Schema({
       type: Number,
       required: true
     }
+  },
+  couponId: {
+    type: String
   }
-});
+},
+  {
+    timestamps: true
+  });
 
 //Export the model
 module.exports = mongoose.model("Order", oderSchema);

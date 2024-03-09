@@ -30,7 +30,7 @@
                                         </thead>
                                         <tbody>
                                             <% for( let i=0; i < products.length; i++ ) { %>
-                                                <tr>
+                                                <tr id="deletecart<%= i %>">
                                                     <td class="image product-thumbnail"><img
                                                             src="/productImages/<%= products[i].image[0].filename  %>"
                                                             alt="product image" alt="#"></td>
@@ -62,7 +62,7 @@
                                                     </td>
 
                                                     <td class="action" data-title="Remove"><a class="text-danger"
-                                                            onclick="confirmDelete('<%= cartData[i].product_id %>')"><i
+                                                            onclick="confirmDelete('<%= cartData[i].product_id %>', '<%= i %>')"><i
                                                                 class="fi-rs-trash"></i></a></td>
                                                 </tr>
                                                 <% totalSubTotal +=parseFloat(products[i].salePrice *
@@ -202,7 +202,7 @@
 
 
     <script>
-        function confirmDelete(productId) {
+        function confirmDelete(productId,index) {
             Swal.fire({
                 title: "Are you sure?",
                 text: "You won't be able to revert this!",
@@ -217,24 +217,30 @@
                     fetch(`/delete-cartItem?id=${productId}`, {
                         method: "DELETE",
                     })
-                        .then(response => {
-                            if (response.ok) {
+                        .then(res => { return res.json() })
+                        .then(data => {
+                            if (data.success) {
                                 // Show success message
                                 Swal.fire({
                                     title: "Deleted!",
-                                    text: "Your file has been deleted.",
+                                    text: data.message,
                                     icon: "success"
-                                }).then(() => {
-                                    // Redirect after successful deletion
-                                    window.location.href = "/cartlist";
-                                });
+                                })
+                                const divToRemove = document.getElementById('deletecart'+index);
+
+                                // Check if the div exists before removing it
+                                if (divToRemove) {
+                                    // Remove the div from the DOM
+                                    divToRemove.remove();
+                                } else {
+                                    console.log('Div not found.');
+                                }
                             } else {
                                 // Handle error response
-                                console.error("Error deleting cart item:", response.statusText);
                                 Swal.fire({
                                     icon: "error",
                                     title: "Oops...",
-                                    text: `Error deleting cart item: ${response.statusText}`,
+                                    text:data.message,
                                 });
                             }
                         })

@@ -134,8 +134,15 @@
                                                             <%= product[i].totalPrice %>
                                                         </td>
                                                         <td>
-                                                            <button class="btn btn-danger"
+                                                            <% if (product[i].status=="canceled") { %>
+                                                             <span>product Canceled</span>
+                                                             <% } else if (product[i].status=="Returned") { %>
+                                                              <span>product Returned</span>
+                                                              <% } else { %>
+                                                                <button class="btn btn-danger"
                                                                 onclick="cancelOrder( '<%= product[i].productId %>','<%= product[i].quantity %>')">cancel</button>
+                                                            <% } %>
+                                                           
                                                         </td>
                                                 </tr>
                                                 <% } %>

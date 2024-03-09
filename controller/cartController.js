@@ -127,11 +127,22 @@ const addCartIcon = async (req, res) => {
     try {
         const id = req.query.id; // Corrected variable declaration
         const productData = await Product.findById(id);
+        if(!req.session.user){
+            return res.status(400).json({success:false,message:"please Login or Sign Up "});
+        }
+        const user_id = req.session.user._id;
         if(productData.stock==0){
             return res.status(400).json({success:false,message:"Out Of Stock"})
         }
+        const cartStockCheck=await Cart.findOne({user_id:user_id,"cartItems.product_id":productData._id});
+        if(cartStockCheck){
+            const cartDataItem = cartStockCheck.cartItems; // Access the first document and then get cartItems
+            const quantityCheck = cartDataItem.find(item => item.product_id == id);
+            if(quantityCheck.quantity >= productData.stock){
+                return res.status(400).json({success:false,message:"Cart have Maximum Stock"})
+            }
+        }
         const quantity = 1;
-        const user_id = req.session.user._id;
         const userExist = await Cart.findOne({
             user_id: user_id, // Corrected to use user_id 
         });
@@ -170,7 +181,7 @@ const addCartIcon = async (req, res) => {
         return res.status(200).json({ success: true, message: "Added to the cart" })
     } catch (error) {
         console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        return res.status(500).json({messge:'Internal Server Error'});
     }
 };
 const deleteCartItem = async (req, res) => {
@@ -184,15 +195,15 @@ const deleteCartItem = async (req, res) => {
             { $pull: { cartItems: { product_id: productId } } },
             { new: true }
         );
-
         if (!updatedCart) {
-            console.log('Cart not found for the user.');
+            return res.status(400).json({success:false,message:"cannot Delete"})
             // Handle the scenario where the cart is not found
         } else {
-            return res.status(200).send(updatedCart);
+            return res.status(200).json({success:true,message:"Cart Product Deleted"});
         }
         // Respond with the updated cart
     } catch (error) {
+        console.log(error.message);
         return res.status(500).send('Internal Server Error');
     }
 };
@@ -202,20 +213,17 @@ const checkOut = async (req, res) => {
         const cartData = await Cart.findOne({ user_id: userId });
         if (cartData) {
             const addressData = await Address.findOne({ userId: userId });
+            let address;
+            if(addressData){
+                 address=addressData.address
+            }
             const cartItemData = cartData.cartItems;
             const productData = cartItemData.map(item => (item.product_id));
             const products = await Product.find({ _id: { $in: productData } })
             const loggedIn = req.session.user ? true : false;
-            return res.status(200).render("checkOut", {
-                loggedIn,
-                // category: categoryData,
-                Address: addressData,
-                cart: cartItemData,
-                product: products
+            return res.status(200).render("checkOut", {loggedIn,Address: address,cart: cartItemData,product: products
             });
         }
-        //const categoryData = await Category.find({ is_active: false });
-
     } catch (error) {
         console.error("Error in checkoutPage:", error);
         return res.status(500).send('Internal Server Error');

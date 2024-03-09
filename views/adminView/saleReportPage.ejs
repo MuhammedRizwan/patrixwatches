@@ -43,9 +43,9 @@
                     <% orderData.forEach(element => { %>
                         <tr>
                             <td><a href="#" class="fw-bold"><%= element.orderId %></a> </td>
-                            <td><%= element.user[0].name %></td>
+                            <td><%= element.address.fullName %></td>
                             <td>
-                                <%= element.user[0].email %>
+                                <%= element.address.mobile %>
                             </td>
                             <td>
                                 <%= element.createdOn.toLocaleDateString() %>

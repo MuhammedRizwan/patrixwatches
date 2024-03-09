@@ -122,7 +122,6 @@
                 </div>
             </section>
             <section class="product-tabs section-padding position-relative wow fadeIn animated">
-                <div class="bg-square"></div>
                 <div class="container">
                     <div class="tab-header">
 
@@ -157,9 +156,10 @@
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#quickViewModal"><i
                                                                     class="fi-rs-eye"></i></a>
-                                                            <a aria-label="Add To Wishlist" class="action-btn hover-up"
-                                                                href="shop-wishlist.html"><i
-                                                                    class="fi-rs-heart"></i></a>
+                                                            <button aria-label="Add To Wishlist"
+                                                                class="action-btn hover-up"
+                                                                onclick="addToWishlist('<%= product[i]._id %>')"><i
+                                                                    class="fi-rs-heart"></i></button>
                                                             <a aria-label="Compare" class="action-btn hover-up"
                                                                 href="shop-compare.html"><i
                                                                     class="fi-rs-shuffle"></i></a>
@@ -183,7 +183,8 @@
                                                         </div>
                                                         <div class="product-price">
                                                             <span>&#8377;<%= product[i].salePrice %></span>
-                                                            <span class="old-price">&#8377;<%= product[i].orginalPrice %>
+                                                            <span class="old-price">&#8377;<%= product[i].orginalPrice
+                                                                    %>
                                                             </span>
                                                         </div>
                                                         <div class="product-action-1 show">
@@ -471,33 +472,70 @@
                 </div>
             </section>
         </main>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            function addToCart(productId) {
-                $.ajax({
-                    url: `/addToCart?id=${productId}`,
-                    method: "GET",
-                    success: function (data) {
-                        console.log(data,"data");
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function addToCart(productId) {
+            fetch(`/addToCart?id=${productId}`,{method: "GET"})
+            .then(res=>{return res.json()})
+            .then(data=>{
+                if(data.success){
+                    Swal.fire({
+                        position: "center",
+                        icon: "success",
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }else{
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: data.message,
+                    });
+                }
+              
+            })
+            .catch(error=>{
+                Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: `Error adding item to cart: ${error}`,
+                    });
+            })
+        }
+    </script>
+    <script>
+        function addToWishlist(productId) {
+            fetch(`/addToWishlist?id=${productId}`, { method: "GET" })
+                .then(res => { return res.json() })
+                .then(data => {
+                    console.log(data);
+                    if (data.success) {
                         Swal.fire({
                             position: "center",
                             icon: "success",
-                            title: "Added To The Cart",
+                            title: data.message,
                             showConfirmButton: false,
                             timer: 1500
                         });
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error adding item to cart:", error);
+                    } else {
                         Swal.fire({
                             icon: "error",
                             title: "Oops...",
-                            text: `Error adding item to cart: ${error}`,
+                            text: data.message,
                         });
                     }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "An error occurred while processing your request.",
+                    });
                 });
-            }
-
-        </script>
- <%- include('../layout/footer') %>
+        }
+    </script>
+    <%- include('../layout/footer') %>

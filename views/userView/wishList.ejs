@@ -1,0 +1,155 @@
+<%- include('../Layout/header') %>
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Wishlist
+                </div>
+            </div>
+        </div>
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table shopping-summery text-center">
+
+                                <% if (product.length>0) { %>
+                                    <thead>
+                                        <tr class="main-heading">
+                                            <th scope="col" colspan="2">Product</th>
+                                            <th scope="col">Price</th>
+                                            <th scope="col">Stock Status</th>
+                                            <th scope="col">Action</th>
+                                            <th scope="col">Remove</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% product.forEach((element,index) => { %>
+                                           <tr id="deleteWish<%= index %>">
+                                            <td class="image product-thumbnail"><img
+                                                    src="/productImages/<%= element.productId.image[0].filename %>" alt="#"></td>
+                                            <td class="product-des product-name">
+                                                <h5 class="product-name"><a
+                                                        href="shop-product-right.html"><%= element.productId.productName %></a></h5>
+                                                <p class="font-xs"><%= element.productId.discription %>
+                                                </p>
+                                            </td>
+                                            <td class="price" data-title="Price"><span>&#8377;<%= element.productId.salePrice %></span></td>
+                                            <td class="text-center" data-title="Stock">
+                                                <% if (element.productId.stock>0) { %>
+                                                    <span class="color3 font-weight-bold text-success">In Stock</span>
+                                                    <% } else { %>
+                                                        <span class="color3 font-weight-bold text-danger">Out of Stock</span>
+                                                <% } %> 
+                                            </td>
+                                            <td class="text-right" data-title="Cart">
+                                                <button class="btn btn-sm"  onclick="addToCart('<%= element.productId._id %>')"><i
+                                                        class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>
+                                            </td>
+                                            <td class="action" data-title="Remove"><a href="#" onclick="confirmDelete('<%= element.productId._id %>','<%= index%>') "><i
+                                                        class="fi-rs-trash"></i></a></td>
+                                        </tr>
+                                        <% }) %>
+                                      
+                                    <% } else { %>
+                                        <div>
+                                            <h1>whaislist have no product</h1>
+                                        </div>
+                                            <% } %>
+                                        </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+         function addToCart(productId) {
+            fetch(`/addToCart?id=${productId}`,{method: "GET"})
+            .then(res=>{return res.json()})
+            .then(data=>{
+                if(data.success){
+                    Swal.fire({
+                        position: "center",
+                        icon: "success",
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }else{
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: data.message,
+                    });
+                }
+              
+            })
+            .catch(error=>{
+                Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: `Error adding item to cart: ${error}`,
+                    });
+            })
+        }
+        function confirmDelete(productId,index) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send a DELETE request using the Fetch API
+                    fetch(`/delete-wishitem?id=${productId}`, {
+                        method: "DELETE",
+                    })
+                        .then(res => { return res.json() })
+                        .then(data => {
+                            if (data.success) {
+                                // Show success message
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: data.message,
+                                    icon: "success"
+                                })
+                                const trToRemove = document.getElementById('deleteWish'+index);
+
+                                // Check if the div exists before removing it
+                                if (trToRemove) {
+                                    // Remove the div from the DOM
+                                    trToRemove.remove();
+                                } else {
+                                    console.log('table row not found.');
+                                }
+                            } else {
+                                // Handle error response
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Oops...",
+                                    text:data.message,
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error deleting cart item:", error);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: `Error deleting cart item: ${error}`,
+                            });
+                        });
+                }
+            });
+        }
+    </script>
+<%- include('../Layout/footer') %>

@@ -45,7 +45,14 @@ const productSchema = new mongoose.Schema({
     },
     image: [{
         filename: String,
-    }]
+    }],
+    offerId:{
+        type:mongoose.Types.ObjectId,
+        ref:"Offer"
+    }
+}, 
+{
+    timestamps: true
 })
 
 module.exports = mongoose.model("ProductDetials", productSchema);

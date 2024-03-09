@@ -1,17 +1,10 @@
 const { User } = require('../model/userModel');
+const Order=require('../model/orderModel');
+const Product=require('../model/productModel');
+const Category=require('../model/categoryModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-// const randomstring=require('randomstring');
-// const nodemailer=require('nodemailer');
-
-// const securePassword=async(password)=>{
-//     try {
-//         const passwordHash=await bcrypt.hash(password,10);
-//         return passwordHash;
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
+// const { default: products } = require('razorpay/dist/types/products');
 
 const genarateToken = (user) => {
 
@@ -25,36 +18,6 @@ const adminLoginPage = async (req, res) => {
         return res.status(500).send('Internal Server Error');
     }
 }
-// const addUserMail=async (name,email,password,user_id)=>{
-//     try {
-//         const transporter=nodemailer.createTransport({
-//             host:'smtp.gmail.com',
-//             port:587,
-//             secure:false,
-//             auth:{
-//                 user:process.env.MAIL,
-//                 pass:process.env.PASS
-//             }
-//         });
-
-//         const mailOptions={
-//             from:process.env.MAIL,
-//             to:email,
-//             subject:'Admin add you and Verify mail',
-//             html:'<p>Hii '+name+' , please click here to <a href="http://127.0.0.1:8000/verify?id='+user_id+'">Verify </a> Your mail.</p><br><br> <b>Email:-</b>'+email+'<br><b>Password:-</b>'+password
-//         }
-//         transporter.sendMail(mailOptions,function(error,info){
-//             if(error){
-//                 console.log(error);
-//             }
-//             else{
-//                 console.log("Email has been sent:-",info.return response);
-//             }
-//         })
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
 
 const adminLogin = async (req, res) => {
     try {
@@ -97,7 +60,15 @@ const adminLogin = async (req, res) => {
 const Dashboard = async (req, res) => {
     try {
         const userData = await User.find({ is_admin: 0 });
-        return res.status(200).render('adminDashboard', { users: userData });
+        const countOrders=await Order.countDocuments()
+        const countProduct=await Product.countDocuments()
+        const countCategory=await Category.countDocuments()
+        const total=await Order.find({paymentStatus:"Paid"})
+        let totalRevenue=[];
+        const totalPrice=total.forEach(element => {
+            totalRevenue.push(element.totalPrice);
+        });
+        return res.status(200).render('adminDashboard', { users: userData ,countOrders,countProduct,countCategory,totalRevenue});
     } catch (error) {
         console.log(error.message)
         return res.status(500).send('Internal Server Error');
@@ -105,8 +76,17 @@ const Dashboard = async (req, res) => {
 }
 const userList = async (req, res) => {
     try {
-        const userData = await User.find({ is_admin: 0 });
-        return res.status(200).render('user', { users: userData });
+        const PAGE_SIZE = 10;
+        const { user, page } = req.query;
+        const pageNumber = parseInt(page) || 1;
+    
+            const totalUsers = await User.countDocuments({ name: { $regex: user || '', $options: 'i' }, is_admin: 0 });
+            const totalPages = Math.ceil(totalUsers / PAGE_SIZE);
+    
+            const users = await User.find({ name: { $regex: user || '', $options: 'i' }, is_admin: 0 })
+                .skip((pageNumber - 1) * PAGE_SIZE)
+                .limit(PAGE_SIZE);
+            return res.status(200).render('user', { users: users, totalPages: totalPages, currentPage: pageNumber });
     } catch (error) {
         console.log(error.message);
         return res.status(500).send('Internal Server Error');
@@ -127,7 +107,7 @@ const blockUser = async (req, res) => {
         if (!userData) {
             return res.status(404).json({ error: true, message: "somthing error occured" }); // Inform if the user was not found
         } else {
-            return res.json({ success: true, message: 'User blocked successfully' });
+            return res.status(200).json({ success: true, message: 'User blocked successfully',userData });
         }
     } catch (error) {
         console.log(error.message);
@@ -142,7 +122,7 @@ const unblockUser = async (req, res) => {
         if (!userData) {
             return res.status(404).send('User not found');
         } else {
-            return res.json({ success: true, message: 'User Unblocked successfully' });
+            return res.status(200).json({ success: true, message: 'User Unblocked successfully', userData});
         }
 
     } catch (error) {
@@ -150,34 +130,28 @@ const unblockUser = async (req, res) => {
         return res.status(500).send('Internal Server Error');
     }
 };
-const deleteUser = async (req, res) => {
+
+const userSearch=async(req,res)=>{
     try {
-        const id = req.params.userId;
-        console.log(id);
-        const userData = await User.deleteOne({ _id: id });
-        if (userData.deletedCount === 0) {
-            return res.status(404).send('User not found or already deleted');
-        } else {
-            return res.status(200).json({ success: true, message: 'User deleted successfully' });
-        }
+        console.log(req.query);
+        const { user } = req.query;
+        const users = await User.find({ name: { $regex: user, $options: 'i' },is_admin:0 });
+        console.log(users);
+        res.status(200).json(users);
     } catch (error) {
         console.log(error.message);
         return res.status(500).send('Internal Server Error');
+
     }
 }
-
 module.exports = {
     adminLoginPage,
     adminLogin,
     Dashboard,
     userList,
     Logout,
-    // newUserPage,
-    // newUser,
-    // editUserPage,
-    // editUser,
-    deleteUser,
     blockUser,
-    unblockUser
+    unblockUser,
+    userSearch
 }
 

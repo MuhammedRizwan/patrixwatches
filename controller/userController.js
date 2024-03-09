@@ -4,6 +4,7 @@ const Product = require('../model/productModel');
 const Category = require('../model/categoryModel');
 const Address = require('../model/addressModel');
 const Order = require('../model/orderModel');
+const Wallet = require('../model/walletModel');
 const bcrypt = require('bcrypt');
 // const jwt = require('jsonwebtoken');
 const otp = require('../util/genarateOtp');
@@ -17,6 +18,13 @@ const securePassword = async (password) => {
     } catch (error) {
         console.log(error.message);
         return res.status(500).send('Internal Server Error');
+        const validationError = new Error("User validation failed: email: Path `email` is required.");
+        validationError.name = "ValidationError";
+        validationError.statusCode = 400;
+        validationError.errors = { email: { message: "Path `email` is required.", kind: "required" } };
+
+        // Call the error handling middleware with the created error
+        next(validationError);
     }
 
 }
@@ -29,7 +37,7 @@ const Home = async (req, res) => {
         const loggedIn = req.session.user ? true : false;
         const categoryData = await Category.find({ is_unList: false });
         const categoryIds = categoryData.map(category => category._id);
-        const productData = await Product.find({ category_id: { $in: categoryIds }, is_blocked: false });
+        const productData = await Product.find({ category_id: { $in: categoryIds }, is_blocked: false }).limit(8);
         return res.status(200).render('Home', { product: productData, category: categoryData, loggedIn });
     } catch (error) {
         console.log(error.message);
@@ -107,6 +115,10 @@ const verifyOtp = async (req, res) => {
                     user.password = undefined
                     req.session.LoggedUser = true
                     req.session.user = user
+                    const newWallet = new Wallet({
+                        user: user._id
+                    })
+                    const saveWallet = await newWallet.save();
                     // const token = genarateToken(user);
                     // const options = {
                     //     expires: new Date(Date.now() + 60 * 60 * 1000),
@@ -202,8 +214,9 @@ const account = async (req, res) => {
                 $limit: 1
             }
         ]);
+        const walletData = await Wallet.findOne({ user: userId })
         if (userData.length === 0) {
-            return res.status(404).render('account', { Address: [], loggedIn, user: [] })
+            return res.status(404).render('account', { Address: [], loggedIn, user: [], wallet: walletData })
         }
         const addressData = await Address.aggregate([
             {
@@ -213,7 +226,11 @@ const account = async (req, res) => {
                 $limit: 1
             }
         ]);
-        return res.status(200).render('account', { Address: addressData, loggedIn, user: userData[0] });
+        if (addressData == 0) {
+            return res.status(200).render('account', { Address: [], loggedIn, user: userData[0], wallet: walletData });
+        }
+
+        return res.status(200).render('account', { Address: addressData[0].address, loggedIn, user: userData[0], wallet: walletData });
 
     } catch (error) {
         console.log(error.message);
@@ -358,26 +375,26 @@ const newPasswordverify = async (req, res) => {
         return res.status(500).send('Internal Server Error');
     }
 }
-const editProfilePage=async(req,res)=>{
+const editProfilePage = async (req, res) => {
     try {
         const loggedIn = req.session.user ? true : false;
-        const userData=await User.findOne({_id:req.session.user._id})
-        return res.status(200).render('editProfile', { loggedIn ,userData});
-        
+        const userData = await User.findOne({ _id: req.session.user._id })
+        return res.status(200).render('editProfile', { loggedIn, userData });
+
     } catch (error) {
         console.log(error.message);
         return res.status(500).send('Internal Server Error');
     }
 }
-const editProfile=async(req,res)=>{
+const editProfile = async (req, res) => {
     try {
-        const userId=req.session.user._id;
-        const {name,phone}=req.body;
+        const userId = req.session.user._id;
+        const { name, phone } = req.body;
         const userData = await User.updateOne(
             { _id: userId },
             {
                 $set: {
-                    name,phone
+                    name, phone
                 },
             }
         );
@@ -386,6 +403,17 @@ const editProfile=async(req,res)=>{
         console.log(error.message);
         return res.status(500).send('Internal Server Error');
 
+    }
+}
+const walletTransaction = async (req, res) => {
+    try {
+        const loggedIn = req.session.user ? true : false;
+        const userId = req.session.user._id;
+        const walletData = await Wallet.findOne({ user: userId })
+        return res.status(200).render("transactionList", { loggedIn, wallet: walletData });
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).send('Internal Server Error');
     }
 }
 module.exports = {
@@ -405,5 +433,6 @@ module.exports = {
     forgetOtpVerification,
     newPasswordverify,
     editProfilePage,
-    editProfile
+    editProfile,
+    walletTransaction
 }

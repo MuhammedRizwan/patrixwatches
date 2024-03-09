@@ -91,6 +91,10 @@ const editCategoryPage = async (req, res) => {
 }
 const editCategory = async (req, res) => {
     try {
+        const categoryExist=await Category.findOne({categoryName:req.body.CategoryName})
+        if(categoryExist){
+            return res.render('editCategory',{message:"category Already Exist",cat:categoryExist});
+        }
         const categoryData = await Category.updateOne({ _id: req.body.id }, {
             $set: {
                 categoryName: req.body.CategoryName,
@@ -107,26 +111,12 @@ const editCategory = async (req, res) => {
         return res.status(500).send('Internal Server Error');
     }
 }
-const deleteCategory = async (req, res) => {
-    try {
-        const id = req.params.id.trim();
-        const deleteCategory = await Category.deleteOne({ _id: id });
-        if (!deleteCategory) {
-            return res.status(400).json({ success: false, message: "category does not  Deleted" });
-        } else {
-            return res.status(200).json({ success: true, message: "category Deleted" });
-        }
-    } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error')
-    }
-}
+
 module.exports = {
     category,
     listCategory,
     unListCategory,
     addCategoryPage,
-    deleteCategory,
     addCategory,
     editCategoryPage,
     editCategory
