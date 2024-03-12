@@ -6,7 +6,6 @@ const categoryController = require('../controller/categoryController');
 const orderController = require('../controller/orderCondroller');
 const couponController=require('../controller/couponController');
 const offerController=require('../controller/offerController');
-const bannerController=require('../controller/bannerController');
 const adminAuth = require('../middleware/adminAuth');
 const upload = require('../config/multer');
 
@@ -67,8 +66,6 @@ admin_route.get('/addCoupon',adminAuth,couponController.addcouponPage);
 admin_route.post('/addCoupon',adminAuth,couponController.addCoupon);
 admin_route.put('/listCoupon',adminAuth,couponController.listnUnlistCoupon);
 
-admin_route.get('/bannerList',adminAuth,bannerController.bannerList);
-admin_route.get('/addBanner',adminAuth,bannerController.addBannerpage);
-admin_route.post('/addbanner',upload.array("files", 4),adminAuth,bannerController.addBanner)
+
 
 module.exports = admin_route;

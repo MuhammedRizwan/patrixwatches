@@ -1,4 +1,4 @@
-<%- include('../layout/header') %>
+<%- include('../layout/header',{currentPage:'cartList'}) %>
     <main class="main">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
@@ -42,7 +42,7 @@
                                                             eget<br> distingy magndapibus.
                                                         </p>
                                                     </td>
-                                                    <td class="price" data-title="Price"><span>$<%=
+                                                    <td class="price" data-title="Price"><span>&#8377;<%=
                                                                 products[i].salePrice %> </span></td>
                                                     <td class="text-center" data-title="Stock">
                                                         <button class="btn btn-sm increment-button"

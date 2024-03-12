@@ -1,8 +1,9 @@
 const Cart = require('../model/cartModel');
 const Product = require('../model/productModel');
 const Address = require('../model/addressModel');
+const {User}=require('../model/userModel')
 
-const addCart = async (req, res) => {
+const addCart = async (req, res,next) => {
     try {
         const qty = req.body.qty;
         const id = req.query.id;
@@ -37,30 +38,30 @@ const addCart = async (req, res) => {
 
         return res.redirect('/cartlist');
     } catch (error) {
-        console.error(error);
-        return res.status(500).send('Internal Server Error');
+       next(error.message)
     }
 }
-const cartPage = async (req, res) => {
+const cartPage = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const userId = req.session.user._id;// Assuming the user ID is available in req.user.user[0]._id
+        const user=await User.findOne({_id:req.session.user});
         const cartData = await Cart.findOne({ user_id: userId });
         if (!cartData) {
-            return res.status(404).render('cartList', { cart: cartData, loggedIn });
+            return res.status(404).render('cartList', { cart: cartData, loggedIn ,Name:user});
         }
         // Fetch cart items based on the product_ids in the cart
         const productIds = cartData.cartItems.map(item => item.product_id);
         const productItems = await Product.find({ _id: { $in: productIds } });
         const cartItems = cartData.cartItems
-        return res.render('cartList', { products: productItems, cart: cartData, cartData: cartItems, loggedIn });// Pass the cartItems data to the 'cart' EJS template
+        return res.render('cartList', { products: productItems, cart: cartData, cartData: cartItems, loggedIn ,Name:user});// Pass the cartItems data to the 'cart' EJS template
     } catch (error) {
-        return res.status(500).send('Error fetching cart data');
+        next(error.message)
     }
 }
 
 
-const addQuantity = async (req, res) => {
+const addQuantity = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const id = req.query.id; // Corrected variable declaration
@@ -90,10 +91,10 @@ const addQuantity = async (req, res) => {
             }
         }
     } catch (error) {
-        console.log(error.message);
+        next(error.message)
     }
 };
-const subQuantity = async (req, res) => {
+const subQuantity = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const id = req.query.id; // Corrected variable declaration
@@ -119,11 +120,11 @@ const subQuantity = async (req, res) => {
         }
     } catch (error) {
         console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 };
 
-const addCartIcon = async (req, res) => {
+const addCartIcon = async (req, res,next) => {
     try {
         const id = req.query.id; // Corrected variable declaration
         const productData = await Product.findById(id);
@@ -180,11 +181,10 @@ const addCartIcon = async (req, res) => {
         }
         return res.status(200).json({ success: true, message: "Added to the cart" })
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({messge:'Internal Server Error'});
+        next(error.message)
     }
 };
-const deleteCartItem = async (req, res) => {
+const deleteCartItem = async (req, res,next) => {
     // Assuming you have an instance of Express set up as `app`
 
     const productId = req.query.id; // Get productId from the query parameter
@@ -203,11 +203,10 @@ const deleteCartItem = async (req, res) => {
         }
         // Respond with the updated cart
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 };
-const checkOut = async (req, res) => {
+const checkOut = async (req, res,next) => {
     try {
         const userId = req.session.user._id;
         const cartData = await Cart.findOne({ user_id: userId });
@@ -221,12 +220,12 @@ const checkOut = async (req, res) => {
             const productData = cartItemData.map(item => (item.product_id));
             const products = await Product.find({ _id: { $in: productData } })
             const loggedIn = req.session.user ? true : false;
-            return res.status(200).render("checkOut", {loggedIn,Address: address,cart: cartItemData,product: products
+            const user=await User.findOne({_id:req.session.user});
+            return res.status(200).render("checkOut", {loggedIn,Address: address,cart: cartItemData,product: products,Name:user
             });
         }
     } catch (error) {
-        console.error("Error in checkoutPage:", error);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 };
 

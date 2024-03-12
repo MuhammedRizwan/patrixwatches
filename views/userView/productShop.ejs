@@ -1,10 +1,10 @@
-<%- include('../layout/header') %>
+<%- include('../layout/header',{ currentPage: 'shop' }) %>
     <main class="main">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
-                    <a href="index.html" rel="nofollow">Home</a>
-                    <span></span> Shop
+                    <a href="/" rel="nofollow">Home</a>
+                    <a href="/Shop"></a>Shop
                 </div>
             </div>
         </div>
@@ -132,7 +132,7 @@
                             <ul class="categories">
                                 <% if (categoryData) { %>
                                     <% categoryData.forEach(element=> { %>
-                                        <li><a href="/Shop?category=<%= element._id %>">
+                                        <li><input type="checkbox" style="width: 10px;height: 10px;" <%= element._id.toString()==category ? 'checked' : '' %> ><a href="/Shop?category=<%= element._id %>" >
                                                 <%= element.categoryName %>
                                             </a></li>
                                         <% }) %>

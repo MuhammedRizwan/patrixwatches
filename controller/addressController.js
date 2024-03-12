@@ -1,19 +1,18 @@
 const Address = require('../model/addressModel');
-const { updateOne } = require('../model/productModel');
 
-
-const addAddressPage = async (req, res) => {
+const addAddressPage = async (req, res,next) => {
 
     try {
         const loggedIn = req.session.user ? true : false;
         const userId = req.session.user._id;
         const addressData = await Address.findOne({ userId: userId });
-        return res.render('addAddress', { loggedIn, addressData });
+        const user=await User.findOne({_id:req.session.user});
+        return res.render('addAddress', { loggedIn, addressData,Name:user });
     } catch (error) {
-        return res.stautus(500).json({ success: false, error: "Internal Server Error" })
+        next(error.message)
     }
 }
-const addAddress = async (req, res) => {
+const addAddress = async (req, res,next) => {
     try {
         const { fullName, mobile, pincode, houseName, landMark, townCity, state } = req.body
         const userId = req.session.user._id;
@@ -39,11 +38,11 @@ const addAddress = async (req, res) => {
         await newAddress.save();
         return res.status(200).redirect("/account");
     } catch (error) {
-        res.status(500).send("Internal Server Error. Please try again later.");
+        next(error.message)
     }
 };
 
-const deletAddress = async (req, res) => {
+const deletAddress = async (req, res,next) => {
     try {
         const addressId = req.query.id;
         const userId = req.session.user._id;
@@ -59,30 +58,31 @@ const deletAddress = async (req, res) => {
         }
 
     } catch (error) {
-        res.status(500).json("Internal Server Error. Please try again later.");
+        next(error.message)
     }
 };
 
 
-const loadEditAddress = async (req, res) => {
+const loadEditAddress = async (req, res,next) => {
     try {
         const addressId = req.query.id
         const userId = req.session.user._id;
         const addressData = await Address.findOne({ userId: userId });
         const address = addressData.address.find(item => item._id == addressId);
         const loggedIn = req.session.user ? true : false;
+        const user=await User.findOne({_id:req.session.user});
         return res.render("editAddress", {
             loggedIn,
             address,
+            Name:user
         });
     } catch (error) {
-        console.log(error);
-        return res.status(500).send("Internal Server Error. Please try again later.");
+        next(error.message)
     }
 };
 
 
-const editAddress = async (req, res) => {
+const editAddress = async (req, res,next) => {
     try {
         const addressType = req.query.id;
         const userId = req.session.user._id;
@@ -104,11 +104,10 @@ const editAddress = async (req, res) => {
         );
         return res.status(200).redirect("/account");
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error. Please try again later.");
+        next(error.message)
     }
 };
-const checkOutAddaddress=async (req, res) => {
+const checkOutAddaddress=async (req, res,next) => {
     try {
         const { fullName, mobile, pincode, houseName, landMark, townCity, state } = req.body.requestData
         const userId = req.session.user._id;
@@ -134,8 +133,7 @@ const checkOutAddaddress=async (req, res) => {
         });
         await newAddress.save();
     }catch(error){
-        console.log(error.message);
-        res.status(500).send("Internal Server Error. Please try again later.");
+        next(error.message)
 
     }
 }

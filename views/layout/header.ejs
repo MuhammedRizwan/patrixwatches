@@ -15,35 +15,26 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/pImage.png">
     <!-- Template CSS -->
     <link rel="stylesheet" href="/assets/css/maind134.css?v=3.4">
     <script src="https://unpkg.com/js-image-zoom@0.4.1/js-image-zoom.js"></script>
 </head>
 
 <body>
-    <header class="header-area header-style-5">
+    <header class="header-area header-style-1">
         <div class="header-top header-top-ptb-1 d-none d-lg-block">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-xl-3 col-lg-4">
                         <div class="header-info">
-                            <ul>
-                                <li><i class="fi-rs-smartphone"></i> <a href="#">(+01) - 2345 - 6789</a></li>
-                                <li><i class="fi-rs-marker"></i><a href="page-contact.html">Our location</a></li>
-                            </ul>
+
                         </div>
                     </div>
                     <div class="col-xl-6 col-lg-4">
                         <div class="text-center">
                             <div id="news-flash" class="d-inline-block">
-                                <ul>
-                                    <li>Get great devices up to 50% off <a href="shop-grid-right.html">View details</a>
-                                    </li>
-                                    <li>Supper Value Deals - Save more with coupons</li>
-                                    <li>Trendy 25silver jewelry, save up 35% off today <a
-                                            href="shop-grid-right.html">Shop now</a></li>
-                                </ul>
+
                             </div>
                         </div>
                     </div>
@@ -51,24 +42,25 @@
                         <div class="header-info header-info-right">
                             <ul>
                                 <li>
-                                    <a class="language-dropdown-active" href="#"> <i class="fi-rs-world"></i> English <i
-                                            class="fi-rs-angle-small-down"></i></a>
-                                    <ul class="language-dropdown">
-                                        <li><a href="#"><img src="/assets/imgs/theme/flag-fr.png" alt="">Français</a>
-                                        </li>
-                                        <li><a href="#"><img src="/assets/imgs/theme/flag-dt.png" alt="">Deutsch</a></li>
-                                        <li><a href="#"><img src="/assets/imgs/theme/flag-ru.png" alt="">Pусский</a></li>
-                                    </ul>
-                                </li>
-                                <% if (loggedIn) { %>
-                                    <div class="single-mobile-header-info">
-                                        <a href="/logout">Log Out </a>
-                                    </div>
-                                    <% } else { %>
+                                    <% if (loggedIn) { %>
                                         <div class="single-mobile-header-info">
-                                            <a href="/login">Log In / Sign Up </a>
-                                        </div>
-                                        <% } %>
+                                                <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                                                id="dropdownAccount" aria-expanded="false"><%= Name.name%></a>
+                                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                                               
+                                                <a class="dropdown-item" href="/account"><i
+                                                        class="material-icons md-settings"></i>Account
+                                                    Settings</a>
+                                                <a class="dropdown-item text-danger" href="/logout"><i
+                                                        class="material-icons md-exit_to_app"></i>Logout</a>
+                                            </div>
+                                            <% } else { %>
+                                                <div class="single-mobile-header-info">
+                                                    <a href="/login">Log In / Sign Up </a>
+                                                </div>
+                                                <% } %>
+                                </li>
+                            
                             </ul>
                         </div>
                     </div>
@@ -79,58 +71,34 @@
             <div class="container">
                 <div class="header-wrap header-space-between position-relative">
                     <div class="logo logo-width-1">
-                       <h1 class="text-danger ">PATRIX</h1>
+                        <h1 class="text-danger ">PATRIX</h1>
                     </div>
                     <div
                         class="main-menu main-menu-grow main-menu-padding-1 main-menu-lh-1 main-menu-mrg-1 hm3-menu-padding d-none d-lg-block hover-boder">
                         <nav>
                             <ul>
-                                <li><a class="active" href="/">Home</a>
-                                    <li><a class="active" href="/Shop">Shop</a>
-                                </li>
-                                <li><a href="blog-category-grid.html">Blog <i class="fi-rs-angle-down"></i></a></li>
-                                <li><a href="#">Pages <i class="fi-rs-angle-down"></i></a>
-                                    <ul class="sub-menu">
-                                        <li><a href="page-about.html">About Us</a></li>
-                                        <li><a href="page-contact.html">Contact</a></li>
-                                        <li><a href="/account">My Account</a></li>
-                                        <li><a href="page-login-register.html">login/register</a></li>
-                                        <li><a href="page-purchase-guide.html">Purchase Guide</a></li>
-                                        <li><a href="page-privacy-policy.html">Privacy Policy</a></li>
-                                        <li><a href="page-terms.html">Terms of Service</a></li>
-                                        <li><a href="page-404.html">404 Page</a></li>
-                                    </ul>
-                                </li>
                                 <li>
-                                    <a href="page-contact.html">Contact</a>
-                                </li>
+                                    <a  class="<%= currentPage === 'home' ? 'active' : '' %>" href="/">Home</a>       
+                                <li><a class="<%= currentPage === 'shop' ? 'active' : '' %>" href="/Shop">Shop</a></li>
+                                <li><a class="<%= currentPage === 'contact' ? 'active' : '' %>" href="page-contact.html">Contact</a></li>
+                                <li><a class="<%= currentPage === 'about us' ? 'active' : '' %>" href="">about Us</a></li>
                             </ul>
                         </nav>
                     </div>
                     <div class="header-action-right">
-                        <div class="search-style-2">
-                            <form action="#">
-                                <select class="select-active">
-                                    <option>Search in</option>
-                                    <option>Women's Clothing</option>
-                                    <option>Men's Clothing</option>
-                                    <option>Cellphones</option>
-                                    <option>Computer & Office</option>
-                                    <option>Consumer Electronics</option>
-                                    <option>Jewelry & Accessories</option>
-                                    <option>Home & Garden</option>
-                                    <option>Luggage & Bags</option>
-                                    <option>Shoes</option>
-                                    <option>Mother & Kids</option>
-                                </select>
-                                <input type="text" placeholder="Search for items…" id="searchInput">
-                            </form>
-                        </div>
+                        <% if (currentPage==='shop') { %>
+                            <div class="search-style-2">
+                                <form action="#">
+                                    
+                                    <input type="text" placeholder="Search for items…" id="searchInput">
+                                </form>
+                            </div>
+                        <% } %>
+                       
                         <div class="header-action-2">
                             <div class="header-action-icon-2">
                                 <a href="/wishList">
                                     <img class="svgInject" alt="Evara" src="/assets/imgs/theme/icons/icon-heart.svg">
-                                    <span class="pro-count blue">4</span>
                                 </a>
                             </div>
                             <div class="header-action-icon-2">
@@ -166,30 +134,6 @@
             </div>
             <div class="mobile-header-content-area">
                 <div class="mobile-menu-wrap mobile-header-border">
-                    <div class="main-categori-wrap mobile-header-border">
-                        <a class="categori-button-active-2" href="#">
-                            <span class="fi-rs-apps"></span> Browse Categories
-                        </a>
-                        <div class="categori-dropdown-wrap categori-dropdown-active-small">
-                            <ul>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-dress"></i>Women's Clothing</a>
-                                </li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-tshirt"></i>Men's Clothing</a>
-                                </li>
-                                <li> <a href="shop-grid-right.html"><i class="evara-font-smartphone"></i> Cellphones</a>
-                                </li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-desktop"></i>Computer &
-                                        Office</a></li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-cpu"></i>Consumer
-                                        Electronics</a></li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-home"></i>Home & Garden</a></li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-high-heels"></i>Shoes</a></li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-teddy-bear"></i>Mother &
-                                        Kids</a></li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-kite"></i>Outdoor fun</a></li>
-                            </ul>
-                        </div>
-                    </div>
                     <!-- mobile menu start -->
                     <nav>
                         <ul class="mobile-menu">
@@ -214,14 +158,7 @@
                                     <li><a href="page-404.html">404 Page</a></li>
                                 </ul>
                             </li>
-                            <li class="menu-item-has-children"><span class="menu-expand"></span><a href="#">Language</a>
-                                <ul class="dropdown">
-                                    <li><a href="#">English</a></li>
-                                    <li><a href="#">French</a></li>
-                                    <li><a href="#">German</a></li>
-                                    <li><a href="#">Spanish</a></li>
-                                </ul>
-                            </li>
+                            
                         </ul>
                     </nav>
                     <!-- mobile menu end -->
@@ -239,9 +176,9 @@
                                 <a href="/login">Log In / Sign Up </a>
                             </div>
                             <% } %>
-                    <div class="single-mobile-header-info">
-                        <a href="#">(+01) - 2345 - 6789 </a>
-                    </div>
+                                <div class="single-mobile-header-info">
+                                    <a href="#">(+01) - 2345 - 6789 </a>
+                                </div>
                 </div>
                 <div class="mobile-social-icon">
                     <h5 class="mb-15 text-grey-4">Follow Us</h5>
@@ -268,52 +205,20 @@
                 </div>
             </div>
             <div class="mobile-header-content-area">
-              
+
                 <div class="mobile-menu-wrap mobile-header-border">
-                    <div class="main-categori-wrap mobile-header-border">
-                        <a class="categori-button-active-2" href="#">
-                            <span class="fi-rs-apps"></span> Browse Categories
-                        </a>
-                        <div class="categori-dropdown-wrap categori-dropdown-active-small">
-                            <ul>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-dress"></i>Women's
-                                        Clothing</a>
-                                </li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-tshirt"></i>Men's
-                                        Clothing</a>
-                                </li>
-                                <li> <a href="shop-grid-right.html"><i class="evara-font-smartphone"></i>
-                                        Cellphones</a>
-                                </li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-desktop"></i>Computer &
-                                        Office</a></li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-cpu"></i>Consumer
-                                        Electronics</a></li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-home"></i>Home & Garden</a>
-                                </li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-high-heels"></i>Shoes</a>
-                                </li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-teddy-bear"></i>Mother &
-                                        Kids</a></li>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-kite"></i>Outdoor fun</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <!-- mobile menu start -->
+                    <div class=""></div>
                     <nav>
                         <ul class="mobile-menu">
-                            <li class="menu-item-has-children"><span class="menu-expand"></span><a
-                                    href="/">Home</a>
-                               
+                            <li class="menu-item-has-children"><span class="menu-expand"></span><a href="/">Home</a>
+
                             </li>
-                            <li class="menu-item-has-children"><span class="menu-expand"></span><a
-                                    href="/Shop">shop</a>
+                            <li class="menu-item-has-children"><span class="menu-expand"></span><a href="/Shop">shop</a>
                             </li>
-                            
+
                             <li class="menu-item-has-children"><span class="menu-expand"></span><a
                                     href="blog-category-fullwidth.html">Blog</a>
-                              
+
                             </li>
                             <li class="menu-item-has-children"><span class="menu-expand"></span><a href="#">Pages</a>
                                 <ul class="dropdown">

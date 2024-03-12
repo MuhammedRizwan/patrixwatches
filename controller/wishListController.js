@@ -2,23 +2,22 @@ const { User } = require('../model/userModel');
 const Product = require('../model/productModel');
 const Wishlist = require('../model/wishListModel');
 
-const wishListPage = async (req, res) => {
+const wishListPage = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
+        const user=await User.findOne({_id:req.session.user});
         const wishListdata=await Wishlist.findOne({user:req.session.user._id}).populate('product.productId');
         if(!wishListdata){
-            return res.status(400).render('wishLiat',{loggedIn,product:[]})
+            return res.status(400).render('wishList',{loggedIn,product:[],Name:user})
         }
-        return res.status(200).render('wishList', { loggedIn,product:wishListdata.product })
+        return res.status(200).render('wishList', { loggedIn,product:wishListdata.product ,Name:user})
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).json("Internal Server Error");
+       next(error.message)
     }
 }
 
-const addToWishList = async (req, res) => {
+const addToWishList = async (req, res, next) => {
     try {
-        console.log("hi");
         const productId = req.query.id;
         if(!req.session.user){
             return res.status(400).json({success:false,message:"please Login or Sign Up "});
@@ -44,11 +43,10 @@ const addToWishList = async (req, res) => {
         }
         return res.status(200).json({ success: true, message: "product Added to Wishlist" });
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).json("Internal Server Error");
+        next(error.message)
     }
 }
-const deleteWishItem= async(req,res)=>{
+const deleteWishItem= async(req,res, next)=>{
     try {
         const productId=req.query.id;
         const userId=req.session.user._id;
@@ -63,7 +61,7 @@ const deleteWishItem= async(req,res)=>{
         return res.status(400).json({success:false,message:"Cannot Deleted Wish Product"})
 
     } catch (error) {
-        console.log(error.message);
+        next(error.message)
     }
 }
 module.exports = {

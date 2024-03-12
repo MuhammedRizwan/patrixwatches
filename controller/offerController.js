@@ -2,24 +2,22 @@ const Offer = require('../model/offerModel');
 const Category = require('../model/categoryModel');
 const Product = require('../model/productModel')
 
-const offerList = async (req, res) => {
+const offerList = async (req, res, next) => {
     try {
-        const offerData = await Offer.find().populate("product").populate('category').sort({_id:-1});
-        return res.status(200).render('offerList',{offerData})
+        const offerData = await Offer.find().populate("product").populate('category').sort({ _id: -1 });
+        return res.status(200).render('offerList', { offerData })
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "Internal server Error" });
+        next(error.message)
     }
 }
-const addOfferPage = async (req, res) => {
+const addOfferPage = async (req, res, next) => {
     try {
         return res.status(200).render("addOffer");
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({ success: false, message: "Internal server Error" });
+        next(error.message)
     }
 }
-const findData = async (req, res) => {
+const findData = async (req, res, next) => {
     try {
         console.log(req.query);
         const option = req.query.option;
@@ -41,14 +39,13 @@ const findData = async (req, res) => {
             return res.status(200).json({ success: true, Data });
         }
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({ success: false, message: "Internal server Error" });
+        next(error.message)
     }
 }
-const addOffer = async (req, res) => {
+const addOffer = async (req, res, next) => {
     try {
 
-        const { select, Id, discountPercent, maxDiscountAmount,expiryDate } = req.body
+        const { select, Id, discountPercent, maxDiscountAmount, expiryDate } = req.body
         let category, product;
         if (select == 'category') {
             category = Id;
@@ -58,62 +55,61 @@ const addOffer = async (req, res) => {
             category = null
         }
         const newOffer = new Offer({
-            product, category, discountPercent, maxDiscountAmount,ExpiryDate:new Date(expiryDate)
+            product, category, discountPercent, maxDiscountAmount, ExpiryDate: new Date(expiryDate)
         });
         const offerData = await newOffer.save();
         if (offerData.product == null) {
-            const productData=await Product.find({category_id:offerData.category})
-            productData.forEach(async(element)=>{
-                let discount=element.orginalPrice*offerData.discountPercent/100;
-                if(discount>offerData.maxDiscountAmount){
-                    discount=offerData.maxDiscountAmount
+            const productData = await Product.find({ category_id: offerData.category })
+            productData.forEach(async (element) => {
+                let discount = element.orginalPrice * offerData.discountPercent / 100;
+                if (discount > offerData.maxDiscountAmount) {
+                    discount = offerData.maxDiscountAmount
                 }
-                element.salePrice-=discount
+                element.salePrice -= discount
                 await element.save()
             })
         } else {
-          const productData=await Product.findOne({_id:offerData.product});
-          let discount=productData.orginalPrice*offerData.discountPercent/100;
-          if(discount>offerData.maxDiscountAmount){
-              discount=offerData.maxDiscountAmount
-          }
-          productData.salePrice-=discount;
-          productData.save()
+            const productData = await Product.findOne({ _id: offerData.product });
+            let discount = productData.orginalPrice * offerData.discountPercent / 100;
+            if (discount > offerData.maxDiscountAmount) {
+                discount = offerData.maxDiscountAmount
+            }
+            productData.salePrice -= discount;
+            productData.save()
         }
         if (select == 'category') {
-            const updateCategory=await Category.updateOne({_id:category},{$set:{offerId:offerData._id}})
+            const updateCategory = await Category.updateOne({ _id: category }, { $set: { offerId: offerData._id } })
         } else {
-            const updateProduct=await Product.updateOne({_id:product},{$set:{offerId:offerData._id}})
+            const updateProduct = await Product.updateOne({ _id: product }, { $set: { offerId: offerData._id } })
         }
         return res.status(200).redirect('admin/offerList');
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({ success: false, message: "Internal server Error" });
+        next(error.message)
 
     }
 }
-const listOffer = async (req, res) => {
+const listOffer = async (req, res, next) => {
     try {
         const { offerId } = req.body;
         const offerData = await Offer.findByIdAndUpdate(offerId, { is_UnList: false });
         if (offerData.category != null) {
-            const productData=await Product.find({category_id:offerData.category})
-            productData.forEach(async(element)=>{
-                let discount=element.orginalPrice*offerData.discountPercent/100;
-                if(discount>offerData.maxDiscountAmount){
-                    discount=offerData.maxDiscountAmount
+            const productData = await Product.find({ category_id: offerData.category })
+            productData.forEach(async (element) => {
+                let discount = element.orginalPrice * offerData.discountPercent / 100;
+                if (discount > offerData.maxDiscountAmount) {
+                    discount = offerData.maxDiscountAmount
                 }
-                element.salePrice-=discount
+                element.salePrice -= discount
                 await element.save()
             })
         } else {
-          const productData=await Product.findOne({_id:offerData.product});
-          let discount=element.orginalPrice*offerData.discountPercent/100;
-          if(discount>offerData.maxDiscountAmount){
-              discount=offerData.maxDiscountAmount
-          }
-          productData.salePrice-=discount;
-          productData.save()
+            const productData = await Product.findOne({ _id: offerData.product });
+            let discount = element.orginalPrice * offerData.discountPercent / 100;
+            if (discount > offerData.maxDiscountAmount) {
+                discount = offerData.maxDiscountAmount
+            }
+            productData.salePrice -= discount;
+            productData.save()
         }
         if (!offerData) {
             return res.status(404).send('category  not updated'); // Respond with a 404 status if product is not found
@@ -121,23 +117,23 @@ const listOffer = async (req, res) => {
             return res.status(200).json({ success: true, message: 'offer listed successfully' });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Error listing offer', error });
+        next(error.message)
     }
 };
-const unListOffer = async (req, res) => {
+const unListOffer = async (req, res, next) => {
     try {
         const { offerId } = req.body;
-        const offerData = await Offer.findByIdAndUpdate(offerId, {$set:{ is_UnList: true} });
+        const offerData = await Offer.findByIdAndUpdate(offerId, { $set: { is_UnList: true } });
         if (offerData.category != null) {
-            const productData=await Product.find({category_id:offerData.category})
-            productData.forEach(async(element)=>{
-                element.salePrice=element.orginalPrice;
+            const productData = await Product.find({ category_id: offerData.category })
+            productData.forEach(async (element) => {
+                element.salePrice = element.orginalPrice;
                 await element.save()
             })
         } else {
-          const productData=await Product.findOne({_id:offerData.product});
-          productData.salePrice=productData.orginalPrice;
-          productData.save()
+            const productData = await Product.findOne({ _id: offerData.product });
+            productData.salePrice = productData.orginalPrice;
+            productData.save()
         }
         if (!offerData) {
             return res.status(404).send('offer  not updated'); // Respond with a 404 status if product is not found
@@ -146,10 +142,10 @@ const unListOffer = async (req, res) => {
         }
 
     } catch (error) {
-        res.status(500).json({ message: 'Error unlisting user', error });
+        next(error.message)
     }
 };
- 
+
 
 module.exports = {
     offerList,
@@ -157,5 +153,5 @@ module.exports = {
     addOffer,
     findData,
     listOffer,
-    unListOffer 
+    unListOffer
 }

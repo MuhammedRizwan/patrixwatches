@@ -1,4 +1,4 @@
-<%- include('../layout/header') %>
+<%- include('../layout/header',{currentPage:'orderDetials'}) %>
     <section class="content-main">
         <div class="content-header">
             <div>
@@ -26,7 +26,7 @@
                             <a class="btn btn-primary text-primary" href="/Orderpayment?id=<%= order._id %>">pay</a>
                         <% } %>
                         
-                        <a class="btn btn-primary" href="/Invoice?id=<%= order.orderId %>">Download Invoice</a>
+                        <a class="btn btn-primary" href="/Invoice?id=<%= order._id%>">Download Invoice</a>
                     </div>
                 </div>
             </header> <!-- card-header end// -->

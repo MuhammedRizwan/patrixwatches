@@ -113,7 +113,8 @@ const orderComplete = async (req, res) => {
 const orderSuccessPage = async (req, res) => {
   try {
     const loggedIn = req.session.user ? true : false;
-    return res.status(200).render('orderSuccess', { loggedIn })
+    const user=await User.findOne({_id:req.session.user});
+    return res.status(200).render('orderSuccess', { loggedIn,Name:user })
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -139,7 +140,8 @@ const orderDetials = async (req, res) => {
       }
     })
     const orderDatas = await Order.find({ user: userId, }, { address: 0 }).sort({ _id: -1 })
-    return res.status(200).render('orderDetialsPage', { orderData: orderDatas, loggedIn });
+    const user=await User.findOne({_id:req.session.user});
+    return res.status(200).render('orderDetialsPage', { orderData: orderDatas, loggedIn,Name:user });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -163,7 +165,7 @@ const singleOrderDetials = async (req, res) => {
     if (updateStatus.length == 0) {
       return res.status(200).redirect('/orderDetials');
     } else {
-      return res.status(200).render('orderDetials', { order: orderData, loggedIn, user: userData, address: orderData.address, product: orderData.products });
+      return res.status(200).render('orderDetials', { order: orderData, loggedIn, user: userData, address: orderData.address, product: orderData.products,Name:userData });
     }
   } catch (error) {
     console.log(error);
@@ -402,7 +404,8 @@ const PaymentOrderPage=async(req,res)=>{
     req.session.orderId=orderId;
     const loggedIn = req.session.user ? true : false;
     const orderData=await Order.findOne({_id:orderId}).populate("products.product")
-    return res.status(200).render('paymentOrderPage',{orderData,loggedIn});
+    const user=await User.findOne({_id:req.session.user});
+    return res.status(200).render('paymentOrderPage',{orderData,loggedIn,name:user});
   } catch (error) {
     console.log(error.message);
     return res.status(500).send("Internal Server Error. Please try again later.");
@@ -1084,11 +1087,10 @@ const saveInvoice = async (req, res) => {
     const orderId = req.query.id;
 
     // Fetch the order details with product and address information
-    const order = await Order.findOne({ orderId: orderId })
-      .populate({
-        path: "products.product",
-      })
+    const order = await Order.findOne({ _id: orderId })
+      .populate("products.product")
     const userId = order.user
+    console.log(order);
     // Fetch user details
     const user = await User.findById(userId);
     // Extract relevant information from the order
@@ -1134,7 +1136,7 @@ const saveInvoice = async (req, res) => {
         // "custom3": "custom value 3"
       },
       information: {
-        number: "order" + order.orderId,
+        Bill: "order " + order.orderId,
         date: order.createdOn.toLocaleDateString,
       },
       "bottom-notice": "Happy shopping and visit Patrix corp  again",

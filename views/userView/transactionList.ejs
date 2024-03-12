@@ -1,4 +1,4 @@
-<%- include('../layout/header') %>
+<%- include('../layout/header',{currentPage:'transaction'}) %>
     <section class="content-main">
         <div class="content-header mt-20">
             <div>
@@ -16,6 +16,7 @@
                                         <tr>
                                             <th>ID</th>
                                             <th>Amount</th>
+                                            <th>Reason</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
@@ -25,9 +26,8 @@
                                                 <td>
                                                     <%=index+1 %>
                                                 </td>
-                                                <td><b>
-                                                        <%=item.amount %>
-                                                    </b></td>
+                                                <td><b><%=item.amount %></b></td>
+                                                <td><%= item.reason %></td>
                                                 <td>
                                                     <%= item.transactionType%>
                                                 </td>

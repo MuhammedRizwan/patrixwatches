@@ -1,5 +1,4 @@
-<%- include('../layout/header') %>
-    <main class="main">
+<%- include('../layout/header',{ currentPage: 'home'}) %>
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
@@ -20,7 +19,7 @@
                                         <h2 class="animated fw-900">Supper value deals</h2>
                                         <h1 class="animated fw-900 text-brand">On all products</h1>
                                         <p class="animated">Save more with coupons & up to 70% off</p>
-                                        <a class="animated btn btn-brush btn-brush-3" href="shop-product-right.html">
+                                        <a class="animated btn btn-brush btn-brush-3" href="/Shop">
                                             Shop
                                             Now </a>
                                     </div>
@@ -79,7 +78,7 @@
                 </div>
                 <div class="slider-arrow hero-slider-1-arrow"></div>
             </section>
-            <section class="featured section-padding position-relative">
+            <section class="featured  position-relative">            
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
@@ -121,7 +120,7 @@
                     </div>
                 </div>
             </section>
-            <section class="product-tabs section-padding position-relative wow fadeIn animated">
+            <section class="product-tabs position-relative wow fadeIn animated">
                 <div class="container">
                     <div class="tab-header">
 
@@ -205,255 +204,7 @@
                     </div>
                     <!--End tab-content-->
                 </div>
-            </section>
-            <section class="banner-2 section-padding pb-0">
-                <div class="container">
-                    <div class="banner-img banner-big wow fadeIn animated f-none">
-                        <img src="assets/imgs/banner/banner-4.png" alt="">
-                        <div class="banner-text d-md-block d-none">
-                            <h4 class="mb-15 mt-40 text-brand">Repair Services</h4>
-                            <h1 class="fw-600 mb-20">We're an Apple <br>Authorised Service Provider</h1>
-                            <a href="shop-grid-right.html" class="btn">Learn More <i class="fi-rs-arrow-right"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section class="popular-categories section-padding mt-15 mb-25">
-                <div class="container wow fadeIn animated">
-                    <h3 class="section-title mb-20"><span>Popular</span> Categories</h3>
-                    <div class="carausel-6-columns-cover position-relative">
-                        <div class="slider-arrow slider-arrow-2 carausel-6-columns-arrow"
-                            id="carausel-6-columns-arrows">
-                        </div>
-                        <div class="carausel-6-columns" id="carausel-6-columns">
-                            <div class="card-1">
-                                <figure class=" img-hover-scale overflow-hidden">
-                                    <a href="shop-grid-right.html"><img src="assets/imgs/shop/category-thumb-1.jpg"
-                                            alt=""></a>
-                                </figure>
-                                <h5><a href="shop-grid-right.html">T-Shirt</a></h5>
-                            </div>
-                            <div class="card-1">
-                                <figure class=" img-hover-scale overflow-hidden">
-                                    <a href="shop-grid-right.html"> <img src="assets/imgs/shop/category-thumb-2.jpg"
-                                            alt=""></a>
-                                </figure>
-                                <h5><a href="shop-grid-right.html">Bags</a></h5>
-                            </div>
-                            <div class="card-1">
-                                <figure class=" img-hover-scale overflow-hidden">
-                                    <a href="shop-grid-right.html"><img src="assets/imgs/shop/category-thumb-3.jpg"
-                                            alt=""></a>
-                                </figure>
-                                <h5><a href="shop-grid-right.html">Sandan</a></h5>
-                            </div>
-                            <div class="card-1">
-                                <figure class=" img-hover-scale overflow-hidden">
-                                    <a href="shop-grid-right.html"><img src="assets/imgs/shop/category-thumb-4.jpg"
-                                            alt=""></a>
-                                </figure>
-                                <h5><a href="shop-grid-right.html">Scarf Cap</a></h5>
-                            </div>
-                            <div class="card-1">
-                                <figure class=" img-hover-scale overflow-hidden">
-                                    <a href="shop-grid-right.html"><img src="assets/imgs/shop/category-thumb-5.jpg"
-                                            alt=""></a>
-                                </figure>
-                                <h5><a href="shop-grid-right.html">Shoes</a></h5>
-                            </div>
-                            <div class="card-1">
-                                <figure class=" img-hover-scale overflow-hidden">
-                                    <a href="shop-grid-right.html"><img src="assets/imgs/shop/category-thumb-6.jpg"
-                                            alt=""></a>
-                                </figure>
-                                <h5><a href="shop-grid-right.html">Pillowcase</a></h5>
-                            </div>
-                            <div class="card-1">
-                                <figure class=" img-hover-scale overflow-hidden">
-                                    <a href="shop-grid-right.html"><img src="assets/imgs/shop/category-thumb-7.jpg"
-                                            alt=""></a>
-                                </figure>
-                                <h5><a href="shop-grid-right.html">Jumpsuits</a></h5>
-                            </div>
-                            <div class="card-1">
-                                <figure class=" img-hover-scale overflow-hidden">
-                                    <a href="shop-grid-right.html"><img src="assets/imgs/shop/category-thumb-8.jpg"
-                                            alt=""></a>
-                                </figure>
-                                <h5><a href="shop-grid-right.html">Hats</a></h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section class="banners mb-15">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6">
-                            <div class="banner-img wow fadeIn animated">
-                                <img src="assets/imgs/banner/banner-1.png" alt="">
-                                <div class="banner-text">
-                                    <span>Smart Offer</span>
-                                    <h4>Save 20% on <br>Woman Bag</h4>
-                                    <a href="shop-grid-right.html">Shop Now <i class="fi-rs-arrow-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <div class="banner-img wow fadeIn animated">
-                                <img src="assets/imgs/banner/banner-2.png" alt="">
-                                <div class="banner-text">
-                                    <span>Sale off</span>
-                                    <h4>Great Summer <br>Collection</h4>
-                                    <a href="shop-grid-right.html">Shop Now <i class="fi-rs-arrow-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 d-md-none d-lg-flex">
-                            <div class="banner-img wow fadeIn animated  mb-sm-0">
-                                <img src="assets/imgs/banner/banner-3.png" alt="">
-                                <div class="banner-text">
-                                    <span>New Arrivals</span>
-                                    <h4>Shop Today’s <br>Deals & Offers</h4>
-                                    <a href="shop-grid-right.html">Shop Now <i class="fi-rs-arrow-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section class="section-padding">
-                <div class="container">
-                    <h3 class="section-title mb-20 wow fadeIn animated"><span>Featured</span> Brands</h3>
-                    <div class="carausel-6-columns-cover position-relative wow fadeIn animated">
-                        <div class="slider-arrow slider-arrow-2 carausel-6-columns-arrow"
-                            id="carausel-6-columns-3-arrows">
-                        </div>
-                        <div class="carausel-6-columns text-center" id="carausel-6-columns-3">
-                            <div class="brand-logo">
-                                <img class="img-grey-hover" src="assets/imgs/banner/brand-1.png" alt="">
-                            </div>
-                            <div class="brand-logo">
-                                <img class="img-grey-hover" src="assets/imgs/banner/brand-2.png" alt="">
-                            </div>
-                            <div class="brand-logo">
-                                <img class="img-grey-hover" src="assets/imgs/banner/brand-3.png" alt="">
-                            </div>
-                            <div class="brand-logo">
-                                <img class="img-grey-hover" src="assets/imgs/banner/brand-4.png" alt="">
-                            </div>
-                            <div class="brand-logo">
-                                <img class="img-grey-hover" src="assets/imgs/banner/brand-5.png" alt="">
-                            </div>
-                            <div class="brand-logo">
-                                <img class="img-grey-hover" src="assets/imgs/banner/brand-6.png" alt="">
-                            </div>
-                            <div class="brand-logo">
-                                <img class="img-grey-hover" src="assets/imgs/banner/brand-3.png" alt="">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section class="section-padding">
-                <div class="container pt-25 pb-20">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <h3 class="section-title mb-20"><span>From</span> blog</h3>
-                            <div class="post-list mb-4 mb-lg-0">
-                                <article class="wow fadeIn animated">
-                                    <div class="d-md-flex d-block">
-                                        <div class="post-thumb d-flex mr-15">
-                                            <a class="color-white" href="blog-post-fullwidth.html">
-                                                <img src="assets/imgs/blog/blog-2.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="post-content">
-                                            <div class="entry-meta mb-10 mt-10">
-                                                <a class="entry-meta meta-2" href="blog-category-fullwidth.html"><span
-                                                        class="post-in font-x-small">Fashion</span></a>
-                                            </div>
-                                            <h4 class="post-title mb-25 text-limit-2-row">
-                                                <a href="blog-post-fullwidth.html">Qualcomm is developing a Nintendo
-                                                    Switch-like console, report says</a>
-                                            </h4>
-                                            <div class="entry-meta meta-1 font-xs color-grey mt-10 pb-10">
-                                                <div>
-                                                    <span class="post-on">14 April 2022</span>
-                                                    <span class="hit-count has-dot">12M Views</span>
-                                                </div>
-                                                <a href="blog-post-right.html">Read More</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </article>
-                                <article class="wow fadeIn animated">
-                                    <div class="d-md-flex d-block">
-                                        <div class="post-thumb d-flex mr-15">
-                                            <a class="color-white" href="blog-post-fullwidth.html">
-                                                <img src="assets/imgs/blog/blog-1.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="post-content">
-                                            <div class="entry-meta mb-10 mt-10">
-                                                <a class="entry-meta meta-2" href="blog-category-fullwidth.html"><span
-                                                        class="post-in font-x-small">Healthy</span></a>
-                                            </div>
-                                            <h4 class="post-title mb-25 text-limit-2-row">
-                                                <a href="blog-post-fullwidth.html">Not even the coronavirus can derail
-                                                    5G's
-                                                    global momentum</a>
-                                            </h4>
-                                            <div class="entry-meta meta-1 font-xs color-grey mt-10 pb-10">
-                                                <div>
-                                                    <span class="post-on">14 April 2022</span>
-                                                    <span class="hit-count has-dot">12M Views</span>
-                                                </div>
-                                                <a href="blog-post-right.html">Read More</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </article>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="banner-img banner-1 wow fadeIn animated">
-                                        <img src="assets/imgs/banner/banner-5.jpg" alt="">
-                                        <div class="banner-text">
-                                            <span>Accessories</span>
-                                            <h4>Save 17% on <br>Autumn Hat</h4>
-                                            <a href="shop-grid-right.html">Shop Now <i
-                                                    class="fi-rs-arrow-right"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="banner-img mb-15 wow fadeIn animated">
-                                        <img src="assets/imgs/banner/banner-6.jpg" alt="">
-                                        <div class="banner-text">
-                                            <span>Big Offer</span>
-                                            <h4>Save 20% on <br>Women's socks</h4>
-                                            <a href="shop-grid-right.html">Shop Now <i
-                                                    class="fi-rs-arrow-right"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="banner-img banner-2 wow fadeIn animated">
-                                        <img src="assets/imgs/banner/banner-7.jpg" alt="">
-                                        <div class="banner-text">
-                                            <span>Smart Offer</span>
-                                            <h4>Save 20% on <br>Eardrop</h4>
-                                            <a href="shop-grid-right.html">Shop Now <i
-                                                    class="fi-rs-arrow-right"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            </section>      
             <section class="mb-50">
                 <div class="container">
                     <div class="row">
@@ -472,7 +223,6 @@
                 </div>
             </section>
         </main>
-    </main>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>

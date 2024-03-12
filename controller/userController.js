@@ -17,14 +17,6 @@ const securePassword = async (password) => {
 
     } catch (error) {
         console.log(error.message);
-        return res.status(500).send('Internal Server Error');
-        const validationError = new Error("User validation failed: email: Path `email` is required.");
-        validationError.name = "ValidationError";
-        validationError.statusCode = 400;
-        validationError.errors = { email: { message: "Path `email` is required.", kind: "required" } };
-
-        // Call the error handling middleware with the created error
-        next(validationError);
     }
 
 }
@@ -32,27 +24,28 @@ const securePassword = async (password) => {
 // const genarateToken = (user) => {
 //     return jwt.sign({ user }, process.env.SECRETKEY, { expiresIn: 2 * 60 * 60 * 1000 })
 // }
-const Home = async (req, res) => {
+const Home = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
+        const userData=await User.findOne({_id:req.session.user});
         const categoryData = await Category.find({ is_unList: false });
         const categoryIds = categoryData.map(category => category._id);
         const productData = await Product.find({ category_id: { $in: categoryIds }, is_blocked: false }).limit(8);
-        return res.status(200).render('Home', { product: productData, category: categoryData, loggedIn });
+        const Home=true;
+        return res.status(200).render('Home', { product: productData, category: categoryData, loggedIn,Name:userData,Home });
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
     }
 }
-const userRegisterPage = async (req, res) => {
+const userRegisterPage = async (req, res,next) => {
     try {
-        const loggedIn = req.session.user ? true : false;
+        const loggedIn = req.session.user ? true: false;
         return res.render('userRegister', { loggedIn })
     } catch (error) {
-        console.log(error.message)
+        next(error.message);
     }
 }
-const userRegister = async (req, res) => {
+const userRegister = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const emailExist = await User.aggregate([
@@ -82,11 +75,10 @@ const userRegister = async (req, res) => {
         const sendEmaildata = await sendEmail(req.body.name, req.body.email, otpData[0].otp);
         return res.status(200).render('verification', { loggedIn });
     } catch (error) {
-        console.log(error);
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
     }
 }
-const verifyOtp = async (req, res) => {
+const verifyOtp = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const userotp = req.body.otp;
@@ -133,12 +125,10 @@ const verifyOtp = async (req, res) => {
         }
 
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
-
+        next(error.message);
     }
 }
-const userLoginPage = async (req, res) => {
+const userLoginPage = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         return res.status(200).render('userLogin', { loggedIn });
@@ -147,7 +137,7 @@ const userLoginPage = async (req, res) => {
         return res.status(500).send('Internal Server Error');
     }
 }
-const userLogin = async (req, res) => {
+const userLogin = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const { email, password } = req.body;
@@ -180,11 +170,10 @@ const userLogin = async (req, res) => {
             return res.status(404).render('userLogin', { message: 'Incorrect email', loggedIn }); // 404: Not Found
         }
     } catch (error) {
-        console.error(error.message);
-        return res.status(500).send('Internal Server Error'); // 500: Internal Server Error
+        next(error.message);
     }
 }
-const resendOtp = async (req, res) => {
+const resendOtp = async (req, res,next) => {
     try {
         const loggedIn = req.session.user_id ? true : false;
         const { name, email } = req.session.tempUser;
@@ -202,7 +191,7 @@ const resendOtp = async (req, res) => {
         return res.status(500).send('Internal Server Error');
     }
 }
-const account = async (req, res) => {
+const account = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const userId = req.session.user._id;
@@ -214,9 +203,10 @@ const account = async (req, res) => {
                 $limit: 1
             }
         ]);
+        const user=await User.findOne({_id:req.session.user});
         const walletData = await Wallet.findOne({ user: userId })
         if (userData.length === 0) {
-            return res.status(404).render('account', { Address: [], loggedIn, user: [], wallet: walletData })
+            return res.status(404).render('account', { Address: [], loggedIn,Name:user, user: [], wallet: walletData })
         }
         const addressData = await Address.aggregate([
             {
@@ -227,17 +217,16 @@ const account = async (req, res) => {
             }
         ]);
         if (addressData == 0) {
-            return res.status(200).render('account', { Address: [], loggedIn, user: userData[0], wallet: walletData });
+            return res.status(200).render('account', { Address: [], loggedIn, user: userData[0],Name:user, wallet: walletData });
         }
 
-        return res.status(200).render('account', { Address: addressData[0].address, loggedIn, user: userData[0], wallet: walletData });
+        return res.status(200).render('account', { Address: addressData[0].address, loggedIn, Name:user,user: userData[0], wallet: walletData });
 
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).json("internal Server Error");
+        next(error.message);
     }
 }
-const userLogout = async (req, res) => {
+const userLogout = async (req, res,next) => {
     try {
         req.session.LoggedUser = false
         req.session.user = undefined;
@@ -247,15 +236,16 @@ const userLogout = async (req, res) => {
         return res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 }
-const changePasswordPage = async (req, res) => {
+const changePasswordPage = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
-        return res.status(200).render('changePassword', { loggedIn });
+        const user=await User.findOne({_id:req.session.user});
+        return res.status(200).render('changePassword', { loggedIn ,Name:user});
     } catch (error) {
-        return res.status(500).jason({ success: false, error: "internal server error" })
+        next(error.message);
     }
 }
-const changePassword = async (req, res) => {
+const changePassword = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const { password, npassword } = req.body;
@@ -268,12 +258,13 @@ const changePassword = async (req, res) => {
                 $project: { password: 1, _id: 0 }
             }
         ]);
+        const user=await User.findOne({_id:req.session.user});
         if (!userData) {
             return res.status(400).json({ success: false, error: "User Not Found" });
         } else {
             const matchPassword = await bcrypt.compare(password, userData[0].password)
             if (!matchPassword) {
-                return res.status(400).render('changePassword', { loggedIn, message: "current Password Doesnot Match Try Again" });
+                return res.status(400).render('changePassword', { loggedIn ,Name:user, message: "current Password Doesnot Match Try Again" });
             } else {
                 const sPassword = await securePassword(npassword);
                 if (!sPassword) {
@@ -289,21 +280,20 @@ const changePassword = async (req, res) => {
             }
         }
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
     }
 }
 
-const verifyEmailPage = async (req, res) => {
+const verifyEmailPage = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         return res.status(200).render('email-verified', { loggedIn })
     } catch (error) {
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
     }
 }
 let emailOtpverify;
-const verifyEmail = async (req, res) => {
+const verifyEmail = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const { email } = req.body;
@@ -331,10 +321,10 @@ const verifyEmail = async (req, res) => {
             return res.status(200).render("forgetOtpVerification", { loggedIn });
         }
     } catch (error) {
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
     }
 }
-const forgetOtpVerification = async (req, res) => {
+const forgetOtpVerification = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const userotp = req.body.otp;
@@ -353,10 +343,10 @@ const forgetOtpVerification = async (req, res) => {
             }
         }
     } catch (error) {
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
     }
 }
-const newPasswordverify = async (req, res) => {
+const newPasswordverify = async (req, res,next) => {
     try {
         const newPassword = req.body.npassword;
         const sPassword = await securePassword(newPassword);
@@ -372,21 +362,20 @@ const newPasswordverify = async (req, res) => {
             }
         }
     } catch (error) {
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
     }
 }
-const editProfilePage = async (req, res) => {
+const editProfilePage = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const userData = await User.findOne({ _id: req.session.user._id })
-        return res.status(200).render('editProfile', { loggedIn, userData });
+        return res.status(200).render('editProfile', { loggedIn, userData,Name:userData });
 
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
     }
 }
-const editProfile = async (req, res) => {
+const editProfile = async (req, res,next) => {
     try {
         const userId = req.session.user._id;
         const { name, phone } = req.body;
@@ -400,20 +389,19 @@ const editProfile = async (req, res) => {
         );
         return res.status(200).redirect('/account')
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
 
     }
 }
-const walletTransaction = async (req, res) => {
+const walletTransaction = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const userId = req.session.user._id;
         const walletData = await Wallet.findOne({ user: userId })
-        return res.status(200).render("transactionList", { loggedIn, wallet: walletData });
+        const user=await User.findOne({_id:req.session.user});
+        return res.status(200).render("transactionList", { loggedIn, wallet: walletData ,Name:user});
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
     }
 }
 module.exports = {

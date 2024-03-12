@@ -1,7 +1,7 @@
 const Product = require('../model/productModel');
 const Category = require('../model/categoryModel');
-
-const productListLoad = async (req, res) => {
+const {User}=require('../model/userModel')
+const productListLoad = async (req, res,next) => {
     try {
         const PAGE_PRODUCT = 12;
         const { product, page ,category} = req.query;
@@ -24,11 +24,10 @@ const productListLoad = async (req, res) => {
             return res.status(200).render('productList', { product: Products, totalPages, currentPage: pageNumber, categoryData });
         }
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const addProductPage = async (req, res) => {
+const addProductPage = async (req, res,next) => {
     try {
         const categoryData = await Category.find({});
         if (!categoryData) {
@@ -37,12 +36,11 @@ const addProductPage = async (req, res) => {
             return res.status(200).render('addproduct', { cat: categoryData });
         }
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 
 }
-const addProduct = async (req, res) => {
+const addProduct = async (req, res,next) => {
     try {
         const categoryId = await Category.findOne({ categoryName: req.body.select });
         if (!categoryId) {
@@ -60,11 +58,10 @@ const addProduct = async (req, res) => {
             }
         }
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const editProductPage = async (req, res) => {
+const editProductPage = async (req, res,next) => {
     try {
         const id = req.query.id;
         const productData = await Product.findById({ _id: id });
@@ -79,11 +76,10 @@ const editProductPage = async (req, res) => {
             }
         }
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const editProduct = async (req, res) => {
+const editProduct = async (req, res,next) => {
     try {
         const { id, productName, brandName, discription, orginalPrice, salePrice, stock } = req.body
         const editProductDta = await Product.findByIdAndUpdate({ _id: id }, {
@@ -92,12 +88,10 @@ const editProduct = async (req, res) => {
         const addImage = await Product.findByIdAndUpdate({ _id: id }, { $push: { image: req.files } })
         return res.status(200).redirect('/admin/productList');
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send('Internal Server Error');
-
+        next(error.message)
     }
 }
-const deleteProductImage = async (req, res) => {
+const deleteProductImage = async (req, res,next) => {
     try {
         const productId = req.params.productId;
         const productImg = req.params.productImg;
@@ -108,11 +102,10 @@ const deleteProductImage = async (req, res) => {
             return res.status(200).json({ success: true, message: "product Image were deleted" });
         }
     } catch (error) {
-        console.error(error);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const blockProduct = async (req, res) => {
+const blockProduct = async (req, res,next) => {
     try {
         const id = req.params.productId;
         const productData = await Product.updateOne({ _id: id },
@@ -127,10 +120,10 @@ const blockProduct = async (req, res) => {
             return res.status(200).json({ success: true, message: "product updated" });
         }
     } catch (error) {
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const unBlockProduct = async (req, res) => {
+const unBlockProduct = async (req, res,next) => {
     try {
         const id = req.params.productId;
         const productData = await Product.updateOne({ _id: id },
@@ -145,27 +138,25 @@ const unBlockProduct = async (req, res) => {
             return res.status(200).json({ success: true, message: "product updated" });
         }
     } catch (error) {
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const productShop = async (req, res) => {
+const productShop = async (req, res,next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const id = req.query.id;
         const productData = await Product.findOne({ _id: id });
-        
-
-
         const categoryData = await Category.find({ is_unList: false });
         const categoryIds = categoryData.map(category => category._id);
         const relatedProduct = await Product.find({ category_id: { $in: categoryIds } });
-        return res.status(200).render('singleProductDetials', { product: productData, productData: relatedProduct, cat: categoryData, loggedIn })
+        const user=await User.findOne({_id:req.session.user});
+        return res.status(200).render('singleProductDetials', { product: productData, productData: relatedProduct, cat: categoryData, loggedIn,Name:user })
     } catch (error) {
         console.error(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const Shop = async (req, res) => {
+const Shop = async (req, res,next) => {
     try {
         const PAGE_PRODUCT = 12;
         const loggedIn = req.session.user ? true : false;
@@ -201,10 +192,10 @@ const Shop = async (req, res) => {
           .skip((pageNumber - 1) * PAGE_PRODUCT)
           .limit(PAGE_PRODUCT)
           .sort(sortQuary);
-          return res.status(200).render("productShop", { loggedIn, product: productData, categoryData, totalPages, currentPage: pageNumber,totalProduct,price });
+          const user=await User.findOne({_id:req.session.user});
+          return res.status(200).render("productShop", { loggedIn, product: productData, categoryData, totalPages, currentPage: pageNumber,totalProduct,price,Name:user ,category:category});
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
 module.exports = {

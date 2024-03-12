@@ -28,7 +28,7 @@ const errorHandler = (err, req, res, next) => {
         success: false,
         message: message,
       });
-    else res.status(statusCode).render("errorPage", { message: message });
+    else res.status(statusCode).render("errorPage", { message: message ,});
   };
 
 

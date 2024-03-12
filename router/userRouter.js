@@ -12,7 +12,7 @@ const {isUser,guestUser,isLoggedUser} = require('../middleware/auth');
 const errorHandler=require('../middleware/errorHandler');
 user_route.set('views', './views/userView');
 
-user_route.use(errorHandler)
+
 user_route.use(session({
     secret: 'your-secret-key', // Change this to a long, random string
     resave: false,
@@ -82,6 +82,9 @@ user_route.delete('/delete-wishitem',isUser,guestUser,wishlistController.deleteW
 
 
 user_route.get('/logout',isUser,userController.userLogout); // Logout endpoint accessible only if logged in
+
+user_route.use(errorHandler)
+
 
 module.exports = user_route;
 

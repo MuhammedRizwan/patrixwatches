@@ -1,14 +1,13 @@
 const Category = require('../model/categoryModel');
 
-const addCategoryPage = async (req, res) => {
+const addCategoryPage = async (req, res,next) => {
     try {
         return res.status(200).render('addCategory')
     } catch (error) {
-        console.error(error);
-        return res.status(500).send('Internal Server Error');
+   next(error.message)
     }
 }
-const addCategory = async (req, res) => {
+const addCategory = async (req, res,next) => {
     try {
         const categoryExist = await Category.aggregate([
             {
@@ -32,24 +31,18 @@ const addCategory = async (req, res) => {
             return res.status(200).redirect('/admin/categoryList');
         }
     } catch (error) {
-        console.log(error.message);
-        if (error.name === 'ValidationError') {
-            // Handle specific validation errors here
-            return res.status(400).send('Validation Error: Invalid data');
-        }
-        return res.status(500).send('Internal Server Error'); // Respond with a 500 status for other errors
+        next(error.message)
     }
 }
-const category = async (req, res) => {
+const category = async (req, res,next) => {
     try {
         const categoryData = await Category.find({});
         return res.status(200).render('categoryList', { cat: categoryData });
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const listCategory = async (req, res) => {
+const listCategory = async (req, res,next) => {
     try {
         const { userId } = req.body;
         const categoryData = await Category.findByIdAndUpdate(userId, { is_unList: false });
@@ -59,10 +52,10 @@ const listCategory = async (req, res) => {
             return res.status(200).json({ success: true, message: 'Category listed successfully' });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Error listing user', error });
+        next(error.message)
     }
 };
-const unListCategory = async (req, res) => {
+const unListCategory = async (req, res,next) => {
     try {
         const { userId } = req.body;
         const categoryData = await Category.findByIdAndUpdate(userId, { is_unList: true });
@@ -73,10 +66,10 @@ const unListCategory = async (req, res) => {
         }
 
     } catch (error) {
-        res.status(500).json({ message: 'Error unlisting user', error });
+        next(error.message)
     }
 };
-const editCategoryPage = async (req, res) => {
+const editCategoryPage = async (req, res,next) => {
     try {
         const id = req.query.id;
         const categoryData = await Category.findById({ _id: id });
@@ -86,10 +79,10 @@ const editCategoryPage = async (req, res) => {
         res.status(200).render('editCategory', { cat: categoryData });
     } catch (error) {
         console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const editCategory = async (req, res) => {
+const editCategory = async (req, res,next) => {
     try {
         const categoryExist=await Category.findOne({categoryName:req.body.CategoryName})
         if(categoryExist){
@@ -107,8 +100,7 @@ const editCategory = async (req, res) => {
         return res.status(200).redirect('/admin/categoryList');
 
     } catch (error) {
-        console.log(error.message)
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
 

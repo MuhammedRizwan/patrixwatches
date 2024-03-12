@@ -1,15 +1,14 @@
 const Coupon = require('../model/coupenModel');
 const User = require('../model/userModel');
 
-const addcouponPage = async (req, res) => {
+const addcouponPage = async (req, res,next) => {
     try {
         return res.render('addCoupon')
     } catch (error) {
-        console.log(error.message);
-        return res.sres.tatus(500).json({ success: false, message: "Internal Server Error" });
+       next(error.message)
     }
 }
-const addCoupon = async (req, res) => {
+const addCoupon = async (req, res,next) => {
     try {
         const { code, discount, minAmt, maxDiscAmt, expiryDate} = req.body;
         console.log(req.body);
@@ -23,11 +22,10 @@ const addCoupon = async (req, res) => {
         const couponData = await newCoupen.save()
         return res.status(200).redirect("/admin/couponList")
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({ success: false, message: "Internal Server Error" })
+        next(error.message)
     }
 }
-const viewCoupon = async (req, res) => {
+const viewCoupon = async (req, res,next) => {
     try {
         const couponData = await Coupon.find({});
         if (!couponData) {
@@ -35,11 +33,10 @@ const viewCoupon = async (req, res) => {
         }
         return res.status(200).render("CouponList", { couponData })
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({ success: false, message: "Internal Server Error" })
+        next(error.message)
     }
 }
-const listnUnlistCoupon = async (req, res) => {
+const listnUnlistCoupon = async (req, res,next) => {
     try {
         const { couponId, Action } = req.body;
         let couponData;
@@ -54,10 +51,10 @@ const listnUnlistCoupon = async (req, res) => {
             return res.status(200).json({ success: true, message: 'coupon list successfully' });
         }
     } catch (error) {
-        res.res.status(500).json.save({ success: false, message: 'Internal Server Error', error });
+        next(error.message)
     }
 };
-const applyCoupon = async (req, res) => {
+const applyCoupon = async (req, res,next) => {
     try {
         console.log(req.body);
         const { code,total } = req.body;
@@ -90,8 +87,7 @@ const applyCoupon = async (req, res) => {
         
         return res.status(200).json({success:true,totalPrice,discountAmount});
     } catch (error) {
-        console.log(error);
-        return res.status(500).json.json({ success: false, message: "Internal Server Error" })
+        next(error.message)
     }
 }
 module.exports = {

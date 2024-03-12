@@ -30,7 +30,7 @@ const isUser = async (req, res, next) => {
       return res.redirect('/login');
     }
   } catch (error) {
-    console.log(error.message);
+   next(error.message)
   }
 }
 const isLoggedUser=async (req, res, next) => {
@@ -43,7 +43,7 @@ const isLoggedUser=async (req, res, next) => {
     
     }
   } catch (error) {
-    console.log(error.message);
+    next(error.message)
   }
 }
 const guestUser = async (req, res, next) => {
@@ -59,7 +59,7 @@ const guestUser = async (req, res, next) => {
       return next()
     }
   } catch (error) {
-    console.log(error.message)
+    next(error.message)
   }
 }
 module.exports = {

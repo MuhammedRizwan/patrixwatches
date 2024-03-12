@@ -10,16 +10,15 @@ const genarateToken = (user) => {
 
     return jwt.sign({ user }, process.env.SECRETKEY, { expiresIn: '2h' })
 }
-const adminLoginPage = async (req, res) => {
+const adminLoginPage = async (req, res,next) => {
     try {
         return res.status(200).render('adminLogin');
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+    next(error.message)
     }
 }
 
-const adminLogin = async (req, res) => {
+const adminLogin = async (req, res,next) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
@@ -53,11 +52,10 @@ const adminLogin = async (req, res) => {
         }
 
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const Dashboard = async (req, res) => {
+const Dashboard = async (req, res,next) => {
     try {
         const userData = await User.find({ is_admin: 0 });
         const countOrders=await Order.countDocuments()
@@ -70,11 +68,10 @@ const Dashboard = async (req, res) => {
         });
         return res.status(200).render('adminDashboard', { users: userData ,countOrders,countProduct,countCategory,totalRevenue});
     } catch (error) {
-        console.log(error.message)
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const userList = async (req, res) => {
+const userList = async (req, res,next) => {
     try {
         const PAGE_SIZE = 10;
         const { user, page } = req.query;
@@ -88,19 +85,17 @@ const userList = async (req, res) => {
                 .limit(PAGE_SIZE);
             return res.status(200).render('user', { users: users, totalPages: totalPages, currentPage: pageNumber });
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const Logout = async (req, res) => {
+const Logout = async (req, res,next) => {
     try {
         return res.clearCookie("token").redirect('/admin');
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 }
-const blockUser = async (req, res) => {
+const blockUser = async (req, res,next) => {
     try {
         const userId = req.body.userId; // Assuming you send the user ID in the request body
         const userData = await User.findByIdAndUpdate(userId, { is_block: true });
@@ -110,12 +105,11 @@ const blockUser = async (req, res) => {
             return res.status(200).json({ success: true, message: 'User blocked successfully',userData });
         }
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 };
 
-const unblockUser = async (req, res) => {
+const unblockUser = async (req, res,next) => {
     try {
         const userId = req.body.userId;
         const userData = await User.findByIdAndUpdate(userId, { is_block: false });
@@ -126,12 +120,11 @@ const unblockUser = async (req, res) => {
         }
 
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
     }
 };
 
-const userSearch=async(req,res)=>{
+const userSearch=async(req,res,next)=>{
     try {
         console.log(req.query);
         const { user } = req.query;
@@ -139,8 +132,7 @@ const userSearch=async(req,res)=>{
         console.log(users);
         res.status(200).json(users);
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message)
 
     }
 }
