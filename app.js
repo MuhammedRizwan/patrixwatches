@@ -4,7 +4,7 @@ const express=require('express');
 const app=express();
 const nocache=require('nocache')
 const cookieParser=require('cookie-parser');
-const PORT=8000;
+const PORT=process.env.PORT;
 app.set('view engine','ejs');
 app.use(express.static('public'));
 app.use(nocache());
