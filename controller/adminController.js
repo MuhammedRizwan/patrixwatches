@@ -2,7 +2,7 @@ const { User } = require('../model/userModel');
 const Order=require('../model/orderModel');
 const Product=require('../model/productModel');
 const Category=require('../model/categoryModel');
-const bcrypt = require('bcryptjs');
+const argon=require('argon2')
 const jwt = require('jsonwebtoken');
 // const { default: products } = require('razorpay/dist/types/products');
 
@@ -31,7 +31,7 @@ const adminLogin = async (req, res,next) => {
             }
         ])
         if (adminData.length > 0) {
-            const matchPassword = await bcrypt.compare(password, adminData[0].password);
+            const matchPassword = await argon.verify(password, adminData[0].password);
             if (matchPassword) {
                 if (adminData[0].is_admin === 0) {
                     return res.status(404).render('adminLogin', { message: "your are not a admin" })

@@ -5,12 +5,12 @@ const Category = require('../model/categoryModel');
 const Address = require('../model/addressModel');
 const Order = require('../model/orderModel');
 const Wallet = require('../model/walletModel');
-const bcrypt = require('bcryptjs');
+const argon = require('argon2');
 const otp = require('../util/genarateOtp');
 const sendEmail = require('../util/sendEmail');
 const securePassword = async (password) => {
     try {
-        const hashPassword = await bcrypt.hash(password, 10);
+        const hashPassword = await argon.hash(password, 10);
         return hashPassword
 
     } catch (error) {
@@ -144,7 +144,7 @@ const userLogin = async (req, res,next) => {
             { $limit: 1 }
         ]);
         if (userData.length > 0) {
-            const passwordMatch = await bcrypt.compare(password, userData[0].password)
+            const passwordMatch = await argon.verify(password, userData[0].password)
             if (passwordMatch) {
                 if (userData[0].is_block === false) {
                     userData[0].password = undefined;
