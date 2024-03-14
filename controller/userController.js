@@ -5,11 +5,9 @@ const Category = require('../model/categoryModel');
 const Address = require('../model/addressModel');
 const Order = require('../model/orderModel');
 const Wallet = require('../model/walletModel');
-const bcrypt = require('bcryptjs')
-// const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const otp = require('../util/genarateOtp');
 const sendEmail = require('../util/sendEmail');
-
 const securePassword = async (password) => {
     try {
         const hashPassword = await bcrypt.hash(password, 10);
