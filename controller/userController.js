@@ -5,9 +5,13 @@ const Category = require('../model/categoryModel');
 const Address = require('../model/addressModel');
 const Order = require('../model/orderModel');
 const Wallet = require('../model/walletModel');
-const argon = require('argon2');
+
+
+
 const otp = require('../util/genarateOtp');
 const sendEmail = require('../util/sendEmail');
+
+const argon = require('argon2');
 const securePassword = async (password) => {
     try {
         const hashPassword = await argon.hash(password, 10);
