@@ -39,7 +39,7 @@ const isLoggedUser=async (req, res, next) => {
       return res.redirect('/');
     }
     else {
-      return next();
+       next();
     
     }
   } catch (error) {
