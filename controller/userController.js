@@ -135,8 +135,7 @@ const userLoginPage = async (req, res,next) => {
         const loggedIn = req.session.user ? true : false;
         return res.status(200).render('userLogin', { loggedIn });
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
     }
 }
 const userLogin = async (req, res,next) => {
@@ -189,8 +188,7 @@ const resendOtp = async (req, res,next) => {
         const sendEmaildata = await sendEmail(name, email, otpData.otp);
         return res.status(200).render('verification', { loggedIn })
     } catch (error) {
-        console.error(error);
-        return res.status(500).send('Internal Server Error');
+        next(error.message);
     }
 }
 const account = async (req, res,next) => {
