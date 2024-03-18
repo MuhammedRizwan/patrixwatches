@@ -41,12 +41,7 @@ const Home = async (req, res, next) => {
 }
 const userRegisterPage = async (req, res, next) => {
     try {
-        let loggedIn = false;
-        if (req.session.user) {
-            loggedIn = true
-        } else {
-            loggedIn = false
-        }
+        const loggedIn = req.session.user ? true : false;
         return res.render('userRegister', { loggedIn })
     } catch (error) {
         next(error.message);
