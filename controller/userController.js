@@ -26,28 +26,28 @@ const securePassword = async (password) => {
 // const genarateToken = (user) => {
 //     return jwt.sign({ user }, process.env.SECRETKEY, { expiresIn: 2 * 60 * 60 * 1000 })
 // }
-const Home = async (req, res,next) => {
+const Home = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
-        const userData=await User.findOne({_id:req.session.user});
+        const userData = await User.findOne({ _id: req.session.user });
         const categoryData = await Category.find({ is_unList: false });
         const categoryIds = categoryData.map(category => category._id);
         const productData = await Product.find({ category_id: { $in: categoryIds }, is_blocked: false }).limit(8);
-        const Home=true;
-        return res.status(200).render('Home', { product: productData, category: categoryData, loggedIn,Name:userData,Home });
+        const Home = true;
+        return res.status(200).render('Home', { product: productData, category: categoryData, loggedIn, Name: userData, Home });
     } catch (error) {
         next(error.message);
     }
 }
-const userRegisterPage = async (req, res,next) => {
+const userRegisterPage = async (req, res, next) => {
     try {
-        const loggedIn = req.session.user ? true: false;
+        const loggedIn = req.session.user ? true : false;
         return res.render('userRegister', { loggedIn })
     } catch (error) {
         next(error.message);
     }
 }
-const userRegister = async (req, res,next) => {
+const userRegister = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const emailExist = await User.aggregate([
@@ -80,7 +80,7 @@ const userRegister = async (req, res,next) => {
         next(error.message);
     }
 }
-const verifyOtp = async (req, res,next) => {
+const verifyOtp = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const userotp = req.body.otp;
@@ -130,15 +130,15 @@ const verifyOtp = async (req, res,next) => {
         next(error.message);
     }
 }
-const userLoginPage = async (req, res,next) => {
+const userLoginPage = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         return res.status(200).render('userLogin', { loggedIn });
     } catch (error) {
-        next(error.message);
+        next(error);
     }
 }
-const userLogin = async (req, res,next) => {
+const userLogin = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const { email, password } = req.body;
@@ -174,7 +174,7 @@ const userLogin = async (req, res,next) => {
         next(error.message);
     }
 }
-const resendOtp = async (req, res,next) => {
+const resendOtp = async (req, res, next) => {
     try {
         const loggedIn = req.session.user_id ? true : false;
         const { name, email } = req.session.tempUser;
@@ -191,7 +191,7 @@ const resendOtp = async (req, res,next) => {
         next(error.message);
     }
 }
-const account = async (req, res,next) => {
+const account = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const userId = req.session.user._id;
@@ -203,10 +203,10 @@ const account = async (req, res,next) => {
                 $limit: 1
             }
         ]);
-        const user=await User.findOne({_id:req.session.user});
+        const user = await User.findOne({ _id: req.session.user });
         const walletData = await Wallet.findOne({ user: userId })
         if (userData.length === 0) {
-            return res.status(404).render('account', { Address: [], loggedIn,Name:user, user: [], wallet: walletData })
+            return res.status(404).render('account', { Address: [], loggedIn, Name: user, user: [], wallet: walletData })
         }
         const addressData = await Address.aggregate([
             {
@@ -217,16 +217,16 @@ const account = async (req, res,next) => {
             }
         ]);
         if (addressData == 0) {
-            return res.status(200).render('account', { Address: [], loggedIn, user: userData[0],Name:user, wallet: walletData });
+            return res.status(200).render('account', { Address: [], loggedIn, user: userData[0], Name: user, wallet: walletData });
         }
 
-        return res.status(200).render('account', { Address: addressData[0].address, loggedIn, Name:user,user: userData[0], wallet: walletData });
+        return res.status(200).render('account', { Address: addressData[0].address, loggedIn, Name: user, user: userData[0], wallet: walletData });
 
     } catch (error) {
         next(error.message);
     }
 }
-const userLogout = async (req, res,next) => {
+const userLogout = async (req, res, next) => {
     try {
         req.session.LoggedUser = false
         req.session.user = undefined;
@@ -236,16 +236,16 @@ const userLogout = async (req, res,next) => {
         return res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 }
-const changePasswordPage = async (req, res,next) => {
+const changePasswordPage = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
-        const user=await User.findOne({_id:req.session.user});
-        return res.status(200).render('changePassword', { loggedIn ,Name:user});
+        const user = await User.findOne({ _id: req.session.user });
+        return res.status(200).render('changePassword', { loggedIn, Name: user });
     } catch (error) {
         next(error.message);
     }
 }
-const changePassword = async (req, res,next) => {
+const changePassword = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const { password, npassword } = req.body;
@@ -258,13 +258,13 @@ const changePassword = async (req, res,next) => {
                 $project: { password: 1, _id: 0 }
             }
         ]);
-        const user=await User.findOne({_id:req.session.user});
+        const user = await User.findOne({ _id: req.session.user });
         if (!userData) {
             return res.status(400).json({ success: false, error: "User Not Found" });
         } else {
             const matchPassword = await argon.verify(password, userData[0].password)
             if (!matchPassword) {
-                return res.status(400).render('changePassword', { loggedIn ,Name:user, message: "current Password Doesnot Match Try Again" });
+                return res.status(400).render('changePassword', { loggedIn, Name: user, message: "current Password Doesnot Match Try Again" });
             } else {
                 const sPassword = await securePassword(npassword);
                 if (!sPassword) {
@@ -284,7 +284,7 @@ const changePassword = async (req, res,next) => {
     }
 }
 
-const verifyEmailPage = async (req, res,next) => {
+const verifyEmailPage = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         return res.status(200).render('email-verified', { loggedIn })
@@ -293,7 +293,7 @@ const verifyEmailPage = async (req, res,next) => {
     }
 }
 let emailOtpverify;
-const verifyEmail = async (req, res,next) => {
+const verifyEmail = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const { email } = req.body;
@@ -324,7 +324,7 @@ const verifyEmail = async (req, res,next) => {
         next(error.message);
     }
 }
-const forgetOtpVerification = async (req, res,next) => {
+const forgetOtpVerification = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const userotp = req.body.otp;
@@ -346,7 +346,7 @@ const forgetOtpVerification = async (req, res,next) => {
         next(error.message);
     }
 }
-const newPasswordverify = async (req, res,next) => {
+const newPasswordverify = async (req, res, next) => {
     try {
         const newPassword = req.body.npassword;
         const sPassword = await securePassword(newPassword);
@@ -365,17 +365,17 @@ const newPasswordverify = async (req, res,next) => {
         next(error.message);
     }
 }
-const editProfilePage = async (req, res,next) => {
+const editProfilePage = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const userData = await User.findOne({ _id: req.session.user._id })
-        return res.status(200).render('editProfile', { loggedIn, userData,Name:userData });
+        return res.status(200).render('editProfile', { loggedIn, userData, Name: userData });
 
     } catch (error) {
         next(error.message);
     }
 }
-const editProfile = async (req, res,next) => {
+const editProfile = async (req, res, next) => {
     try {
         const userId = req.session.user._id;
         const { name, phone } = req.body;
@@ -393,13 +393,13 @@ const editProfile = async (req, res,next) => {
 
     }
 }
-const walletTransaction = async (req, res,next) => {
+const walletTransaction = async (req, res, next) => {
     try {
         const loggedIn = req.session.user ? true : false;
         const userId = req.session.user._id;
         const walletData = await Wallet.findOne({ user: userId })
-        const user=await User.findOne({_id:req.session.user});
-        return res.status(200).render("transactionList", { loggedIn, wallet: walletData ,Name:user});
+        const user = await User.findOne({ _id: req.session.user });
+        return res.status(200).render("transactionList", { loggedIn, wallet: walletData, Name: user });
     } catch (error) {
         next(error.message);
     }
