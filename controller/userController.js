@@ -41,12 +41,12 @@ const Home = async (req, res, next) => {
 }
 const userRegisterPage = async (req, res, next) => {
     try {
-      let loggedIn = null
-      if(req.session.user){
-        loggedIn = true
-      }else{
-        loggedIn = false
-      }
+        let loggedIn = false;
+        if (req.session.user) {
+            loggedIn = true
+        } else {
+            loggedIn = false
+        }
         return res.render('userRegister', { loggedIn })
     } catch (error) {
         next(error.message);
@@ -152,7 +152,7 @@ const userLogin = async (req, res, next) => {
             { $limit: 1 }
         ]);
         if (userData.length > 0) {
-            const passwordMatch = await argon.verify(userData[0].password,password)
+            const passwordMatch = await argon.verify(userData[0].password, password)
             if (passwordMatch) {
                 if (userData[0].is_block === false) {
                     userData[0].password = undefined;
@@ -267,7 +267,7 @@ const changePassword = async (req, res, next) => {
         if (!userData) {
             return res.status(400).json({ success: false, error: "User Not Found" });
         } else {
-            const matchPassword = await argon.verify( userData[0].password,password)
+            const matchPassword = await argon.verify(userData[0].password, password)
             if (!matchPassword) {
                 return res.status(400).render('changePassword', { loggedIn, Name: user, message: "current Password Doesnot Match Try Again" });
             } else {
