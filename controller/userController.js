@@ -206,7 +206,7 @@ const account = async (req, res, next) => {
         const user = await User.findOne({ _id: req.session.user });
         const walletData = await Wallet.findOne({ user: userId })
         if (userData.length === 0) {
-            return res.status(404).render('account', { Address: [], loggedIn, Name: user, user: [], wallet: walletData })
+            return res.status(404).render('Account', { Address: [], loggedIn, Name: user, user: [], wallet: walletData })
         }
         const addressData = await Address.aggregate([
             {
