@@ -31,7 +31,7 @@ const adminLogin = async (req, res,next) => {
             }
         ])
         if (adminData.length > 0) {
-            const matchPassword = await argon.verify(password, adminData[0].password);
+            const matchPassword = await argon.verify( adminData[0].password,password);
             if (matchPassword) {
                 if (adminData[0].is_admin === 0) {
                     return res.status(404).render('adminLogin', { message: "your are not a admin" })

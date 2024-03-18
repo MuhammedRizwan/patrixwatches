@@ -405,7 +405,7 @@ const PaymentOrderPage=async(req,res)=>{
     const loggedIn = req.session.user ? true : false;
     const orderData=await Order.findOne({_id:orderId}).populate("products.product")
     const user=await User.findOne({_id:req.session.user});
-    return res.status(200).render('paymentOrderPage',{orderData,loggedIn,name:user});
+    return res.status(200).render('paymentOrderPage',{orderData,loggedIn,Name:user});
   } catch (error) {
     console.log(error.message);
     return res.status(500).send("Internal Server Error. Please try again later.");
