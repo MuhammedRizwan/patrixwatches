@@ -217,10 +217,10 @@ const account = async (req, res, next) => {
             }
         ]);
         if (addressData == 0) {
-            return res.status(200).render('account', { Address: [], loggedIn, user: userData[0], Name: user, wallet: walletData });
+            return res.status(200).render('Account', { Address: [], loggedIn, user: userData[0], Name: user, wallet: walletData });
         }
 
-        return res.status(200).render('account', { Address: addressData[0].address, loggedIn, Name: user, user: userData[0], wallet: walletData });
+        return res.status(200).render('Account', { Address: addressData[0].address, loggedIn, Name: user, user: userData[0], wallet: walletData });
 
     } catch (error) {
         next(error.message);
