@@ -31,7 +31,7 @@ const viewCoupon = async (req, res,next) => {
         if (!couponData) {
             return res.status(400).json({ success: false, message: "something went wrong" })
         }
-        return res.status(200).render("CouponList", { couponData })
+        return res.status(200).render("couponList", { couponData })
     } catch (error) {
         next(error.message)
     }
