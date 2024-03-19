@@ -22,7 +22,6 @@ const instance = new Razorpay({
 
 const orderComplete = async (req, res) => {
   try {
-    console.log(req.body);
     const { AddressType, paymentOption, Price, coupon } = req.body;
     const user_id = req.session.user._id;
     const addressData = await Address.findOne({ userId: user_id });
@@ -33,6 +32,43 @@ const orderComplete = async (req, res) => {
       AddressArray = addressData.address[1]
     }
     const cartData = await Cart.findOne({ user_id: user_id }, { cartItems: 1, _id: 0 });
+    if(!cartData){
+      req.session.razorOrderId = orderData._id;
+      if (paymentOption == "RazorPay") {
+        var options = {
+          amount: totalPrice * 100,  // amount in the smallest currency unit
+          currency: "INR",
+          receipt: String(count)
+        };
+        instance.orders.create(options, function (err, order) {
+          return res.status(200).json({ orderId: order.id, amount: order.amount });
+        });
+      } else if (paymentOption == 'CashOnDelivery') {
+        if (1000 <= totalPrice) {
+          return res.status(400).json({ success: false, message: "cannot order above 1000" })
+        } else {
+          orderData.paymentMethod=paymentOption
+          await orderData.save()
+          const deleteCart = await Cart.deleteOne({ user_id: user_id })
+          return res.status(200).json({ success: true, message: "order Placed successfully " })
+        }
+      } else if (paymentOption == 'wallet') {
+        const walletData = await Wallet.findOne({ user: user_id });
+        if (walletData.walletBalance < totalPrice) {
+          return res.status(400).json({ success: false, message: "insufficient balance" })
+        }
+        walletData.walletBalance -= totalPrice;
+        walletData.transaction.push({ amount: totalPrice, reson: "product payment", transactionType: "Debit" });
+        walletData.save();
+        orderData.paymentMethod=paymentOption
+        orderData.paymentStatus = "Paid";
+        orderData.save()
+        const deleteCart = await Cart.deleteOne({ user_id: user_id })
+        return res.status(200).json({ success: true, message: "order Placed successfully " })
+      } else {
+        return res.status(400).json({ success: false, message: "cannot order" })
+      }
+    }
     const totalPrice = parseInt(Price);
     const products = await Promise.all(cartData.cartItems.map(async (item) => {
       const stockCheck = await Product.findOne({ _id: item.product_id });
@@ -69,6 +105,7 @@ const orderComplete = async (req, res) => {
         status: "pending"
       });
       const orderData = await order.save();
+      const deleteCart = await Cart.deleteOne({ user_id: user_id })
       req.session.razorOrderId = orderData._id;
       if (paymentOption == "RazorPay") {
         var options = {
@@ -85,7 +122,6 @@ const orderComplete = async (req, res) => {
         } else {
           orderData.paymentMethod=paymentOption
           await orderData.save()
-          const deleteCart = await Cart.deleteOne({ user_id: user_id })
           return res.status(200).json({ success: true, message: "order Placed successfully " })
         }
       } else if (paymentOption == 'wallet') {
@@ -99,7 +135,6 @@ const orderComplete = async (req, res) => {
         orderData.paymentMethod=paymentOption
         orderData.paymentStatus = "Paid";
         orderData.save()
-        const deleteCart = await Cart.deleteOne({ user_id: user_id })
         return res.status(200).json({ success: true, message: "order Placed successfully " })
       } else {
         return res.status(400).json({ success: false, message: "cannot order" })
@@ -159,7 +194,7 @@ const singleOrderDetials = async (req, res) => {
       
     }
     if (!orderData) {
-      return res.status(500).json({ success: false, message: "no orders are found" });
+      return res.status(400).json({ success: false, message: "no orders are found" });
     }
     const updateStatus = orderData.products.filter(item => item.status !== "canceled")
     if (updateStatus.length == 0) {
@@ -179,8 +214,7 @@ const cancelSingleProduct = async (req, res) => {
       { _id: orderId, "products.product": productId },
       { $set: { "products.$.status": "canceled" } }
     );
-    const resultData = await Order.findOne({ _id: orderId });
-    console.log(resultData)
+    const resultData = await Order.findOne({ _id: orderId })
     if (resultData.paymentStatus == "Paid") {
       const product = resultData.products.find(item => item.product == productId)
       const productPrice = product.price
@@ -252,7 +286,6 @@ const adminOrderDetails = async (req, res) => {
     }
     const orderData = await Order.findOne({ orderId: orderId });
     if (!orderData) {
-      console.error("Order not found");
       return res.status(404).send("Order not found");
     }
     const addressData = await Order.findOne({ orderId: orderId }, { _id: 0, address: 1 });
@@ -354,9 +387,9 @@ const razorOrderComplete = async (req, res) => {
     const orderId = req.session.razorOrderId;
     const orderData = await Order.findOne({ _id: orderId });
     orderData.paymentStatus = "Paid"
+    orderData.paymentMethod="Razor Pay"
     await orderData.save()
     if (orderData) {
-      const deleteCart = await Cart.deleteOne({ user_id: user_id })
       return res.status(200).json({ success: true, message: "Payment successfully completed" })
     } else {
       return res.status(400).json({ success: false, message: "something went wrong" })
@@ -413,7 +446,6 @@ const PaymentOrderPage=async(req,res)=>{
 }
 const paymentOrder=async(req,res)=>{
   try {
-    console.log(req.body);
     const {paymentOption}=req.body
     const user_id=req.session.user._id
     const count = await Order.countDocuments();
@@ -439,7 +471,6 @@ const paymentOrder=async(req,res)=>{
         }
       } else if (paymentOption == 'wallet') {
         const walletData = await Wallet.findOne({ user: user_id });
-        console.log(walletData);
         if (walletData.walletBalance < totalPrice) {
           return res.status(400).json({ success: false, message: "insufficient balance" })
         }
@@ -1090,7 +1121,6 @@ const saveInvoice = async (req, res) => {
     const order = await Order.findOne({ _id: orderId })
       .populate("products.product")
     const userId = order.user
-    console.log(order);
     // Fetch user details
     const user = await User.findById(userId);
     // Extract relevant information from the order
@@ -1292,7 +1322,6 @@ const saleChart = async (req, res) => {
     });
 
     const values = salesData.map((item) => item.totalSales);
-    console.log(labels, values);
 
     res.json({ labels, values });
   } catch (error) {
