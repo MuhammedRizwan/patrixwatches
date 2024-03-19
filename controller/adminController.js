@@ -31,13 +31,13 @@ const adminLogin = async (req, res,next) => {
             }
         ])
         if (adminData.length > 0) {
-            const matchPassword = await argon.verify( adminData[0].password,password);
+            const matchPassword = await argon.verify(adminData[0].password,password);
             if (matchPassword) {
                 if (adminData[0].is_admin === 0) {
                     return res.status(404).render('adminLogin', { message: "your are not a admin" })
                 } else {
                     const token = genarateToken(adminData[0]);
-                    const options = {
+                    const options = { 
                         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
                         httpOnly: true
                     }
