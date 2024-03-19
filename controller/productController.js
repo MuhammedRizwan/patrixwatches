@@ -72,7 +72,7 @@ const editProductPage = async (req, res,next) => {
             if (!categoryData) {
                 return res.status(404).send('Category not found');
             } else {
-                return res.status(200).render('editproduct', { product: productData, cat: categoryData })
+                return res.status(200).render('editProduct', { product: productData, cat: categoryData })
             }
         }
     } catch (error) {
