@@ -6,6 +6,7 @@ const Address = require('../model/addressModel');
 const Cart = require('../model/cartModel');
 const Order = require('../model/orderModel');
 const Wallet = require('../model/walletModel');
+const Coupon=require('../model/coupenModel')
 const Razorpay = require('razorpay');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
@@ -105,6 +106,9 @@ const orderComplete = async (req, res) => {
         status: "pending"
       });
       const orderData = await order.save();
+      const couponData =await Coupon.findOne({_id:coupon});
+      couponData.users.push(user_id);
+      couponData.save();
       const deleteCart = await Cart.deleteOne({ user_id: user_id })
       req.session.razorOrderId = orderData._id;
       if (paymentOption == "RazorPay") {

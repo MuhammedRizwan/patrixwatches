@@ -19,7 +19,6 @@ const addOfferPage = async (req, res, next) => {
 }
 const findData = async (req, res, next) => {
     try {
-        console.log(req.query);
         const option = req.query.option;
         if (option == "category") {
             const categoryData = await Category.find();

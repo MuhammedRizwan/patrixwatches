@@ -130,80 +130,42 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function updateQuantity(action, productId, index) {
-            $.ajax({
-                type: 'POST',
-                url: `/${action}?id=${productId}`,
-                success: function (data) {
-                    console.log("Success:", data);
-                    if (!data || typeof data !== 'object') {
-                        console.error("Invalid data received from server.");
-                        return;
-                    }
-                    if (data.error) {
-                        // Handle specific errors
-                        if (data.error === "Out of stock") {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Oops...",
-                                text: "This product is currently out of stock.",
-                            });
-                        } else {
-                            // Handle other errors
-                            Swal.fire({
-                                icon: "error",
-                                title: "Oops...",
-                                text: data.error,
-                            });
-                        }
-                        return;
-                    }
-                    const newQuantity = Math.max(1, data[0].quantity);
-
-                    const cartProductQty = $(`#cartProductqty${index}`);
-                    const priceElement = $(`#cartProductqty${index}`).closest('tr').find('.price span');
-
-                    const salePriceStr = priceElement.text().replace('$', '').trim();
-
-                    if (!salePriceStr) {
-                        console.error("Error: salePriceStr is null, undefined, or empty");
-                        return;
-                    }
-                    const salePrice = parseFloat(salePriceStr);
-
-                    if (isNaN(salePrice)) {
-                        console.error("Error: salePrice is NaN");
-                    } else {
-                        cartProductQty.val(newQuantity);
-                        const newSubtotal = (newQuantity * salePrice).toFixed(2);
-                        $(`#subtotal${index}`).text(newSubtotal);
-
+            fetch(`/${action}?id=${productId}`, { method: 'POST' })
+                .then(res => { return res.json() })
+                .then(data => {
+                    if (data.success) {
+                        const newQuantity = Math.max(1, data.matchingProduct[0].quantity);
+                        const quantityInput = document.getElementById(`cartProductqty${index}`)
+                        quantityInput.value = newQuantity;
+                        const subTotal = document.getElementById(`subtotal${index}`);
+                        subTotal.textContent = data.matchingProduct[0].price * newQuantity
                         let totalSubTotal = 0;
-                        $('.text-right[data-title="Cart"] span').each(function () {
-                            const textValue = parseFloat($(this).text());
+                        const cartElements = document.querySelectorAll('.text-right[data-title="Cart"] span');
+
+                        cartElements.forEach(function (element) {
+                            const textValue = parseFloat(element.textContent);
                             if (!isNaN(textValue)) {
                                 totalSubTotal += textValue;
                             }
                         });
 
-                        $('.cart_total_amount span').text(`${totalSubTotal.toFixed(2)}`);
+                        const cartTotalAmount = document.querySelector('.cart_total_amount span');
+                        cartTotalAmount.textContent = totalSubTotal.toFixed(2);
+
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "opps..",
+                            text: data.message,
+                        });
                     }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error updating quantity:", error);
-                    const errorMessage = xhr.responseJSON ? xhr.responseJSON.error : "Unknown error";
-                    Swal.fire({
-                        icon: "error",
-                        title: "Hello...",
-                        text: `Error updating quantity: ${errorMessage}`,
-                    });
-                }
-            });
+                })
         }
     </script>
 
 
     <script>
-        function confirmDelete(productId,index) {
+        function confirmDelete(productId, index) {
             Swal.fire({
                 title: "Are you sure?",
                 text: "You won't be able to revert this!",
@@ -227,7 +189,7 @@
                                     text: data.message,
                                     icon: "success"
                                 })
-                                const divToRemove = document.getElementById('deletecart'+index);
+                                const divToRemove = document.getElementById('deletecart' + index);
 
                                 // Check if the div exists before removing it
                                 if (divToRemove) {
@@ -241,7 +203,7 @@
                                 Swal.fire({
                                     icon: "error",
                                     title: "Oops...",
-                                    text:data.message,
+                                    text: data.message,
                                 });
                             }
                         })

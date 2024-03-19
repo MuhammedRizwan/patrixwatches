@@ -11,7 +11,6 @@ const addcouponPage = async (req, res,next) => {
 const addCoupon = async (req, res,next) => {
     try {
         const { code, discount, minAmt, maxDiscAmt, expiryDate} = req.body;
-        console.log(req.body);
         const ExistingCoupon = await Coupon.findOne({ code: code });
         if (ExistingCoupon) {
             return res.res.status(400).render("addCoupon", { message: "already existing code" });
@@ -56,7 +55,6 @@ const listnUnlistCoupon = async (req, res,next) => {
 };
 const applyCoupon = async (req, res,next) => {
     try {
-        console.log(req.body);
         const { code,total } = req.body;
         const userId=req.session.user._id;
         const couponData=await Coupon.findOne({code:code,is_list:false});
@@ -67,14 +65,13 @@ const applyCoupon = async (req, res,next) => {
             const currentDate=new Date();
             const expiryDate=new Date(couponData.ExpiryDate);
             if(currentDate>expiryDate){
-                return res.status(4000).json({success:false,message:"coupon Expired"})
+                return res.status(400).json({success:false,message:"coupon Expired"})
             }
         }
         const couponUsed=couponData.users.find((user)=>user==userId);
         if(couponUsed){
             return res.status(400).json({success:false,message:"user Already used"});
         }
-        couponData.users.push(userId);
         couponData.save();
         if(total<couponData.minAmt){
             return res.status(400).json({success:false,message:`valid for above ${couponData.minAmt}`});

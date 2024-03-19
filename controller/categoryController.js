@@ -84,7 +84,7 @@ const editCategoryPage = async (req, res,next) => {
 }
 const editCategory = async (req, res,next) => {
     try {
-        const categoryExist=await Category.findOne({categoryName:req.body.CategoryName})
+        const categoryExist = await Category.findOne({ categoryName: { $regex: new RegExp('^' + req.body.CategoryName + '$', 'i') } });
         if(categoryExist){
             return res.render('editCategory',{message:"category Already Exist",cat:categoryExist});
         }

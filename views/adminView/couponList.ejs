@@ -100,9 +100,10 @@
                             Action
                         }),
                     })
-                        .then((res) => {
-                            if (res.ok) {
-                                Swal.fire.fire({
+                    .then(res=>{return res.json()})
+                        .then((data) => {
+                            if (data.success) {
+                                Swal.fire({
                                     position: "center",
                                     icon: "success",
                                     title: `coupon were ${Action}`,
@@ -123,7 +124,7 @@
                             }
                         })
                         .catch((err) => {
-                            console.error(err);
+                            console.log(err);
                             swal.fire("internal server error")
                         })
 

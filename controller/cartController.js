@@ -74,7 +74,7 @@ const addQuantity = async (req, res,next) => {
             const foundItem = cartData.cartItems.find(item => item.product_id == id);
             const quantity = foundItem.quantity + 1;
             if (productStock.stock < quantity) {
-                return res.status(400).json({ success: false, error: "Out of stock" });
+                return res.status(400).json({ success: false, message: "Out of stock" });
             } else {
                 const updateCart = await Cart.findOneAndUpdate(
                     { user_id: userId, 'cartItems.product_id': id },
@@ -84,7 +84,7 @@ const addQuantity = async (req, res,next) => {
                     const cartItemData = updateCart.cartItems;// Assuming cartData contains the cartItems array
                     const matchingProduct = cartItemData
                         .filter(item => item.product_id == id);
-                    return res.json(matchingProduct);
+                    return res.status(200).json({success:true,matchingProduct});
                 } else {
                     return res.status(400).send("cart is not found ")
                 }
@@ -103,7 +103,7 @@ const subQuantity = async (req, res,next) => {
         const cartDataItem = cartData.cartItems; // Access the first document and then get cartItems
         const existProduct = cartDataItem.find(item => item.product_id == id);
         if (existProduct.quantity < 2) {
-            return res.status(200).json(cartData);
+            return res.status(200).json({success:false,message:"cannot be less than one "});
         } else {
             const updateCart = await Cart.findOneAndUpdate(
                 { user_id: userId, 'cartItems.product_id': id },
@@ -113,7 +113,7 @@ const subQuantity = async (req, res,next) => {
                 const cartItemData = updateCart.cartItems;// Assuming cartData contains the cartItems array
                 const matchingProduct = cartItemData
                     .filter(item => item.product_id == id);
-                return res.json(matchingProduct)
+                return res.status(200).json({success:true,matchingProduct})
             } else {
                 return res.status(400).send("cart is not found ")
             }
