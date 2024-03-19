@@ -54,7 +54,7 @@ const oderSchema = new mongoose.Schema({
     type: String
   },
   couponId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
   },
   address: {
     addressType: {

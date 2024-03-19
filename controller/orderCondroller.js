@@ -95,20 +95,20 @@ const orderComplete = async (req, res) => {
       return res.status(400).json({ success: false, message: "product is Out of Stock" });
     } else {
       const count = await Order.countDocuments();
-
+      const couponData =await Coupon.findOne({code:coupon});
+      couponData.users.push(user_id);
+      couponData.save();
       const order = new Order({
         orderId: String(count),
         totalPrice, products, address: AddressArray,
         user: user_id,
-        couponId: coupon,
+        couponId: couponData._id,
         paymentMethod: "pending",
         paymentStatus: "pending",
         status: "pending"
       });
       const orderData = await order.save();
-      const couponData =await Coupon.findOne({_id:coupon});
-      couponData.users.push(user_id);
-      couponData.save();
+     
       const deleteCart = await Cart.deleteOne({ user_id: user_id })
       req.session.razorOrderId = orderData._id;
       if (paymentOption == "RazorPay") {
