@@ -55,6 +55,7 @@ const oderSchema = new mongoose.Schema({
   },
   couponId: {
     type: mongoose.Schema.Types.ObjectId,
+    ref:"Coupon"
   },
   address: {
     addressType: {

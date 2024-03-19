@@ -21,7 +21,7 @@
                         </span></small>
                     </div>
                     <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                        <% if (order.paymentStatus=="paid") { %>
+                        <% if (order.paymentStatus=="Paid") { %>
                          <% } else { %>
                             <a class="btn btn-primary text-primary" href="/Orderpayment?id=<%= order._id %>">pay</a>
                         <% } %>

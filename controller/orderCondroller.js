@@ -328,7 +328,7 @@ const changeOrderStatus = async (req, res) => {
     } else {
       var updatedOrder = await Order.updateOne(
         { orderId: orderId },
-        { $set: { status: option, paymentStatus: "paid" } },
+        { $set: { status: option, paymentStatus: "Paid" } },
         { new: true }
       );
     }
@@ -1221,7 +1221,7 @@ const saleschart = async (req, res) => {
         $match: {
           $or: [
             { status: "Delivered" },
-            { paymentStatus: "paid" }
+            { paymentStatus: "Paid" }
           ],
           createdOn: { $gte: startDate } // Filter orders placed after the start date
         }
