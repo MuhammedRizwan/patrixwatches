@@ -95,14 +95,18 @@ const orderComplete = async (req, res) => {
       return res.status(400).json({ success: false, message: "product is Out of Stock" });
     } else {
       const count = await Order.countDocuments();
-      const couponData =await Coupon.findOne({code:coupon});
-      couponData.users.push(user_id);
-      couponData.save();
+      let couponId;
+      if(coupon){
+        const  couponData =await Coupon.findOne({code:coupon});
+        couponData.users.push(user_id);
+        couponData.save();
+        couponId=couponData._id
+      }
       const order = new Order({
         orderId: String(count),
         totalPrice, products, address: AddressArray,
         user: user_id,
-        couponId: couponData._id,
+        couponId: couponId,
         paymentMethod: "pending",
         paymentStatus: "pending",
         status: "pending"
