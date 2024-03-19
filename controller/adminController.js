@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 
 const genarateToken = (user) => {
 
-    return jwt.sign({ user }, process.env.SECRETKEY, { expiresIn: '2h' })
+    return jwt.sign({ user }, "secretkey", { expiresIn: '2h' })
 }
 const adminLoginPage = async (req, res,next) => {
     try {

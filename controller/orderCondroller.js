@@ -32,7 +32,7 @@ const orderComplete = async (req, res) => {
       AddressArray = addressData.address[1]
     }
     const cartData = await Cart.findOne({ user_id: user_id }, { cartItems: 1, _id: 0 });
-    if(!cartData){
+    if (!cartData) {
       req.session.razorOrderId = orderData._id;
       if (paymentOption == "RazorPay") {
         var options = {
@@ -47,7 +47,7 @@ const orderComplete = async (req, res) => {
         if (1000 <= totalPrice) {
           return res.status(400).json({ success: false, message: "cannot order above 1000" })
         } else {
-          orderData.paymentMethod=paymentOption
+          orderData.paymentMethod = paymentOption
           await orderData.save()
           const deleteCart = await Cart.deleteOne({ user_id: user_id })
           return res.status(200).json({ success: true, message: "order Placed successfully " })
@@ -60,7 +60,7 @@ const orderComplete = async (req, res) => {
         walletData.walletBalance -= totalPrice;
         walletData.transaction.push({ amount: totalPrice, reson: "product payment", transactionType: "Debit" });
         walletData.save();
-        orderData.paymentMethod=paymentOption
+        orderData.paymentMethod = paymentOption
         orderData.paymentStatus = "Paid";
         orderData.save()
         const deleteCart = await Cart.deleteOne({ user_id: user_id })
@@ -100,7 +100,7 @@ const orderComplete = async (req, res) => {
         totalPrice, products, address: AddressArray,
         user: user_id,
         couponId: coupon,
-        paymentMethod:"pending",
+        paymentMethod: "pending",
         paymentStatus: "pending",
         status: "pending"
       });
@@ -120,7 +120,7 @@ const orderComplete = async (req, res) => {
         if (1000 <= totalPrice) {
           return res.status(400).json({ success: false, message: "cannot order above 1000" })
         } else {
-          orderData.paymentMethod=paymentOption
+          orderData.paymentMethod = paymentOption
           await orderData.save()
           return res.status(200).json({ success: true, message: "order Placed successfully " })
         }
@@ -132,7 +132,7 @@ const orderComplete = async (req, res) => {
         walletData.walletBalance -= totalPrice;
         walletData.transaction.push({ amount: totalPrice, reson: "product payment", transactionType: "Debit" });
         walletData.save();
-        orderData.paymentMethod=paymentOption
+        orderData.paymentMethod = paymentOption
         orderData.paymentStatus = "Paid";
         orderData.save()
         return res.status(200).json({ success: true, message: "order Placed successfully " })
@@ -148,8 +148,8 @@ const orderComplete = async (req, res) => {
 const orderSuccessPage = async (req, res) => {
   try {
     const loggedIn = req.session.user ? true : false;
-    const user=await User.findOne({_id:req.session.user});
-    return res.status(200).render('orderSuccess', { loggedIn,Name:user })
+    const user = await User.findOne({ _id: req.session.user });
+    return res.status(200).render('orderSuccess', { loggedIn, Name: user })
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -175,8 +175,8 @@ const orderDetials = async (req, res) => {
       }
     })
     const orderDatas = await Order.find({ user: userId, }, { address: 0 }).sort({ _id: -1 })
-    const user=await User.findOne({_id:req.session.user});
-    return res.status(200).render('orderDetialsPage', { orderData: orderDatas, loggedIn,Name:user });
+    const user = await User.findOne({ _id: req.session.user });
+    return res.status(200).render('orderDetialsPage', { orderData: orderDatas, loggedIn, Name: user });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -189,9 +189,9 @@ const singleOrderDetials = async (req, res) => {
     const userData = await User.findOne({ _id: userId })
     const orderId = req.params.orderId;
     const orderData = await Order.findOne({ _id: orderId }).populate("products.product");
-    const walletData =await Wallet.findOne({code:orderData.couponId})
-    if(walletData){
-      
+    const walletData = await Wallet.findOne({ code: orderData.couponId })
+    if (walletData) {
+
     }
     if (!orderData) {
       return res.status(400).json({ success: false, message: "no orders are found" });
@@ -200,7 +200,7 @@ const singleOrderDetials = async (req, res) => {
     if (updateStatus.length == 0) {
       return res.status(200).redirect('/orderDetials');
     } else {
-      return res.status(200).render('orderDetials', { order: orderData, loggedIn, user: userData, address: orderData.address, product: orderData.products,Name:userData });
+      return res.status(200).render('orderDetials', { order: orderData, loggedIn, user: userData, address: orderData.address, product: orderData.products, Name: userData });
     }
   } catch (error) {
     console.log(error);
@@ -241,12 +241,12 @@ const cancelSingleProduct = async (req, res) => {
 const adminOrderPage = async (req, res) => {
   try {
     const PAGE_SIZE = 10;
-        const { page } = req.query;
-        const pageNumber = parseInt(page) || 1;
-        const totalorders = await Order.countDocuments()
-        const totalPages = Math.ceil(totalorders / PAGE_SIZE);
+    const { page } = req.query;
+    const pageNumber = parseInt(page) || 1;
+    const totalorders = await Order.countDocuments()
+    const totalPages = Math.ceil(totalorders / PAGE_SIZE);
     const orders = await Order.find().sort({ createdOn: -1 }).skip((pageNumber - 1) * PAGE_SIZE)
-    .limit(PAGE_SIZE);;
+      .limit(PAGE_SIZE);;
     const users = await Promise.all(orders.map(async (data) => {
       const userData = await User.findOne({ _id: data.user });
       if (userData) {
@@ -267,7 +267,7 @@ const adminOrderPage = async (req, res) => {
       user: users,
       order: orders,
       totalPages: totalPages,
-       currentPage: pageNumber 
+      currentPage: pageNumber
     });
   } catch (error) {
     console.log(error.message);
@@ -386,8 +386,8 @@ const razorOrderComplete = async (req, res) => {
     const user_id = req.session.user._id;
     const orderId = req.session.razorOrderId;
     const orderData = await Order.findOne({ _id: orderId });
-    orderData.paymentStatus = "Paid"
-    orderData.paymentMethod="Razor Pay"
+    orderData.paymentMethod = paymentOption;
+    orderData.paymentStatus = "Paid";
     await orderData.save()
     if (orderData) {
       return res.status(200).json({ success: true, message: "Payment successfully completed" })
@@ -416,12 +416,12 @@ const returnSingleProduct = async (req, res) => {
       { orderId: orderId, "products.product": productId },
       { $set: { "products.$.status": "Returned" } }
     );
-    const resultData=await Order.findOne({ orderId: orderId });
-    const returnedArray=resultData.products.find(item=>item.status !="Returned")
-    if(returnedArray.length==0){
+    const resultData = await Order.findOne({ orderId: orderId });
+    const returnedArray = resultData.products.find(item => item.status != "Returned")
+    if (returnedArray.length == 0) {
       const changeAsReturn = await Order.updateOne(
         { orderId: orderId },
-        { $set: { status : "Returned" } }
+        { $set: { status: "Returned" } }
       );
     }
     return res.status(200).json({ success: true, message: `${productPrice} is refunded in your wallet` });
@@ -431,59 +431,59 @@ const returnSingleProduct = async (req, res) => {
 
   }
 }
-const PaymentOrderPage=async(req,res)=>{
+const PaymentOrderPage = async (req, res) => {
   try {
-    const orderId=req.query.id;
-    req.session.orderId=orderId;
+    const orderId = req.query.id;
+    req.session.orderId = orderId;
     const loggedIn = req.session.user ? true : false;
-    const orderData=await Order.findOne({_id:orderId}).populate("products.product")
-    const user=await User.findOne({_id:req.session.user});
-    return res.status(200).render('paymentOrderPage',{orderData,loggedIn,Name:user});
+    const orderData = await Order.findOne({ _id: orderId }).populate("products.product")
+    const user = await User.findOne({ _id: req.session.user });
+    return res.status(200).render('paymentOrderPage', { orderData, loggedIn, Name: user });
   } catch (error) {
     console.log(error.message);
     return res.status(500).send("Internal Server Error. Please try again later.");
   }
 }
-const paymentOrder=async(req,res)=>{
+const paymentOrder = async (req, res) => {
   try {
-    const {paymentOption}=req.body
-    const user_id=req.session.user._id
+    const { paymentOption } = req.body
+    const user_id = req.session.user._id
     const count = await Order.countDocuments();
-    const orderData=await Order.findOne({_id:req.session.orderId})
-    const totalPrice=orderData.totalPrice;
+    const orderData = await Order.findOne({ _id: req.session.orderId })
+    const totalPrice = orderData.totalPrice;
     req.session.razorOrderId = orderData._id
-      if (paymentOption == "RazorPay") {
-        var options = {
-          amount: totalPrice * 100,  // amount in the smallest currency unit
-          currency: "INR",
-          receipt: String(count)
-        };
-        instance.orders.create(options, function (err, order) {
-          return res.status(200).json({ orderId: order.id, amount: order.amount });
-        });
-      } else if (paymentOption == 'CashOnDelivery') {
-        if (1000 <= totalPrice) {
-          return res.status(400).json({ success: false, message: "cannot order above 1000" })
-        } else {
-          orderData.paymentMethod=paymentOption
-          await orderData.save()
-          return res.status(200).json({ success: true, message: "order Placed successfully " })
-        }
-      } else if (paymentOption == 'wallet') {
-        const walletData = await Wallet.findOne({ user: user_id });
-        if (walletData.walletBalance < totalPrice) {
-          return res.status(400).json({ success: false, message: "insufficient balance" })
-        }
-        walletData.walletBalance -= totalPrice;
-        walletData.transaction.push({ amount: totalPrice, reson: "product payment", transactionType: "Debit" });
-        walletData.save();
-        orderData.paymentMethod=paymentOption
-        orderData.paymentStatus = "Paid";
-        orderData.save()
-        return res.status(200).json({ success: true, message: "order Placed successfully " })
+    if (paymentOption == "RazorPay") {
+      var options = {
+        amount: totalPrice * 100,  // amount in the smallest currency unit
+        currency: "INR",
+        receipt: String(count)
+      };
+      instance.orders.create(options, function (err, order) {
+        return res.status(200).json({ orderId: order.id, amount: order.amount });
+      });
+    } else if (paymentOption == 'CashOnDelivery') {
+      if (1000 <= totalPrice) {
+        return res.status(400).json({ success: false, message: "cannot order above 1000" })
       } else {
-        return res.status(400).json({ success: false, message: "cannot order" })
+        orderData.paymentMethod = paymentOption
+        await orderData.save()
+        return res.status(200).json({ success: true, message: "order Placed successfully " })
       }
+    } else if (paymentOption == 'wallet') {
+      const walletData = await Wallet.findOne({ user: user_id });
+      if (walletData.walletBalance < totalPrice) {
+        return res.status(400).json({ success: false, message: "insufficient balance" })
+      }
+      walletData.walletBalance -= totalPrice;
+      walletData.transaction.push({ amount: totalPrice, reson: "product payment", transactionType: "Debit" });
+      walletData.save();
+      orderData.paymentMethod = paymentOption
+      orderData.paymentStatus = "Paid";
+      orderData.save()
+      return res.status(200).json({ success: true, message: "order Placed successfully " })
+    } else {
+      return res.status(400).json({ success: false, message: "cannot order" })
+    }
   } catch (error) {
     console.log(error.message);
   }
@@ -1156,8 +1156,8 @@ const saveInvoice = async (req, res) => {
       },
       client: {
         company: "Customer Address",
-        name:order.address.fullName,
-        house:order.address.houseName,
+        name: order.address.fullName,
+        house: order.address.houseName,
         zip: order.address.pincode, // Using pinCode as zip
         city: order.address.townCity,
         address: order.address.addressLine,
