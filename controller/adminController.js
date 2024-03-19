@@ -7,8 +7,8 @@ const jwt = require('jsonwebtoken');
 // const { default: products } = require('razorpay/dist/types/products');
 
 const genarateToken = (user) => {
-
-    return jwt.sign({ user }, process.env.SECRETKEY, { expiresIn: '2h' })
+const SECRETKEY="secretkey"
+    return jwt.sign({ user }, SECRETKEY, { expiresIn: '2h' })
 }
 const adminLoginPage = async (req, res,next) => {
     try {
