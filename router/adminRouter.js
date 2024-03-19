@@ -10,6 +10,12 @@ const adminAuth = require('../middleware/adminAuth');
 const upload = require('../config/multer');
 
 admin_route.set('views', './views/adminView');
+
+admin_route.use(session({
+    secret: 'your-secret-key', // Change this to a long, random string
+    resave: false,
+    saveUninitialized: true
+}));
 //  admin route configurations with session control
 admin_route.get('/', adminController.adminLoginPage); // Admin login page accessible only if logged out
 admin_route.post('/log', adminController.adminLogin); // Admin login endpoint
