@@ -1,0 +1,362 @@
+<%- include('../layouts/adminHeader.ejs') %>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    <style>
+        input[type="file"] {
+            display: block;
+        }
+
+        .imageThumb {
+            max-height: 75px;
+            border: 2px solid;
+            padding: 1px;
+            cursor: pointer;
+        }
+
+        .pip {
+            display: inline-block;
+            margin: 10px 10px 0 0;
+        }
+
+        .remove {
+            display: block;
+            background: #444;
+            border: 1px solid black;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .remove:hover {
+            background: white;
+            color: black;
+        }
+    </style>
+
+    <link rel="stylesheet" href="./node_modules/cropperjs/dist/cropper.min.css">
+
+    <form action="/admin/addproduct" method="post" enctype="multipart/form-data" id="product-form"
+        onsubmit="return validationChecking()">
+
+        <section class="content-main">
+            <div class="row">
+                <div class="col-12">
+                    <div class="content-header">
+                        <h2 class="content-title">Add New Product</h2>
+                        <div>
+                            <a href='/admin/prdoucts'> <button
+                                    class="btn btn-light rounded font-sm mr-5 text-body hover-up">cancel</button></a>
+                            <input type="submit" class="btn btn-md rounded font-sm hover-up" value="Upload">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="product_title" class="form-label">Product title</label>
+                                <input type="text" placeholder="Type here" name="name" class="form-control"
+                                    id="product_title">
+
+                                <div class="error-message" style="color: red;" id="product_title-error"></div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="inputPassword4" class="form-label">Category</label>
+                                    <select name="category" class="form-control" id="product_category">
+                                        <option value="" disabled selected>Select a Category</option>
+                                        <% categories.forEach(category=> {
+                                            if (category.is_listed) { %>
+                                            <option value="<%= category._id %>">
+                                                <%= category.name %>
+                                            </option>
+                                            <% } }); %>
+                                    </select>
+                                    <div class="error-message" style="color: red;" id="product_category-error"></div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="inputPrice" class="form-label">Stock</label>
+                                    <input type="text" class="form-control" name="stock" placeholder="Enter the stock"
+                                        id="product_stock">
+                                    <div class="error-message" style="color: red;" id="product_stock-error"></div>
+                                </div>
+                            </div>
+
+                        </div> <!-- card end// -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row gx-3">
+                                    <div class="col-md-4">
+                                        <label for="inputPrice" class="form-label">Price</label>
+                                        <input type="text" class="form-control" name="price"
+                                            placeholder="Enter the price" id="product_price">
+                                        <div class="error-message" style="color: red;" id="product_price-error"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="discount_price">Discount Price:</label>
+                                        <input type="text" name="discount_price" placeholder="Type here"
+                                            class="form-control" id="discount_price">
+                                        <div class="error-message" style="color: red;" id="discount_price-error"></div>
+                                    </div>
+
+
+                                    <div class="col-md-4 mb-3">
+
+
+
+
+
+                                        </select>
+                                        <div class="error-message" style="color: red;" id="gender-error"></div>
+                                    </div>
+
+                                </div>
+                                <div class="row gx-3">
+                                    <div class="col-md-12 card mb-4">
+                                        <div class="card-body">
+
+                                            <div class="size-container">
+                                                <!-- Add Product Images Here -->
+                                            </div>
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+                                <div>
+                                    <label class="form-label">Description</label>
+                                    <textarea placeholder="Type here" name="description" class="form-control" rows="4"
+                                        id="description"></textarea>
+                                    <div class="error-message" style="color: red;" id="description-error"></div>
+
+                                </div>
+                            </div>
+                        </div> <!-- card end// -->
+
+                    </div>
+
+
+                    <div class="col-lg-3">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Picture</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <div class="images-container">
+                                            <div
+                                                class="image-preview-container d-flex flex-wrap justify-content-center">
+                                            </div>
+
+                                            <input class="form-control" name="image" multiple="multiple" type="file"
+                                                id="files" onchange="displayImages(this)">
+                                            <div class="error-message" style="color: red;" id="product_image-error">
+                                            </div>
+
+                                            <script
+                                                src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+                                                <script>
+                                                    let imageCount = 0;
+                                                    let removedImages = []; // Keep track of removed images
+                                                
+                                                    function displayImages(input) {
+                                                        const previewContainer = $('.image-preview-container');
+                                                
+                                                        // Clear existing previews
+                                                        previewContainer.html('');
+                                                
+                                                        if (input.files && input.files.length > 0) {
+                                                            for (let i = 0; i < input.files.length; i++) {
+                                                                const reader = new FileReader();
+                                                                reader.onload = function (e) {
+                                                                    const imagePreview = createImagePreview(e.target.result, imageCount);
+                                                                    previewContainer.append(imagePreview);
+                                                                    cropImage(imageCount);
+                                                                    imageCount++;
+                                                                };
+                                                                reader.readAsDataURL(input.files[i]);
+                                                            }
+                                                        }
+                                                    }
+                                                
+                                                    function createImagePreview(src, index) {
+                                                        const imagePreview = $('<div class="image-container border-1 mb-4">' +
+                                                            '<img class="image-preview" src="' + src + '" alt="Product Image" id="image-preview' + index + '">' +
+                                                            '<canvas id="image-canvas' + index + '" style="display:none;"></canvas>' +
+                                                            '<br/><span class="remove" data-index="' + index + '">Remove image</span>' +
+                                                            '</div>');
+                                                        return imagePreview;
+                                                    }
+                                                
+                                                    function cropImage(imageNumber) {
+                                                        const image = document.getElementById('image-preview' + imageNumber);
+                                                        const canvas = document.getElementById('image-canvas' + imageNumber);
+                                                        const cropper = new Cropper(image, {
+                                                            aspectRatio: 1, // You can adjust the aspect ratio as needed
+                                                            viewMode: 1,
+                                                            crop: () => {
+                                                                const croppedData = cropper.getData();
+                                                                const croppedCanvas = cropper.getCroppedCanvas();
+                                                                canvas.width = croppedData.width;
+                                                                canvas.height = croppedData.height;
+                                                                const ctx = canvas.getContext('2d');
+                                                                ctx.drawImage(croppedCanvas, 0, 0, croppedData.width, croppedData.height);
+                                                            },
+                                                        });
+                                                    }
+                                                
+                                                    $(document).on('click', '.remove', function () {
+                                                        const index = $(this).data('index');
+                                                        const container = $(this).parent(".image-container");
+                                                        container.remove();
+                                                        removedImages.push(index);
+                                                    });
+                                                
+                                                    function saveProduct() {
+                                                        const productId = getProductId(); // Implement a function to get the product ID.
+                                                        // Use removedImages array to delete images in the server during save
+                                                        $.ajax({
+                                                            url: '/api/deleteImages',
+                                                            method: 'POST',
+                                                            data: { productId: productId, removedImages: removedImages },
+                                                            success: function (response) {
+                                                                // Handle the server response if needed
+                                                                console.log(response);
+                                                            },
+                                                            error: function (error) {
+                                                                // Handle the error if needed
+                                                                console.error(error);
+                                                            }
+                                                        });
+                                                    }
+                                                </script>
+                                                
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div id="invalid">
+                            <% if (typeof message !=='undefined' && message) { %>
+                                <p style="color: rgb(8, 96, 0);" id="message">
+                                    <%= message %>
+                                </p>
+                                <% } %>
+                                              
+                        </div>
+                    </div> <!-- card end// -->
+                </div>
+
+            </div>
+            <div class="container">
+                <div>
+                    <div </div>
+                    </div>
+        </section>
+    </form>
+    <script src="./node_module/cropperjs/dist/cropper.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        function validationChecking() {
+            // Get input elements and error message elements
+            const product_title_input = document.getElementById("product_title");
+            const product_category_input = document.getElementById("product_category");
+            const description_input = document.getElementById("description"); // Update to match the HTML
+            const product_price_input = document.getElementById("product_price"); // Update to match the HTML
+            const product_stock_input = document.getElementById("product_stock");
+            const discount_price_input = document.getElementById("discount_price"); // Update to match the HTML
+            const product_price_error = document.getElementById("product_price-error");
+            const product_stock_error = document.getElementById("product_stock-error");
+            const discount_price_error = document.getElementById("discount_price-error"); // Update to match the HTML
+            const product_title_error = document.getElementById("product_title-error");
+            const product_category_error = document.getElementById("product_category-error");
+            const description_error = document.getElementById("description-error");
+            const filesInput = document.getElementById("files");
+            const product_image_error = document.getElementById("product_image-error");
+
+            // Convert values to numbers
+            const product_price_value = parseFloat(product_price_input.value);
+            const product_stock_value = parseInt(product_stock_input.value);
+            const discount_price_value = parseFloat(discount_price_input.value);
+
+            // Check if the product title is empty
+            if (product_title_input.value.trim() === "") {
+                product_title_error.innerHTML = 'Product title is required.';
+            } else {
+                product_title_error.innerHTML = '';
+            }
+
+            // Check if the category is not selected
+            if (product_category_input.value === "") {
+                product_category_error.innerHTML = 'Please select a category.';
+            } else {
+                product_category_error.innerHTML = '';
+            }
+
+            // Check if the description is empty
+            if (description_input.value.trim() === "") {
+                description_error.innerHTML = 'Description is required.';
+            } else {
+                description_error.innerHTML = '';
+            }
+
+            // Check if the price is not entered or less than zero
+            if (isNaN(product_price_value) || product_price_value <= 0) {
+                product_price_error.innerHTML = 'Please enter a valid price greater than zero.';
+            } else {
+                product_price_error.innerHTML = '';
+            }
+
+            // Check if the stock is not entered or less than zero
+            if (isNaN(product_stock_value) || product_stock_value < 0) {
+                product_stock_error.innerHTML = 'Please enter a valid stock greater than or equal to zero.';
+            } else {
+                product_stock_error.innerHTML = '';
+            }
+
+            // Check if the discount price is not entered or less than zero
+            if (isNaN(discount_price_value) || discount_price_value < 0) {
+                discount_price_error.innerHTML = 'Please enter a valid discount price greater than or equal to zero.';
+            } else {
+                discount_price_error.innerHTML = '';
+            }
+
+            if (filesInput.files.length === 0) {
+                product_image_error.innerHTML = 'Please select at least one image.';
+            } else {
+                product_image_error.innerHTML = '';
+            }
+
+
+            // If any validation fails, return false
+            if (
+                isNaN(product_price_value) || product_price_value <= 0 ||
+                isNaN(product_stock_value) || product_stock_value < 0 ||
+                isNaN(discount_price_value) || discount_price_value < 0 ||
+                filesInput.files.length === 0
+            ) {
+                return false;
+            }
+
+            // If all validations pass, return true
+            return true;
+        }
+    </script>
+
+
+    <%- include('../layouts/adminFooter.ejs') %>

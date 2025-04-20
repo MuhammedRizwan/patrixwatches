@@ -1,0 +1,418 @@
+<%- include('../layouts/adminHeader.ejs') %>
+
+
+    <style>
+        input[type="file"] {
+            display: block;
+        }
+
+        .imageThumb {
+            max-height: 75px;
+            border: 2px solid;
+            padding: 1px;
+            cursor: pointer;
+        }
+
+        .pip {
+            display: inline-block;
+            margin: 10px 10px 0 0;
+        }
+
+        .remove {
+            display: block;
+            background: #444;
+            border: 1px solid black;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .remove:hover {
+            background: white;
+            color: black;
+        }
+    </style>
+    <form action="" method="post" enctype="multipart/form-data" id="product-form"
+        onsubmit="return validationChecking()">
+
+        <section class="content-main">
+            <div class="row">
+                <div class="col-12">
+                    <div class="content-header">
+                        <h2 class="content-title">Add Edit Product</h2>
+                        <div>
+                            <a href='/admin/prdouctList'> <button
+                                    class="btn btn-light rounded font-sm mr-5 text-body hover-up">cancel</button></a>
+                            <input type="submit" class="btn btn-md rounded font-sm hover-up" value="Upload">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <input type="hidden" name="product_id" value="<%= product._id %>">
+                            <div class="mb-4">
+                                <label for="product_title" class="form-label">Product title</label>
+                                <input type="text" placeholder="Type here" value="<%= product.name %>" name="name"
+                                    class="form-control" id="product_title">
+                                <div class="error-message" style="color: red;" id="product_title-error"></div>
+
+                            </div>
+                            <div class="row gx-3">
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="inputPassword4" class="form-label">Category</label>
+                                        <select name="category" class="form-control" id="product_category">
+                                            <option value="" disabled selected>Select a Category</option>
+                                            <% categories.forEach(category=> { %>
+                                                <% if (category.is_listed) { %>
+                                                    <option value="<%= category._id %>" <%=product.category &&
+                                                        product.category.toString()===category._id.toString()
+                                                        ? 'selected' : '' %>>
+                                                        <%= category.name %>
+                                                    </option>
+                                                    <% } %>
+                                                        <% }); %>
+                                        </select>
+                                        <div class="error-message" style="color: red;" id="product_category-error">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="inputPrice" class="form-label">Stock</label>
+                                        <input type="text" class="form-control" name="stock"
+                                            placeholder="Enter the stock" id="product_stock"
+                                            value="<%= product.stock %>">
+                                        <div class="error-message" style="color: red;" id="product_stock-error"></div>
+                                    </div>
+                                </div>
+
+                                <!-- card end// -->
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <div class="row gx-3">
+                                            <div class="col-md-4">
+                                                <label for="inputPrice" class="form-label">price</label>
+                                                <input type="text" class="form-control" value="<%= product.price %>"
+                                                    name="price" id="inputprice" placeholder="enter the price">
+                                                <div class="error-message" style="color: red;" id="product_price-error">
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="col-md-4  mb-3">
+                                                <label class="form-label">Discount Price</label>
+                                                <input type="number" name="discountPrice" value="<%= product.discount_price %>" placeholder="Type here" class="form-control" id="product_discount">
+                                                <div class="error-message" style="color: red;" id="product_discount-error"></div>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="row gx-3">
+                                            <div class="col-md-12 card mb-4">
+                                                <div class="card-body">
+
+                                                    <div class="size-container">
+
+                                                        <div class="row my-1">
+
+
+
+                                                        </div>
+
+
+
+
+                                                        <!-- Add Product Images Here -->
+                                                    </div>
+
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+
+                                        <div>
+                                            <label class="form-label">Description</label>
+                                            <textarea placeholder="Type here" name="description" class="form-control"
+                                                rows="4"><%= product.description %></textarea>
+                                            <div class="error-message" style="color: red;" id="description-error"></div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-lg-4">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h4>Picture</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row d-flex justify-content-around flex-row">
+                                            <div class="card col-lg-8 p-2">
+                                                <div class="images-container">
+                                                    <% if (product.image && product.image.length > 0) { %>
+                                                        <% for (let i = 0; i < product.image.length; i++) { %>
+                                                            <div class="image-container border-1 mb-4">
+                                                                <img class="image-preview"
+                                                                    src="/admin-assets/imgs/productIMG/<%= product.image[i] %>"
+                                                                    alt="Product Image">
+                                                                <br />
+                                                                <span class="remove" onclick="removeExistingImage('<%= product.image[i] %>', '<%= product._id %>')">Remove image</span>
+
+                                                            </div>
+                                                        <% } %>
+                                                    <% } %>
+                                                </div>
+                                                
+                                                <!-- Input for New Images -->
+                                                <input class="form-control" name="image" multiple="multiple" type="file"
+                                                    id="files" onchange="displayImages(this)">
+                                                <div class="error-message" style="color: red;" id="product_image-error"></div>
+                                                
+                                                <script>
+                                                    function displayImages(input) {
+                                                        const previewContainer = $('.images-container');
+                                                
+                                                        if (input.files && input.files.length > 0) {
+                                                            for (let i = 0; i < input.files.length; i++) {
+                                                                const timestamp = Date.now(); // Use timestamp as a unique identifier
+                                                                const reader = new FileReader();
+                                                                reader.onload = function (e) {
+                                                                    const imagePreview = createImagePreview(e.target.result, timestamp);
+                                                                    previewContainer.append(imagePreview);
+                                                                };
+                                                                reader.readAsDataURL(input.files[i]);
+                                                            }
+                                                        } else {
+                                                            const defaultImagePreview = createImagePreview('/uploadimage.svg');
+                                                            previewContainer.append(defaultImagePreview);
+                                                        }
+                                                
+                                                        // Add event delegation for the remove button click event
+                                                        previewContainer.off('click', '.remove'); // Remove previous event handlers
+                                                        previewContainer.on('click', '.remove', function () {
+                                                            const timestamp = $(this).closest(".image-container").data('timestamp');
+                                                            const index = $(this).closest(".image-container").index();
+                                                            removeExistingImage(index, timestamp, product);
+                                                            console.log(product)
+                                                        });
+                                                    }
+                                                
+                                                    function createImagePreview(src, timestamp) {
+                                                        const imagePreview = $('<div class="image-container border-1 mb-4" data-timestamp="' + timestamp + '">' +
+                                                            '<img class="image-preview" src="' + src + '" alt="Product Image">' +
+                                                            '<br/><span class="remove">Remove image</span>' +
+                                                            '</div>');
+                                                
+                                                        return imagePreview;
+                                                    }
+                                                
+                                                    function removeExistingImage(index,  product,timestamp) {
+                                                        // Perform logic to remove the existing image at the specified index
+                                                        $(`.images-container .image-container:eq(${index})`).remove();
+                                                        console.log("Image removed",product,index)
+                                                        // Add fetch request to remove image from backend
+                                                        fetch(`/admin/removeImage?productId=${product}&filename=${index}`, {
+                                                            method: 'GET',
+                                                        })
+                                                            .then(response => response.json())
+                                                            .then(data => console.log(data))
+                                                            .catch(error => console.error('Error:', error));
+                                                    }
+                                                    $(document).ready(function () {
+                                                        $(document).on('click', '.images-container .remove', function () {
+                                                            $(this).closest(".image-container").remove();
+                                                        });
+                                                    });
+                                                </script>
+                                                
+
+
+
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+                                <div id="invalid">
+                                    <% if (typeof message !=='undefined' && message) { %>
+                                        <p style="color: rgb(8, 96, 0);" id="message">
+                                            <%= message %>
+                                        </p>
+                                        <% } %>
+
+                                </div>
+                            </div> <!-- card end// -->
+                        </div>
+
+                    </div>
+        </section>
+    </form>
+
+
+
+    <script>
+        let sizeCount = 0;
+
+        function addSize() {
+            sizeCount++;
+            const container = document.querySelector('.size-container');
+            const sizeDiv = document.createElement('div');
+            sizeDiv.classList.add('row', 'my-1');
+
+            sizeDiv.innerHTML = `
+        <div class="col-5">
+            <label for="size[${sizeCount}]">Size :</label>
+            <input type="text" name="sizes[${sizeCount}][size]" placeholder="Type here" class="form-control" id="size${sizeCount}">
+        </div>
+        <div class="col-5">
+            <label for="stock${sizeCount}">Stock:</label>
+            <input type="text" name="sizes[${sizeCount}][stock]" placeholder="Type here" class="form-control" id="stock${sizeCount}">
+        </div>
+        <div class="col-2 mt-4">
+                <button type="button" class="btn btn-danger " onclick="removeSize(this)">Remove</button>
+            </div>
+    `;
+
+            container.appendChild(sizeDiv);
+        }
+
+
+        function displayImage(imageNumber, input) {
+            const preview = document.getElementById(`image-preview${imageNumber}`);
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = '';
+            }
+        }
+
+        function removeSize(button) {
+            const container = document.querySelector('.size-container');
+            const sizeDiv = button.parentElement.parentElement; // Get the parent div containing the size and stock fields.
+            container.removeChild(sizeDiv); // Remove the parent div from the container.
+        }
+
+        function viewImage(event, imageIndex) {
+            const imgView = document.getElementById(`imgView${imageIndex}`);
+            imgView.src = URL.createObjectURL(event.target.files[0]);
+        }
+    </script>
+
+
+
+
+    <!-- Add the following code to your existing script -->
+    <script>
+        function validationChecking() {
+            // Get input elements and error message elements
+            const product_title_input = document.getElementById("product_title");
+            const product_category_input = document.getElementById("product_category");
+            const description_input = document.querySelector("textarea[name='description']");
+            const product_price_input = document.getElementById("inputprice");
+            const product_stock_input = document.getElementById("product_stock");
+            const discount_price_input = document.getElementById("product_discount");
+            const product_price_error = document.getElementById("product_price-error");
+            const product_stock_error = document.getElementById("product_stock-error");
+            const discount_price_error = document.getElementById("product_discount-error");
+            const product_title_error = document.getElementById("product_title-error");
+            const product_category_error = document.getElementById("product_category-error");
+            const description_error = document.getElementById("description-error");
+            const imagesContainer = document.querySelector(".images-container");
+        const product_image_error = document.getElementById("product_image-error");
+
+
+            // Convert values to numbers
+            const product_price_value = parseFloat(product_price_input.value);
+            const product_stock_value = parseInt(product_stock_input.value);
+            const discount_price_value = parseFloat(discount_price_input.value);
+
+            // Check if the product title is empty
+            if (product_title_input.value.trim() === "") {
+                product_title_error.innerHTML = 'Product title is required.';
+            } else {
+                product_title_error.innerHTML = '';
+            }
+
+            // Check if the category is not selected
+            if (product_category_input.value === "") {
+                product_category_error.innerHTML = 'Please select a category.';
+            } else {
+                product_category_error.innerHTML = '';
+            }
+
+            // Check if the description is empty
+            if (description_input.value.trim() === "") {
+                description_error.innerHTML = 'Description is required.';
+            } else {
+                description_error.innerHTML = '';
+            }
+
+            // Check if the price is not entered or less than zero
+            if (isNaN(product_price_value) || product_price_value <= 0) {
+                product_price_error.innerHTML = 'Please enter a valid price greater than zero.';
+            } else {
+                product_price_error.innerHTML = '';
+            }
+
+            // Check if the stock is not entered or less than zero
+            if (isNaN(product_stock_value) || product_stock_value < 0) {
+                product_stock_error.innerHTML = 'Please enter a valid stock greater than or equal to zero.';
+            } else {
+                product_stock_error.innerHTML = '';
+            }
+
+            // Check if the discount price is not entered or less than zero
+            if (isNaN(discount_price_value) || discount_price_value < 0) {
+                discount_price_error.innerHTML = 'Please enter a valid discount price greater than or equal to zero.';
+            } else {
+                discount_price_error.innerHTML = '';
+            }
+             // Check if no existing and new images are selected
+        if (imagesContainer.children.length === 0) {
+            product_image_error.innerHTML = 'Please select at least one image.';
+        } else {
+            product_image_error.innerHTML = '';
+        }
+
+            // If any validation fails, return false
+            if (
+                isNaN(product_price_value) || product_price_value <= 0 ||
+                isNaN(product_stock_value) || product_stock_value < 0 ||
+                isNaN(discount_price_value) || discount_price_value < 0 ||
+                imagesContainer.children.length === 0
+            ) {
+                return false;
+            }
+
+            // If all validations pass, return true
+            return true;
+        }
+    </script>
+
+
+
+
+    <%- include('../layouts/adminFooter.ejs') %>

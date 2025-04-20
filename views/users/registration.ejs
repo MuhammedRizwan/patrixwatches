@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RIZT</title>
+    <meta name="description" content="<%= locals.description %>" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="/user-assets/imgs/theme/Wlogo.jpeg"
+    />
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="\user-assets\css\maind134.css" />
+  </head>
+
+  <body class="">
+    <main class="main">
+      <section class="pt-150 pb-150">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-10 m-auto">
+              <div class="row">
+                <div class="col-lg-3"></div>
+                <div class="col-lg-6">
+                  <div
+                    class="login_wrap widget-taber-content p-30 background-white border-radius-5"
+                  >
+                    <div class="padding_eight_all bg-white">
+                      <div class="heading_s1">
+                        <h3 class="mb-30">Create an Account</h3>
+                      </div>
+                      <form action="/register" id="myForm" method="post" onsubmit="return validation(event)">
+                        <div class="form-group">
+                          <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            onkeyup="nameChaking()"
+                            placeholder="Enter Name"
+                          />
+                          <div id="errorname" class="ms-2 text-danger"></div>
+                        </div>
+                        <div class="form-group">
+                          <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            onkeyup="emailChaking()"
+                            placeholder="Enter Email"
+                          />
+                          <div id="erroremail" class="ms-2 text-danger"></div>
+                        </div>
+                        <div class="form-group">
+                          <input
+                            type="text"
+                            id="number"
+                            name="mobile"
+                            onkeyup="numberChaking()"
+                            placeholder="Enter Mobile"
+                          />
+                          <div id="errornumber" class="ms-2 text-danger"></div>
+                        </div>
+                        <div class="form-group">
+                          <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            onkeyup="passwordChaking()"
+                            placeholder="Enter Password"
+                          />
+                          <div
+                            id="errorpassword"
+                            class="ms-2 text-danger"
+                          ></div>
+                        </div>
+                        <div class="form-group">
+                          <input
+                            type="password"
+                            id="cpassword"
+                           
+                            placeholder="Confirm Password"
+                          />
+                          <div
+                            id="errorcpassword"
+                            class="mt-0 ms-2 text-danger"
+                          ></div>
+                        </div>
+                        <div class="form-group text-center">
+                          <button
+                            type="submit"
+                            class="btn btn-fill-out btn-block hover-up"
+                            name="login"
+                          >
+                             Register
+                          </button>
+                        </div>
+                      </form>
+                      <div class="text-muted text-center"> <a href="/login"></a></div>
+                      <div id="text-center">
+                        <% if (typeof message !== 'undefined' && message) { %>
+                            <p style="color: green;"class="text-center"><%= message %></p>
+                        <% } %>
+                    </div>  
+                    <div id="invalid text-center">
+                        <% if (typeof error !== 'undefined' && error) { %>
+                            <p style="color: red;" id="message text-center"><%= error %></p>
+                        <% } %>
+                    </div>  
+                    </div> 
+                    <div class="">
+                     
+                     
+                    </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      function validation(event) {
+ 
+        if(nameChaking() && emailChaking() && numberChaking() && passwordChaking() ){
+                document.getElementById("myForm").submit();                
+            }
+            else{
+              nameChaking();
+
+emailChaking();
+
+numberChaking();
+
+passwordChaking();
+                return false;
+            }
+   
+
+    
+
+        // Show all errors
+      }
+
+function nameChaking() {
+  let name = document.getElementById("name").value;
+  let errorName = document.getElementById("errorname");
+
+  // Check if the name contains only numbers
+  if (/^\d+$/.test(name)) {
+    errorName.innerHTML = "Please enter Alphabets";
+    return false;
+  } else if (name.trim() === "") {
+    errorName.innerHTML = "Please enter your name";
+    return false;
+  } else {
+    errorName.innerHTML = "";
+    return true;
+  }
+}
+
+
+
+      function emailChaking() {
+        let emailId = document.getElementById("email").value;
+        let errorEmail = document.getElementById("erroremail");
+
+        if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(emailId)) {
+          errorEmail.innerHTML = "Please enter valid email";
+          return false;
+        } else {
+          errorEmail.innerHTML = "";
+          return true;
+        }
+      }
+
+      async function numberChecking() {
+  let number = document.getElementById("number").value;
+  let errorNumber = document.getElementById("errornumber");
+
+  if (!/^[0-9]+$/.test(number)) {
+    errorNumber.innerHTML = "Please enter a valid number";
+    return false;
+  } else if (number.length !== 10) {
+    errorNumber.innerHTML = "Please enter 10 digits";
+    return false;
+  } else {
+    // Check if the number already exists
+    const exists = await checkExistingNumber(number);
+
+  }
+}
+      let password 
+      function passwordChaking() {
+         password = document.getElementById("password").value;
+        let errorPassword = document.getElementById("errorpassword");
+
+        if (password.trim() === "") {
+          errorPassword.innerHTML = "Please enter your password";
+          return false;
+        } else if (password.length < 8) {
+          errorPassword.innerHTML = "Please enter a minimum of 8 characters";
+          return false;
+        } else {
+          errorPassword.innerHTML = "";
+          return true;
+        }
+      }
+      function password2Chaking() {
+        let cpassword = document.getElementById("cpassword").value;
+        if (cpassword == "") {
+          document.getElementById("errorcpassword").innerHTML =
+            "please enter your password";
+          return false;
+        } else if (cpassword != password) {
+          document.getElementById("errorcpassword").innerHTML =
+            "Password not match";
+          return false;
+        } else {
+          document.getElementById("errorcpassword").innerHTML = "";
+          return true;
+        }
+      }
+    </script>
+  </body>
+</html>

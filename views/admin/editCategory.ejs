@@ -1,0 +1,188 @@
+<%- include('../layouts/adminHeader.ejs') %>
+
+    <form action="/admin/editCategory" method="post" enctype="multipart/form-data"
+        onsubmit="return validationChecking()">
+
+        <section class="content-main">
+            <div class="row">
+                <div class="col-9">
+                    <div class="content-header">
+                        <h2 class="content-title">Edit Category</h2>
+
+
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+
+                    <div class="card mb-4">
+
+                        <div class="card-header">
+                            <h4>Basic</h4>
+                        </div>
+                        <input type="hidden" name="category_id" value="<%= category._id %>">
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Category name</label>
+                                <input type="text" name="name" placeholder="Type here" value="<%= category.name %>"
+                                    class="form-control" id="category_name">
+                                <div class="error-message" style="color: red;" id="category_name-error"></div>
+                            </div>
+                          
+
+
+
+                        </div>
+                    </div> <!-- card end// -->
+
+                </div>
+                <div class="col-lg-3">
+           
+
+                    <div>
+
+                        <input type="submit" value="submit" class="btn btn-md rounded font-sm hover-up">
+                    </div>
+
+                    <div id="invalid">
+                        <% if (typeof error !=='undefined' && error) { %>
+                            <p class="text-danger" id="message">
+                                <%= error %>
+                            </p>
+                            <% } %>
+                            
+                    </div>
+                </div>
+                <div id="invalid">
+                    <% if (typeof message !=='undefined' && message) { %>
+                        <p style="color: rgb(8, 96, 0);" id="message">
+                            <%= message %>
+                        </p>
+                        <% } %>
+                        
+                </div>
+
+            </div>
+            </div>
+
+
+
+        </section> 
+    </form>
+    <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+            const categoryImageInput = document.getElementById('category_image');
+            const categoryImagePreview = document.getElementById('category_image_preview');
+
+            categoryImageInput.addEventListener('change', function() {
+                displayCategoryImage(this, categoryImagePreview);
+            });
+        });
+
+        function displayCategoryImage(input, preview) {
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '/category/<%= category.image %>';
+            }
+        }
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+        const categoryImageInput = document.getElementById('category_image');
+        const categoryImagePreview = document.getElementById('category_image_preview');
+
+        categoryImageInput.addEventListener('change', function() {
+            displayCategoryImage(this, categoryImagePreview);
+            });
+        });
+
+        function displayCategoryImage(input, preview) {
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '/uploadimage.svg';
+            }
+        }
+    
+    
+    
+            document.addEventListener('DOMContentLoaded', function () {
+                const category_name = document.getElementById("category_name");
+                const category_name_error = document.getElementById("category_name-error");
+                const description = document.getElementById("description");
+                const description_error = document.getElementById("description-error");
+      
+    
+                category_name.addEventListener('input', function () {
+                    category_name_error.innerHTML = category_name.value.trim() === "" ? "Please enter category name" : "";
+                });
+    
+                description.addEventListener('input', function () {
+                    description_error.innerHTML = description.value.trim() === "" ? "Please enter category description" : "";
+                });
+    
+           
+            });
+    
+            function validationChecking() {
+    const category_name = document.getElementById("category_name").value;
+    const description = document.getElementById("description").value;
+    const category_image = document.getElementById("category_image"); // Get the uploaded file
+
+    const category_name_error = document.getElementById("category_name-error");
+    const description_error = document.getElementById("description-error");
+    const category_image_error = document.getElementById("category_image-error");
+
+    category_name_error.innerHTML = category_name.trim() === "" ? "Please enter category name" : "";
+    description_error.innerHTML = description.trim() === "" ? "Please enter category description" : "";
+
+    const uploadedFile = category_image.files[0];
+    const existingImage = document.getElementById("category_image_preview");
+    const defaultImageSrc = existingImage.getAttribute("src");
+    const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/bmp",
+        "image/webp"
+    ];
+
+    if (category_name.trim() === "" || description.trim() === "") {
+        return false; // Prevent form submission if fields are empty
+    }
+
+    if (uploadedFile) {
+        if (!allowedTypes.includes(uploadedFile.type)) {
+            category_image_error.innerHTML = "Please upload a valid image file (JPEG, PNG, GIF)";
+            return false; // Prevent form submission if invalid file type
+        }
+    } else {
+        // If no new file is selected, maintain the existing image
+        existingImage.setAttribute("src", defaultImageSrc);
+    }
+
+    return true; // Allow form submission if all validations pass
+}
+
+
+    </script>
+
+
+    <%- include('../layouts/adminFooter.ejs') %>

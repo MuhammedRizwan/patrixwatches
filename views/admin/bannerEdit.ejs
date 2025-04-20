@@ -1,0 +1,239 @@
+<%- include('../layouts/adminHeader.ejs') %>
+
+
+
+<form action="" method="post" enctype="multipart/form-data" id="banner-form" >
+    <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+
+                <div class="content-header">
+                    <h2 class="content-title">Edit Banner</h2>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mb-4">
+                <a href="/admin/bannerList"><button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button></a>
+                <input type="submit" value="submit" class="btn btn-md rounded font-sm hover-up">
+            </div>
+            <div class="col-lg-12">
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Picture</h4>
+                    </div>
+                    <input type="hidden" value="<%= banner._id %>" name="bannerId" id="">
+
+                    <div class="card-body">
+                        <div class="input-upload">
+                            <img id="image-preview" src="/bannerImg/<%= banner.image %>" alt="">
+                            <input class="form-control" value="<%=banner.image%>" type="file" name="image" id="banner_image" accept="image/*">
+                            <div class="error-message" style="color: red;" id="banner_image-error"></div>
+                        </div>
+                    </div>
+                </div> <!-- card end// -->
+             
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="category_name" class="form-label">Banner name</label>
+                                <input type="text" name="title" placeholder="Type here" value="<%=banner.title%>" class="form-control" id="banner_name">
+                                <div class="error-message" style="color: red;" id="banner_name-error"></div>
+                            </div>
+                            
+                           
+                            <div class="mb-4">
+                                <label for="category_name" class="form-label">Subtitle</label>
+                                <input type="text" name="subtitle" placeholder="Type here" value="<%=banner.subtitle%>" class="form-control" id="banner_subtitle">
+                                <div class="error-message" style="color: red;" id="banner_subtitle-error"></div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="category_name" class="form-label">Offer</label>
+                                <input type="text" name="offer" placeholder="Type here" value="<%=banner.offer%>" class="form-control" id="offer">
+                                <div class="error-message" style="color: red;" id="offer-error"></div>
+                            </div>
+                          
+                           
+
+                        </div>
+                    </div> <!-- card end// -->
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="bannerType" class="form-label">Banner Type</label>
+                            <select id="bannerType" class="form-select" name="bannerType">
+                                <option value="">Select Category</option>
+                                <option value="Category Banner"  <%= banner.bannerType === 'Category Banner' ? 'selected' : '' %>>Category Offer</option>
+                                <option value="Product Banner" <%= banner.bannerType === 'Product Banner' ? 'selected' : '' %>>Product Offer</option>
+                                <option value="New Arrival" <%= banner.bannerType === 'New Arrival' ? 'selected' : '' %>>New Arrival</option>
+                                <option value="Deals and Promotions" <%= banner.bannerType === 'Deals and Promotions' ? 'selected' : '' %>>Deals and Promotions</option>
+                                <option value="Seasonal Sales" <%= banner.bannerType === 'Seasonal Sales' ? 'selected' : '' %>>Seasonal Sales</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Category Div -->
+                        <div class="mb-4" id="categoryDiv" style="display: none;">
+                            <label for="bannerCategory" class="form-label">Category</label>
+                            <select id="bannerCategory" class="form-select" name="bannerCategory">
+                                <option value="">Category</option>
+                        
+                                <% if (category.length > 0) {
+                                    for (let i = 0; i < category.length; i++) { %>
+                                        <option value="<%= category[i].name %>"><%= category[i].name %></option>
+                                    <% }
+                                } %>
+                            </select>
+                        </div>
+                        
+                        <!-- Product Div -->
+                        <div class="mb-4" id="productDiv" style="display: none;">
+                            <label for="bannerCategory" class="form-label">Product</label>
+                            <select id="bannerCategory" class="form-select" name="product">
+                                <option value="">Product</option>
+                        
+                                <% if (product.length > 0) {
+                                    for (let i = 0; i < product.length; i++) { %>
+                                        <option value="<%= product[i]._id %>"  <% if( banner.product.name==product[i].name ){ %> selected <%}%>><%= product[i].name %></option>
+                                    <% }
+                                } %>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="category_name" class="form-label">From</label>
+                            <input type="date" name="fromDate" value="<%= startDate %>" placeholder="Type here" class="form-control" id="fromDate">
+                            <div class="error-message" style="color: red;" id="fromDate-error"></div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="category_name" class="form-label">Expiry</label>
+                            <input type="date" name="expiryDate" value="<%= endDate %>" placeholder="Type here" class="form-control" id="expiryDate">
+                            <div class="error-message" style="color: red;" id="expiryDate-error"></div>
+                        </div>
+                      
+                    </div>
+                </div> <!-- card end// -->
+            </div>
+        </div>
+   
+
+        <div id="invalid">
+            <% if (typeof message !== 'undefined' && message) { %>
+                <p style="color: red;" id="message"><%= message %></p>
+            <% } %>
+                    </div>  
+        </div> 
+            
+    
+    </section> <!-- content-main end// -->
+</form>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const bannerTypeSelect = document.getElementById('bannerType');
+        const categoryDiv = document.getElementById('categoryDiv');
+        const productDiv = document.getElementById('productDiv');
+    
+        bannerTypeSelect.addEventListener('change', function () {
+            const selectedValue = bannerTypeSelect.value;
+    
+            // Hide both divs by default
+            categoryDiv.style.display = 'none';
+            productDiv.style.display = 'none';
+    
+            // Show the appropriate div based on the selected value
+            if (selectedValue === 'Category Banner') {
+                categoryDiv.style.display = 'block';
+            } else {
+                productDiv.style.display = 'block';
+            }
+        });
+    });
+    </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('banner-form');
+
+        form.addEventListener('submit', function (event) {
+            let isValid = true;
+
+            // Reset error messages
+            document.querySelectorAll('.error-message').forEach(function (error) {
+                error.textContent = '';
+            });
+
+            // Validate input fields
+            const requiredFields = ['banner_name', 'banner_link', 'banner_subtitle', 'offer', 'fromDate', 'expiryDate'];
+            requiredFields.forEach(function (fieldName) {
+                const input = document.getElementById(fieldName);
+                if (!input.value.trim()) {
+                    isValid = false;
+                    const errorMessage = document.getElementById(fieldName + '-error');
+                    errorMessage.textContent = 'This field is required.';
+                }
+            });
+
+            // Validate file input
+            const fileInput = document.getElementById('banner_image');
+            if (fileInput.files.length) {
+                // Check image dimensions
+                const img = new Image();
+                img.src = URL.createObjectURL(fileInput.files[0]);
+
+                if (img.complete) {
+                    if (img.width < 1200 || img.height < 600) {
+                        isValid = false;
+                        const errorMessage = document.getElementById('banner_image-error');
+                        errorMessage.textContent = 'Image should be height => 600 and width =>1200';
+                        fileInput.value = ''; // Clear the file input
+                    }
+                } else {
+                    img.onload = function () {
+                        if (img.width < 1200 || img.height < 600) {
+                            isValid = false;
+                            const errorMessage = document.getElementById('banner_image-error');
+                            errorMessage.textContent = 'Image should be height => 600 and width =>1200';
+                            fileInput.value = ''; // Clear the file input
+                        }
+                    };
+                }
+            }
+
+            // Prevent form submission if validation fails
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+
+
+
+
+
+<script>
+    const imagePreview = document.getElementById('image-preview');
+    const categoryImageInput = document.getElementById('banner_image');
+    
+    categoryImageInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+    
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+        };
+    
+        reader.readAsDataURL(this.files[0]);
+      } else {
+        imagePreview.src = "../../Public/adminAssets/imgs/theme/upload.svg";
+      }
+    });
+    
+    </script>
+    
+    
+
+
+    <%- include('../layouts/adminFooter.ejs') %>

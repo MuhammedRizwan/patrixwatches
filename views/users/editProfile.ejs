@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIKTIK</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/userProfile/user.css">
+    <link href="/public/admin-assets/css/main.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    </div>
+    </div>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="" class="brand-wrap logo menu-absolute m-0 h6">
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i>
+                </button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item active">
+                    <a class="menu-link" href="/userProfile"> <i class="icon material-icons md-perm_identity"></i>
+                        <span class="text">Profile</span>
+                    </a>
+                </li>
+                <li class="menu-item ">
+                    <a class="menu-link active" href=""> <i class="icon material-icons  md-account_balance_wallet"></i>
+                        <span class="text">Wallet </span>
+                    </a>
+
+                </li>
+
+                <li class="menu-item ">
+                    <a class="menu-link" href="/listOrder"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">List orders</span>
+                    </a>
+
+                </li>
+
+
+            </ul>
+            <ul class="menu-aside">
+                <li class="menu-item has-submenu">
+                    <a class="menu-link"> <i class="icon material-icons md-location_on"></i>
+                        <span class="text">Address</span>
+                    </a>
+
+                    <div class="submenu">
+                        <a href="/getaddressList">address List</a>
+                        <a href="/loadAddress">Add address</a>
+                        <!-- <a href="" class="active">edit address</a> -->
+                    </div>
+                </li>
+
+            </ul>
+        </nav>
+    </aside>
+    <main class="main-wrap">
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2>Edit Profile</h2>
+                    <h6 class="content-title card-title">Welcome, <%= user.name %>
+                    </h6>
+                </div>
+                <div>
+                    <a href="/home" class="btn btn-primary"><i class="text-muted material-icons md-home"></i> Home</a>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Edit Profile Form -->
+                                <form action="/editProfile" method="POST" id="editProfileForm"
+                                    enctype="multipart/form-data">
+                                    <div class="form-group row">
+                                        <label for="fullName" class="col-sm-3 col-form-label">Full Name</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="fullName" name="fullName"
+                                                value="<%= user.name %>" required>
+                                            <div id="fullNameError" class="text-danger"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="email" class="col-sm-3 col-form-label">Email</label>
+                                        <div class="col-sm-9">
+                                            <input type="email" class="form-control" id="email" name="email"
+                                                value="<%= user.email %>" required>
+                                            <div id="emailError" class="text-danger"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="mobile" class="col-sm-3 col-form-label">Mobile</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="mobile" name="mobile"
+                                                value="<%= user.mobile %>" required>
+                                            <div id="mobileError" class="text-danger"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="image" class="col-sm-3 col-form-label">Profile Image</label>
+                                        <div class="col-sm-9">
+                                            <div class="image-preview">
+                                                <!-- Display the current profile image if available -->
+                                                <img id="currentProfileImage" src="public/user-assets/imgs/user/<%= user.image %>" alt="Current Profile Image" width="150">
+                                            </div>
+                                            <div>
+                                                <!-- File input for changing the image -->
+                                                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                                <div id="imageError" class="text-danger"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    <div class="form-group row">
+                                        <div class="col-sm-9 offset-sm-3">
+                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+
+    <script>
+        document.getElementById("editProfileForm").addEventListener("submit", function (event) {
+            let valid = true;
+    
+            // Validate Full Name
+            const fullName = document.getElementById("fullName").value;
+            if (!fullName.trim()) {
+                document.getElementById("fullNameError").textContent = "Name cannot be blank.";
+                valid = false;
+            } else if (fullName.length < 4 || fullName.length > 20) {
+                document.getElementById("fullNameError").textContent = "Name must be between 4 and 12 characters.";
+                valid = false;
+            } else if (/[^a-zA-Z\s]/.test(fullName)) {
+                document.getElementById("fullNameError").textContent = "Name cannot contain symbols or numbers.";
+                valid = false;
+            } else {
+                document.getElementById("fullNameError").textContent = "";
+            }
+    
+            // Validate Email
+            const email = document.getElementById("email").value;
+            if (!email.trim()) {
+                document.getElementById("emailError").textContent = "Email cannot be blank.";
+                valid = false;
+            } else if (!/^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email)) {
+                document.getElementById("emailError").textContent = "Invalid email format.";
+                valid = false;
+            } else {
+                document.getElementById("emailError").textContent = "";
+            }
+    
+            // Validate Mobile Number
+            const mobile = document.getElementById("mobile").value;
+            if (!mobile.match(/^\d{10}$/)) {
+                document.getElementById("mobileError").textContent = "Mobile number must be 10 digits.";
+                valid = false;
+            } else if (/(\d)\1{3,}/.test(mobile)) {
+                document.getElementById("mobileError").textContent = "Mobile number must need 4 different numbers.";
+                valid = false;
+            } else {
+                document.getElementById("mobileError").textContent = "";
+            }
+    
+            // Submit the form if there are no validation errors
+            if (valid) {
+                // You can add code to submit the form here, or simply remove the 'if (valid)' block to allow the default form submission.
+            } else {
+                // Prevent the default form submission
+                event.preventDefault();
+            }
+        });
+    </script>
+
+    <script>document.getElementById("image").addEventListener("change", function (e) {
+        const currentImage = document.getElementById("currentProfileImage");
+        const file = e.target.files[0];
+    
+        // Check if a file was selected
+        if (file) {
+            const reader = new FileReader();
+    
+            reader.onload = function (e) {
+                // Display a preview of the selected image
+                currentImage.src = e.target.result;
+            };
+    
+            reader.readAsDataURL(file);
+        }
+    });
+    </script>
+    
+
+    <script src="/public/admin-assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="/public/admin-assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/public/admin-assets/js/vendors/select2.min.js"></script>
+    <script src="/public/admin-assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/public/admin-assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <script src="/public/admin-assets/js/vendors/chart.js"></script>
+    <!-- Main Script -->
+    <script src="/public/admin-assets/js/main.js" type="text/javascript"></script>
+    <script src="/public/admin-assets/js/custom-chart.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>

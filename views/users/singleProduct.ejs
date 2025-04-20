@@ -1,0 +1,326 @@
+<style>
+    /* Increase the size of the increment and decrement buttons */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        height: 50px;
+        /* Adjust the height as needed */
+        width: 60px;
+        /* Adjust the width as needed */
+    }
+
+    /* For Firefox */
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+
+
+    .image-container {
+        /* width: 500px; */
+        height: 470px;
+        overflow: hidden;
+        /* border: 1px solid #ccc; Optional: Add a border for visualization */
+    }
+
+    .zoom-container {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .image-zoom {
+        width: 100%;
+        height: 100%;
+        transition: transform 0.3s ease;
+    }
+
+    .image-zoom:hover {
+        transform: scale(1.8);
+        /* Adjust the scale factor for zoom effect */
+    }
+
+    .thumbnail {
+        /* width: 50px; */
+        /* height: 50px; */
+        margin-right: 10px;
+        border: 1px solid black;
+        border-radius: 10%;
+    }
+
+    .custom-col {
+        flex: 0 0 5.5%;
+        /* Adjust the width percentage as needed */
+        max-width: 5.5%;
+    }
+</style>
+
+
+
+
+
+
+
+
+<%- include('../layouts/userHeader.ejs') %>
+
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html" rel="nofollow">Home</a>
+                    <span></span> Watches
+
+                </div>
+            </div>
+        </div>
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-11">
+                        <div class="product-detail accordion-detail">
+                            <div class="row mb-50">
+                                <div class="col-1 custom-col d-flex flex-column justify-content-center">
+                                    <% if (product && product.image) { %>
+                                        <% for (let i = 0; i < product.image.length; i++) { %>
+                                            <img src='/admin-assets/imgs/productIMG/<%= product.image[i] %>'
+                                                onclick="changeMainImage('<%= product.image[i] %>')" alt="Thumbnail"
+                                                class="my-3 thumbnail">
+                                        <% } %>
+                                    <% } %>
+                                </div>
+                                <div class="col-md-5 col-sm-12 col-xs-12">
+                                    <div class="mt-5">
+                                        <!-- THUMBNAILS -->
+                                    </div>
+                                    <div class="image-container">
+                                        <div class="zoom-container">
+                                            <% if (product && product.image) { %>
+                                                <img src='/admin-assets/imgs/productIMG/<%= product.image[0] %>'
+                                                   id="mainImage" alt="Image" class="image-zoom"> 
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12 col-xs-12">
+                                    <div class="detail-info">
+                                <div class="col-md-6 col-sm-12 col-xs-12">
+                                    <div class="detail-info">
+                                        <h2 class="title-detail">
+                                            <%= product.name %>
+                                        </h2>
+
+                                        <div class="product-rate-cover text-end">
+                                            <div class="product-rate d-inline-block">
+                                                <div class="product-rating" style="width:90%">
+                                                </div>
+                                            </div>
+                                            <span class="font-small ml-5 text-muted"> (25 reviews)</span>
+                                        </div>
+                                    </div>
+                                    <div class="product-price primary-color float-left">
+                                        <% if (product.discount_price && product.discount_price !=product.price) { %>
+                                            <% const percentageOff=((product.price - product.discount_price) /
+                                                product.price) * 100; %>
+
+                                                <ins><span class="text-brand">₹<%= product.discount_price %>
+                                                    </span></ins>
+                                                <ins><span class="old-price font-md ml-15"><s>₹<%= product.price %></s>
+                                                    </span></ins>
+                                                <span class="save-price  font-md color3 ml-15">
+                                                    <%= percentageOff.toFixed(2) %>%Off
+                                                </span>
+
+                                                <% } else { %>
+                                                    <ins><span class="text-brand">₹<%= product.discount_price %>
+
+                                                                <% } %>
+
+                                    </div>
+                                    <div class="bt-1 border-color-1 mt-15 mb-15"></div>
+                                    <div class="short-desc mb-30">
+                                        <p>
+                                            <%= product.description%>
+                                        </p>
+                                    </div>
+                                    <div class="product_sort_info font-xs mb-30">
+                                        <ul>
+                                            <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year AL Jazeera
+                                                Brand Warranty</li>
+                                            <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> 30 Day Return
+                                                Policy</li>
+                                            <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div id="insufficientStockError" style="color: red;">
+                                        <% if (insufficientStockMessage) { %>
+                                            <%= insufficientStockMessage %>
+                                                <% } %>
+                                    </div>
+
+                                    <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                                    
+                                    <form action="/cart" method="post">
+                                        <input type="hidden" value="<%= product._id %>" name="ID" id="">
+                                        <div class="detail-extralink">
+                                            <input type="number" name="qty" class="w-25 py-4" style="font-size:10px "value="1" min="1"
+                                                max="10">
+                                                
+                                            <div class="product-extra-link2 w-50 my-1">
+
+                                                <button type="submit" class=" btn-product btn-cart" style=" padding: 12px 20px"><span>Add To Cart</span></button>
+
+
+                                                
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <form action="/Wishlist" method="post" class="product-form">
+                                        <input type="hidden" value="<%= product._id %>" name="productId">
+                                        <div class="detail-extralink">
+                                            <div class="product-extra-link2 w-50 my-1">
+                                                <!-- Add a class for styling, e.g., wishlist-button -->
+                                                <button type="button" aria-label="Add To Wishlist" class="action-btn hover-up wishlist-button" onclick="addToWishlist('<%= product.id %>', '<%= product.name %>', '₹<%= product.price %>')">
+                                                    <i class="fi-rs-heart"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+
+                                </div>
+                                <!-- Detail Info -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            </div>
+        </section>
+        <style>
+            /* Add these styles to your stylesheet */
+            .wishlist-button {
+                font-size: 15px;
+                font-weight: 500;
+                padding: 12px 40px;
+                color: #ffffff;
+                border: none;
+                background-color: #088178;
+                border: 1px solid #046963;
+                border-radius: 5px;
+            }
+        
+            .wishlist-button i {
+                /* Add any additional styles specific to the heart icon if needed */
+            }
+        
+            .wishlist-button:hover {
+                background-color: #046963; /* Change background color on hover if desired */
+            }
+        </style>
+    </main>
+    <script>
+        function changeMainImage(imageName) {
+            const mainImage = document.getElementById('mainImage');
+            mainImage.src = `/admin-assets/imgs/productIMG/${imageName}`;
+        }
+    
+        document.querySelector('.image-zoom').addEventListener('mousemove', function (e) {
+            const { left, top, width, height } = this.getBoundingClientRect();
+            const x = (e.clientX - left) / width * 100;
+            const y = (e.clientY - top) / height * 100;
+    
+            this.style.transformOrigin = `${x}% ${y}%`;
+        });
+    </script>
+    
+    <script>
+        function addToWishlist() {
+            const productId = document.querySelector('[name="productId"]').value;
+
+            fetch('/addToWishlist', {
+                method: 'POST',
+                body: JSON.stringify({ productId }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success SweetAlert
+                        Swal.fire({
+                            title: "Success!",
+                            text: data.message,
+                            icon: "success",
+                        });
+                    } else {
+                        // Show error SweetAlert
+                        Swal.fire({
+                            title: "Error!",
+                            text: data.error || "Failed to add the product to the wishlist.",
+                            icon: "error",
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding to wishlist:', error);
+                });
+        }
+
+        function addToCart() {
+            const qtyData = document.getElementById('qty').value;
+            const productDataId = document.getElementById('productData_id').value;
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            const insufficientStockError = document.getElementById('insufficientStockError');
+
+            const requestData = {
+                qty: qtyData,
+                productData_id: productDataId
+            };
+
+            fetch('/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("Item added to cart successfully");
+                        window.location.href = '/cart';
+                    } else {
+                        console.error('Error:', data.message);
+
+                        if (data.message === "Insufficient stock") {
+                            // Show the error message on the single product page
+                            insufficientStockError.innerText = 'Insufficient stock.';
+                        } else {
+                            // Optionally, handle other error cases
+                            alert('Error occurred while adding to cart: ' + data.message);
+                        }
+
+                        // Optionally, you can disable the "Add To Cart" button or handle other UI updates
+                        addToCartBtn.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error occurred while placing order');
+                });
+
+            // Prevent the default form submission
+            return false;
+        }
+
+    </script>
+
+
+
+
+    <%- include('../layouts/userFooter.ejs') %>

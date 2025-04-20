@@ -1,0 +1,189 @@
+<%- include('../layouts/adminHeader.ejs') %>
+
+<section class="content-main">
+  <div class="content-header">
+      <div>
+          <h2 class="content-title card-title">Category List</h2>
+          <p>Lorem ipsum dolor sit amet.</p>
+      </div>
+      <div>
+          <a href="#" class="btn btn-light rounded font-md">Export</a>
+          <a href="#" class="btn btn-light rounded  font-md">Import</a>
+          <a href="/admin/addCategory" class="btn btn-primary btn-sm rounded">Create new</a>
+      </div>
+  </div>
+  <div class="card mb-4">
+      <header class="card-header">
+          <div class="row align-items-center">
+              
+              <form action="/category" method="get">
+
+                  <div style="display: flex;  align-items: center;">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search for products...">
+
+                   
+                    <div class="col-md-3 col-12 me-auto mb-md-0 mb-3" style="display: flex;">
+
+                      <label for="status" class="form-control">Select Status:</label>
+                      <select name="status" class="form-select" id="status">
+                          <option value="" selected>All</option>
+                          <option value="listed">Listed</option>
+                          <option value="unlisted">Unlisted</option>
+                      </select>
+                    </div>
+   
+                      <input type="submit" class="btn btn-sm font-sm rounded btn-brand" value="Filter">
+
+                </div>
+              </form>
+          </div>
+      </header> <!-- card-header end// -->
+      <div class="card-body">
+        <table id="category" class="table">
+          <thead>
+            <tr>
+              <!-- <th scope="col"></th> -->
+              <th scope="col">Name</th>
+              <!-- <th scope="col">Description</th> -->
+              <th scope="col">Status</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+        
+          <tbody>
+            <%
+            if (categorydata.length > 0) {
+              categorydata.forEach(category => {
+            %>
+            <tr>
+             
+              <td>
+                <div class="d-flex align-items-center">
+                              <!-- <img
+                                  src='/admin-assets/imgs/category/<%= category.image%>'
+                                  alt="<%= category.image%>"
+                                  style="width: 45px; height: 45px"
+                                  class="rounded-circle"
+                                  /> -->
+                              <div class="ms-3">
+                                <p class="fw-bold mb-1"><%= category.name %></p>
+                                <p class="text-muted mb-0">Every <%= category.name %> Products</p>
+                              </div>
+                            </div>
+               
+              </td>
+              <td>
+                <!-- <div class="info align-items-center">
+                  <span><%= category.description %></span>
+                </div> -->
+              </td>
+              <td>
+                <div class="col-lg-2 col-sm-2 col-4 col-status">
+                  <% if (category.is_listed == 1) { %>
+                    <span class="badge rounded-pill alert-success">listed</span>
+                  <% } else { %>
+                    <span class="badge rounded-pill alert-danger">unlisted</span>
+                  <% } %>
+                </div>
+              </td>
+              <td>
+                <% if (category.is_listed == 0) { %>
+                  <a  onclick="ProductUnlist('<%= category._id %>')"  class="btn btn-sm font-sm rounded btn-brand">
+                    <i class="material-icons md-edit"></i> List
+                  </a>
+                <% } else { %>
+                  <a onclick="ProductUnlist('<%= category._id %>')"  class="btn btn-sm font-sm rounded btn-danger">
+                    <i class="material-icons md-edit"></i> Unlist
+                  </a>
+                <% } %>
+                <a href="/admin/editCategory?id=<%= category._id %>" class="btn btn-sm font-sm rounded btn-light">
+                  <i class="material-icons md-edit"></i> Edit
+                </a>
+              </td>
+            </tr>
+            <%
+              });
+            } else {
+            %>
+            <tr>
+              <td colspan="5">
+                <p>Category not found</p>
+              </td>
+            </tr>
+            <%
+            }
+            %>
+          </tbody>
+        </table>
+        
+   
+      </div> <!-- card-body end// -->
+  </div> <!-- card end// -->
+
+    
+</section> <!-- content-main end// -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+const searchInput = document.getElementById("searchInput");
+const table = document.getElementById("category");
+const rows = table.getElementsByTagName("tr");
+
+searchInput.addEventListener("keyup", function () {
+const searchText = searchInput.value.toLowerCase();
+
+for (let i = 1; i < rows.length; i++) {
+  const rowData = rows[i].textContent.toLowerCase();
+  if (rowData.includes(searchText)) {
+      rows[i].style.display = "";
+  } else {
+      rows[i].style.display = "none";
+  }
+}
+});
+});
+        
+function ProductUnlist(productId) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Please confirm to unlist this category!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, unlist it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Perform the deletion via AJAX/fetch to the server
+          fetch(`/admin/unlistCategory?id=${productId}`, {
+            method: 'GET',
+            // Add other necessary headers or configurations
+          }).then(response => {
+            if (response.ok) {
+              // Product successfully deleted
+              Swal.fire({
+                title: "success",
+                text: "Please confirm to list this product!",
+                icon: "success",
+                timer: 2000,
+                timeProgressBar: true,
+                showConfirmButton: false,
+
+
+              })
+                .then(() => {
+                  // Redirect after displaying the success message
+                  window.location.href = '/admin/category'; // Redirect to a suitable page
+                });
+            } else {
+              Swal.fire("Error!", "Failed to delete product", "error");
+            }
+          }).catch(error => {
+            Swal.fire("Error!", "Failed to delete product", "error");
+          });
+        }
+      });
+    }
+
+  </script>
+
+    <%- include('../layouts/adminFooter.ejs') %>

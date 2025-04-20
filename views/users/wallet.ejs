@@ -1,0 +1,140 @@
+<%- include('../layouts/userHeader.ejs') %>
+
+<main class="main">
+  <div class="page-header breadcrumb-wrap">
+      <div class="container">
+          <div class="breadcrumb">
+              <a href="index.html" rel="nofollow">Home</a>
+              <span></span> Pages
+              <span></span> Account
+          </div>
+      </div>
+  </div>
+
+  <section class="pt-150 pb-150">
+  
+      <div class="container">
+    
+          <div class="row">
+              <div class="col-lg-12 m-auto">
+          
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="dashboard-menu">
+                              <ul class="nav flex-column" role="tablist">
+                                 
+                                  <li class="nav-item">
+                                    <a class="nav-link"   href="/userprofile" ><i class="fi-rs-user mr-10"></i>Account details</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" href="/userAddress"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                              </li>
+                                  <li class="nav-item">
+                                      <a class="nav-link"  href="/orderSuccess"  ><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                                  </li>
+                                  <li class="nav-item">
+                                    <a class="nav-link" href="/wallet"><i class="fi-rs-shopping-bag mr-10"></i>Wallets</a>
+                                  </li>
+                                  <li class="nav-item">
+                                    <a class="nav-link" href="/wishlist"><i class="fi-rs-heart mr-10"></i>Your List</a>
+                                  </li>
+
+                                  <li class="nav-item">
+                                    <a class="nav-link"  href="/coupon" ><i class="fi-rs-shopping-bag mr-10"></i>coupon</a>
+                                  </li>
+                             
+                               
+                                  <li class="nav-item">
+                                    <a class="nav-link" href="/logout"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="col-md-9">
+                        <div class="row">
+
+
+                            <div class="col-md-8 col-lg-10">
+                                <div class="tab-content d-flex justify-content-center align-items-center">                           
+        
+                                    
+        
+                                  <div class="card" style="width: 100vw;">
+                                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                                        <i class="fa-solid fa-wallet" style="font-size: 50px;"></i><h3>Wallet Balance</h3>
+                                    
+                                        <p style="font-size: 30px;">₹&nbsp; <%= wallet.walletBalance %></p>
+                                    </div>
+                      
+                                  </div>
+                                    
+                                </div>
+                                <div class="mt-5">
+                                    <table id="wallet" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Transaction Type</th>
+                                                <th scope="col">Date</th>
+                                                <th scope="col">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <% if (wallet != null && wallet.transaction != null) { %>
+                                                <% wallet.transaction.forEach(transactions => { %>
+                                                    <tr>
+                                                        <td>
+                                                            <span class="badge badge-pill bg-success"><%= transactions.type %></span>
+                                                        </td>
+                                                        <td><%= new Date(transactions.date).toLocaleDateString() %></td>
+                                                        <td>
+                                                            <span class=""> <%= transactions.amount %></span>
+                                                        </td>
+                                                    </tr>
+                                                <% }); %>
+                                            <% } else { %>
+                                                <tr><td class="text-center" colspan="3">no wallet data</td></tr>
+                                            <% } %>
+                                        </tbody>
+                                    </table>
+                                    
+                                </div>
+                            
+                            </div>
+                          </div>
+                           
+                                 
+                                
+                                     
+                                      
+                                       
+                                 
+                                  </div>
+                       
+                           
+                         
+                            
+                     
+                  </div>
+              </div>
+          </div>
+          
+      </div>
+  </section>
+</main>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+        new DataTable('#wallet', {
+            order: [[0, 'desc']],
+            "lengthMenu": [7, 20, 30, 50],
+            "pageLength": 7
+        });
+    });
+  </script>
+
+<%- include('../layouts/userFooter.ejs') %>

@@ -1,0 +1,269 @@
+<style>
+    /* Increase the size of the increment and decrement buttons */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        height: 50px;
+        /* Adjust the height as needed */
+        width: 60px;
+        /* Adjust the width as needed */
+    }
+
+    /* For Firefox */
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+    .empty-cart-message {
+        text-align: center;
+        color: red;
+        font-size: 18px;
+        /* Adjust font size as needed */
+        margin-top: 20px;
+        /* Adjust margin-top as needed */
+    }
+</style>
+
+<%- include('../layouts/userHeader.ejs') %>
+
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Your Cart
+                </div>
+            </div>
+        </div>
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <% if (cart.length > 0) { %>
+                            <table class="table shopping-summery text-center clean">
+                                <thead>
+                                    <tr class="main-heading">
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Subtotal</th>
+                                        <th scope="col">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <% if (cart.length>0) {
+                                        cart.forEach((cartData,index)=>{
+                                        %>
+                                        <p></p>
+                                        <tr>
+                                            <td class="image product-thumbnail"><img
+                                                    src="/admin-assets/imgs/productIMG/<%=cartData.product.image[0]%>"
+                                                    alt="#"></td>
+                                            <td class="product-des product-name">
+                                                <%=cartData.product.name%>
+                                            </td>
+                                            <td class="price" data-title="Price">
+                                                <%if (cartData.product.discount_Price &&cartData.product.discountStatus &&new Date(cartData.product.discountStart) <= new Date() && new Date(cartData.product.discountEnd) >= new Date()) {
+                                                   %> <span>  <%=cartData.product.discount_Price%>   </span><%
+                                                }else{
+                                                    %> <span>  <%=cartData.product.price%>   </span><%
+                                                }
+                                                    %>
+                                            </td>       
+                                            <td class="text-center" data-title="Stock">
+                                                <div class="cart-product-quantity">
+                                                    <% if (parseInt(cartData.product.stock) <= 0) { %>
+                                                        <p class="text-danger">Out of stock</p>
+                                                    <% } else if (parseInt(cartData.product.stock) <= 5) { %>
+                                                        <select class="form-control" name="qty_<%= cartData.product._id %>" onchange="updateCart('<%= cartData.product._id %>', this.value)">
+                                                            <% for (let i = 1; i <= cartData.product.stock; i++) { %>
+                                                                <option value="<%= i %>" <%= i === cartData.quantity ? 'selected' : '' %>><%= i %></option>
+                                                            <% } %>
+                                                        </select>
+                                                    <% } else { %>
+                                                        <!-- Number input for stock > 5 -->
+                                                        <input type="number" class="form-control" id="input-quantity-<%= cartData.product._id %>" name="qty_<%= cartData.product._id %>"
+                                                            value="<%= cartData.quantity %>" min="1" max="<%= cartData.product.stock %>" step="1"
+                                                            onchange="updateCart('<%= cartData.product._id %>', this.value)">
+                                                    <% } %>
+                                                </div>
+                                            </td>
+                                            
+                                                
+                                                
+                                            <td class="text-right" data-title="Cart">
+                                                <span>
+                                                    <%=productTotal[index] %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button type="button"
+                                                    onclick="confirmRemoveCartItem('<%= cartData.product._id %>');">
+                                                   Remove <i class="fi-rs-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <% }) } %>
+
+
+
+
+                                            
+                                </tbody>
+                            </table>
+                            <% } else { %>
+                                <!-- Display message when the cart is empty -->
+                                <div class="empty-cart-message">
+                                    Your shopping cart is empty.
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="cart-action text-end">
+                            <a class="btn" href="/shop"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                        </div>
+                        
+                        <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
+                        <div class="row mb-50">
+                            <div class="col-lg-6 col-md-12">
+
+                            </div>
+                            <div class="col-lg-6 col-md-12">
+                                <div class="border p-md-4 p-30 border-radius cart-totals">
+                                    <div class="heading_s1 mb-3">
+                                        <h4>Cart Totals</h4>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="cart_total_label">Cart Subtotal</td>
+                                                    <td class="cart_total_amount"><span
+                                                            class="font-lg fw-900 text-brand">
+                                                            <%=subtotalWithShipping %>
+                                                        </span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Shipping</td>
+                                                    <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free
+                                                        Shipping</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Total</td>
+                                                    <td class="cart_total_amount"><strong><span
+                                                                class="font-xl fw-900 text-brand">
+                                                                <%=subtotalWithShipping %>
+                                                            </span></strong></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
+                                        CheckOut</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Add this script tag in the head of your HTML file -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function confirmRemoveCartItem(productId) {
+            console.log("kkkkkkkkkkkkkkkkk");
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // User clicked "Yes," so proceed with removing the item
+                    removeCartItem(productId);
+                }
+            });
+        }
+        function removeCartItem(productId) {
+            fetch(`/removeCartItem?productId=${productId}`, {
+                method: 'DELETE',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        localStorage.setItem('productRemoved', 'true');
+                        location.reload();
+                    } else {
+                        console.error('Failed to remove cart item:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error removing cart item:', error);
+                });
+        }
+
+
+        function updateCart(productId, newQuantity) {
+    fetch(`/updateCart?productId=${productId}&quantity=${newQuantity}`, {
+        method: 'PUT',
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the UI with the new quantity
+            var quantityElement = $(`#quantity-${productId}`);
+            if (quantityElement.length) {
+                quantityElement.text(newQuantity);
+            }
+        } else {
+            console.error('Failed to update cart:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating cart:', error);
+    });
+}
+
+function increaseQuantity(productId) {
+    var inputElement = $(`#input-quantity-${productId}`);
+    var currentQuantity = parseInt(inputElement.val());
+    if (currentQuantity < 10) {
+        inputElement.val(currentQuantity + 1);
+        updateCart(productId, currentQuantity + 1);
+    }
+}
+
+function decreaseQuantity(productId) {
+    var inputElement = $(`#input-quantity-${productId}`);
+    var currentQuantity = parseInt(inputElement.val());
+    if (currentQuantity > 1) {
+        inputElement.val(currentQuantity - 1);
+        updateCart(productId, currentQuantity - 1);
+    }
+}
+
+
+
+    </script>
+
+<script>
+    function toggleDropdown(productId) {
+        const dropdownId = 'dropdown' + productId;
+        const dropdown = document.getElementById(dropdownId);
+
+        if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.style.display = 'none';
+        }
+    }
+</script>
+    <%- include('../layouts/userFooter.ejs') %>

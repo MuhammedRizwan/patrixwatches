@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RIZT</title>
+    <meta name="description" content="<%= locals.description %>" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="/user-assets/imgs/theme/Wlogo.jpeg"
+    />
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="\user-assets\css\maind134.css" />
+  </head>
+
+
+
+<main class="main">
+ 
+  <section class="pt-150 pb-150">
+      <div class="container">
+          <div class="row">
+              <div class="col-lg-10 m-auto">
+                  <div class="row">
+                    <div class="col-lg-3"></div>
+                    <div class="col-lg-6">
+                      <div class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5">
+                          <div class="padding_eight_all bg-white">
+                              <div class="heading_s1">
+                                  <h3 class="mb-30">Login</h3>
+                              </div>
+                              <div id="error-message" class="ms-2 text-danger">
+                                <%=message%>
+                              </div>
+                              <form
+                              class="row login_form"
+                              action="/login"
+                              method="post"
+                              
+                            >
+                              <div class="col-md-12 form-group">
+                                <input
+                                  type="email"
+                                  class="form-control"
+                                  id="email"
+                                  name="email"
+                                  onkeyup="emailChaking()"
+                                  placeholder="Username"
+                                  onfocus="this.placeholder = ''"
+                                  onblur="this.placeholder = 'Username'"
+                                  required
+                                />
+                              </div>
+                              <div class="col-md-12 form-group">
+                                <input
+                                  type="password"
+                                  class="form-control"
+                                  id="password"
+                                  name="password"
+                                  onkeyup="passwordChaking()"
+                                  placeholder="Password"
+                                  onfocus="this.placeholder = ''"
+                                  onblur="this.placeholder = 'Password'"
+                                  required
+                                />
+                              </div>
+                              
+                              <div class="col-md-12 form-group">
+                                <div class="creat_account">
+                                  <!-- <input type="checkbox" onclick="passwordFind()"> -->
+                                  <label for="f-option2">show password</label>
+                                </div>
+                                <!-- <div class="creat_account">
+                             
+                                  <input type="checkbox" id="f-option2" name="selector" />
+                                  <label for="f-option2">Keep me logged in</label>
+                                </div> -->
+                               
+                                <!-- <div id="messageDiv" style="display: none;">
+                                 <h6><p id="messageText"></p></h6> 
+                                </div> -->
+                                
+                              </div>
+                              <div class="col-md-12 form-group">
+                                <button type="submit" value="submit" class="primary-btn">
+                                  Log In
+                                </button>
+                                <a href="/forget">Forgot Password?</a>
+                              </div>               
+                            </form>   
+                              <div class="divider-text-center mt-15 mb-15">
+                                <span> or</span>
+                            </div>
+                            <!-- <ul class="btn-login list_none text-center mb-15">
+                                <li><a href="#" class="btn btn-facebook hover-up mb-lg-0 mb-sm-4">Login With Facebook</a></li>
+                                <li><a href="#" class="btn btn-google hover-up">Login With Google</a></li>
+                            </ul> -->
+                            <div class="text-muted text-center">Already have an account? <a href="/register">Sign in now</a></div>
+                          </div>
+                      </div>
+                  </div>
+                  </div>
+                
+                
+              </div>
+          </div>
+      </div>
+  </section>
+</main>
+<script
+src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+crossorigin="anonymous"
+></script>
+
+<script>
+  if(localStorage){
+    localStorage.removeItem('countdownValue');
+    console.log("localstorage")
+  }
+function validation(event) {
+  event.preventDefault(); // Prevent form submission
+
+
+
+  emailChaking();
+
+
+
+  passwordChaking();
+
+
+
+  // Show all errors
+}
+
+
+function emailChaking() {
+  let emailId = document.getElementById("email").value;
+  let errorEmail = document.getElementById("erroremail");
+
+  if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(emailId)) {
+    errorEmail.innerHTML = "Please enter valid email";
+    return false;
+  } else {
+    errorEmail.innerHTML = "";
+    return true;
+  }
+}
+
+
+
+function passwordChaking() {
+  let password = document.getElementById("password").value;
+  let errorPassword = document.getElementById("errorpassword");
+
+  if (password.trim() === "") {
+    errorPassword.innerHTML = "Please enter your password";
+    return false;
+  } else if (password.length < 8) {
+    errorPassword.innerHTML = "Please enter a minimum of 8 characters";
+    return false;
+  } else {
+    errorPassword.innerHTML = "";
+    return true;
+  }
+}
+
+</script>
+</body>
+</html>

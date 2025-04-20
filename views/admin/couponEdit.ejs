@@ -1,0 +1,194 @@
+<%- include('../layouts/adminHeader.ejs') %>
+
+
+
+<form action="" method="post"  id="coupon-form" >
+  <section class="content-main">
+      <div class="row">
+          <div class="col-9">
+
+              <div class="content-header">
+                  <h2 class="content-title">Edit Coupon</h2>
+              </div>
+          </div>
+          <div class="d-flex justify-content-end mb-4">
+              <a href="/admin/couponList"><button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button></a>
+              <button type="button" onclick="addCoupon( )"  class="btn btn-md rounded font-sm hover-up">Add Coupon</button>
+          </div>
+          <div class="col-lg-12">
+              
+             
+           
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-lg-6">
+                  <div class="card mb-4">
+                      <div class="card-body">
+                          <div class="mb-4">
+                              <label for="coupon_code" class="form-label">Coupon code</label>
+                              <input type="text" name="couponCode" placeholder="Type here" value="<%= coupon.code %>"  class="form-control" id="coupon_code">
+                              <div class="error-message" style="color: red;" id="code-error"></div>
+                          </div>
+                          <div class="mb-4">
+                              <label for="discount" class="form-label">Discount</label>
+                              <input type="number" name="discount" placeholder="Type here"  value="<%= coupon.discount %>"  class="form-control" id="discount">
+                              <div class="error-message" style="color: red;" id="discount-error"></div>
+                          </div>
+                         
+                          <div class="mb-4">
+                              <div class="form-group">
+                                  <label  class="form-label mt-3"  for="limit">Limit</label>
+                                  <input type="number" class="form-control"  value="<%= coupon.limit %>"  id="limit" name="limit" >
+                                  <div class="error-message" style="color: red;" id="limit-error"></div>
+
+                              </div>
+                          </div>
+                        
+                         
+
+                      </div>
+                  </div> <!-- card end// -->
+          </div>
+          <div class="col-lg-6">
+              <div class="card mb-4">
+                  <div class="card-body">
+               
+                      <div class="col-12 d-flex">
+
+                          <div class="mb-4 col-5">
+                              <div class="form-group">
+                                  <label  class="form-label mt-3"  for="limit">Min  Amount</label>
+                                  <input type="number" class="form-control"  value="<%= coupon.minAmt %>"  id="minAmt" name="minAmt" >
+                                  <div class="error-message" style="color: red;" id="minAmt-error"></div>
+
+                              </div>
+                          </div>
+                          <div class="mb-4 col-2"></div>
+                          <div class="mb-4 col-5">
+                              <label  class="form-label mt-3"    for="limit">Max  Amount</label>
+                              <input type="number" class="form-control" id="maxAmt" value="<%= coupon.maxAmt %>" name="maxAmt" >
+                              <div class="error-message" style="color: red;" id="maxAmt-error"></div>
+
+                          </div>
+                      </div>
+                    
+                      <!-- Category Div -->
+                      
+              
+                      <div class="mb-2">
+                          <label for="category_name" class="form-label">Expiry</label>
+                          <input type="date" name="expiryDate" value="<%= expiry  %>"  placeholder="Type here" class="form-control" id="expiryDate" min="<%= new Date().toISOString().split('T')[0] %>">
+                          <div class="error-message" style="color: red;" id="expiryDate-error"></div>
+                      </div>
+                    
+                  </div>
+              </div> <!-- card end// -->
+          </div>
+      </div>
+      <div id="invalid">
+          <% if (typeof message !== 'undefined' && message) { %>
+              <p style="color: red;" id="message"><%= message %></p>
+          <% } %>
+                  </div>  
+      </div> 
+
+         
+          
+  
+  </section> <!-- content-main end// -->
+</form>
+<script> 
+  function validationChecking(coupon_code, discount, limit, minAmt, maxAmt, expiryDate) {
+  const code_error = document.getElementById("code-error");
+  const discount_error = document.getElementById("discount-error");
+  const limit_error = document.getElementById("limit-error");
+  const minAmt_error = document.getElementById("minAmt-error");
+  const maxAmt_error = document.getElementById("maxAmt-error");
+  const expiryDate_error = document.getElementById("expiryDate-error");
+
+  code_error.innerHTML = coupon_code.trim() === "" ? "Please enter coupon code" : "";
+  discount_error.innerHTML =
+    discount.trim() === "" ? "Please enter discount" : /^\d+$/.test(discount) === false ? "Please enter valid discount number" : "";
+  limit_error.innerHTML =
+    limit.trim() === "" ? "Please enter limit" : /^\d+$/.test(limit) === false ? "Please enter valid limit number" : "";
+  minAmt_error.innerHTML =
+    minAmt.trim() === "" ? "Please enter min amount" : /^\d+$/.test(minAmt) === false ? "Please enter valid min amount" : "";
+  maxAmt_error.innerHTML =
+    maxAmt.trim() === "" ? "Please enter max amount" : /^\d+$/.test(maxAmt) === false ? "Please enter valid max amount" : "";
+  expiryDate_error.innerHTML =
+    expiryDate.trim() === "" ? "Please enter expiry date" : "";
+
+  // Return true if there are errors, false otherwise
+  return (
+    code_error.innerHTML ||
+    discount_error.innerHTML ||
+    limit_error.innerHTML ||
+    minAmt_error.innerHTML ||
+    maxAmt_error.innerHTML ||
+    expiryDate_error.innerHTML
+  );
+}
+
+const addCoupon = () => {
+  const coupon_code = document.getElementById("coupon_code").value;
+  const discount = document.getElementById("discount").value;
+  const limit = document.getElementById("limit").value;
+  const maxAmt = document.getElementById("maxAmt").value;
+  const minAmt = document.getElementById("minAmt").value;
+  const expiryDate = document.getElementById("expiryDate").value;
+
+  const errors = validationChecking(coupon_code, discount, limit, minAmt, maxAmt, expiryDate);
+
+  if (!errors) {
+    const requestData = {
+      coupon_code,
+      discount,
+      limit,
+      minAmt,
+      maxAmt,
+   
+      expiryDate
+    };
+ 
+
+
+    const couponId = "<%= coupon._id %>"; 
+    fetch(`/admin/couponEdit?couponId=${couponId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestData),
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Network response was not ok.');
+      }
+    })
+    .then(data => {
+      if (data.success) {
+        window.location.href = '/admin/couponList';
+      } else {
+        alert('Error occurred while adding coupon');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error occurred adding coupon');
+    });
+  }
+};
+
+
+
+
+
+
+ </script>
+    
+
+
+    <%- include('../layouts/adminFooter.ejs') %>

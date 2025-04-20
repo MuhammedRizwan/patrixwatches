@@ -1,0 +1,226 @@
+<%- include('../layouts/adminHeader.ejs') %>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Order detail</h2>
+            <p>Details for Order ID: <%= order._id %></p>
+            </div>
+            </div>
+            <div class="card">
+            <header class="card-header">
+            <div class="row align-items-center">
+            <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+            <span>
+            <i class="material-icons md-calendar_today"></i><br>
+        
+            <small class="text-muted">Ordered Date: </small><b> <%= new Date(order.orderDate).toLocaleDateString() %></b>
+            </span> <br>
+            <small class="text-muted">Order ID: <%= order._id %></small><br>
+            <small class="text-muted">Order Status: </small><b class="">
+            <% if (order.status == 'Pending') { %>
+            <span class="badge badge-pill badge-soft-warning"><%= order.status %></span>
+            <% } else if (order.status == 'Order Confirmed') { %>
+            <span class="badge badge-pill badge-soft-warning"><%= order.status %></span>
+            <% } else if (order.status == 'Shipped') { %>
+            <span class="badge badge-pill badge-soft-dark"><%= order.status %></span>
+            <% } else if (order.status == 'Out For Delivery') { %>
+            <span class="badge badge-pill badge-soft-dark"><%= order.status %></span>
+            <% } else if (order.status == 'Delivered') { %>
+            <span class="badge badge-pill badge-soft-success"><%= order.status %></span>
+            <% } else if (order.status == 'Return Successfull') { %>
+            <span class="badge badge-pill badge-soft-success"><%= order.status %></span>
+            <% } else { %>
+            <span class="badge badge-pill badge-soft-danger"><%= order.status %></span>
+            <% } %>
+            <br>
+            <% if (order.status == 'Return Successfull'|| order.status =='Cancel Requested' || order.status =='Cancelled' || order.status=='Return Requested' || order.status =='Returned') { %>
+                <small class="text-muted">Reason: </small><h4 class="text-danger d-flex"><%= order.reason %></h4>
+                <% } %>
+            <small class="text-muted">Delivery Date: </small><b><%= new Date(order.deliveryDate).toLocaleDateString() %></b>
+            </div>
+            
+                    <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+
+                        
+                        <% if (order.status !== 'Cancelled') { %>
+                            <select id="orderStatusDropdown" class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
+                                <option value="Order Confirmed" <% if (order.status === 'Order Confirmed') { %> selected <% } %>>Order Confirmed</option>
+                                <option value="Out For Delivery" <% if (order.status === 'Out For Delivery') { %> selected <% } %>>Out For Delivery</option>
+                                <option value="Delivered" <% if (order.status === 'Delivered') { %> selected <% } %>>Delivered</option>
+                                <option value="Pending" <% if (order.status === 'Pending') { %> selected <% } %>>Pending</option>
+                                <option value="Shipped" <% if (order.status === 'Shipped') { %> selected <% } %>>Shipped</option>
+                                <option value="Cancelled" style="color: red;" <% if (order.status === 'Cancelled') { %> selected <% } %>>Cancelled</option>
+                            </select>
+                            <a class="btn btn-primary" href="#" onclick="saveOrderStatus(`<%=order._id%>`)">Save</a>
+                            <% if (order.status === 'Return Requested') { %>
+                                <a href="/admin/refundOrder?orderId=<%= order._id %>&status=Return Successful" class="p-2 btn btn-primary">Proceed Return</a>
+                            <% } else if (order.status === 'Return Successfull') { %>
+                                <span class="badge rounded-pill alert-success text-success">Order Returned</span>
+                           
+                            <% } else { %>
+                                <span class="badge rounded-pill alert-danger text-danger"></span>
+                            <% } %>
+                            
+                              
+                        
+                        
+                    </div>
+                    
+                    <script>
+                        function saveOrderStatus(orderId) {
+                            const dropdown = document.getElementById("orderStatusDropdown");
+                            const selectedStatus = dropdown.options[dropdown.selectedIndex].value;
+                    
+                            // Redirect to the selected route
+                            window.location.href = `/admin/orderstatus?orderId=${orderId}&status=${selectedStatus}&orderDetails=true`;
+                        }
+                    </script>
+                    
+            </div>
+        </header>
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-person"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Customer</h6>
+                                <p class="mb-1">
+                                    <%=order.user.name%> <br>
+                                        <%=order.user.mobile%>
+                                </p>
+                                <br>
+                                <a href="#">View profile</a>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-local_shipping"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Order info</h6>
+                                <p class="mb-1">
+                                    Shipping: Fargo express <br> Pay method: <%=order.paymentMethod %> <br> Status:
+                                        <%=order.status %>
+                                </p>
+                                <a href="#">Download info</a>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-place"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Deliver to</h6>
+                                <p class="mb-1">
+                                    City: <%=order.address.city %>, <%=order.address.street %> <br>
+                                            <%=order.address.houseName %> <br>
+                                                <%=order.address.pincode %>
+                                </p>
+                                <a href="#">View profile</a>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-11">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th width="40%">Product</th>
+                                        <th width="20%">Unit Price</th>
+                                        <th width="20%">Quantity</th>
+                                        <th width="20%" class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% let subtotal=0; order.items.forEach(function(item) { let
+                                        total=item.product.discount_price * item.quantity; subtotal +=total; %>
+                                        <tr>
+                                            <td>
+                                                <a class="itemside" href="#">
+                                                    <div class="left">
+                                                        <img src="/admin-assets/imgs/productIMG/<%=item.product.image[0]%>"
+                                                            width="40" height="40" class="img-xs" alt="Item">
+                                                    </div>
+                                                    <div class="info">
+                                                        <%=item.product.name %>
+                                                    </div>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                ₹<%=item.product.discount_price %>
+                                            </td>
+                                            <td>
+                                                <%=item.quantity %>
+                                            </td>
+                                            <td class="text-end">
+                                                ₹<%= total %>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                            <tr>
+                                                <td colspan="4">
+                                                    <article class="float-end">
+                                                        <dl class="dlist">
+                                                            <dt>Subtotal:</dt>
+                                                            <dd>₹<%= subtotal %>
+                                                            </dd>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt>Shipping cost:</dt>
+                                                            <dd>₹0.00</dd>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt>Grand total:</dt>
+                                                            <dd> <b class="h5">₹<%= subtotal %></b> </dd>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt>Status:</dt>
+                                                            <dd>
+                                                                <%=order.status %>
+                                                            </dd>
+                                                            <dt>Status:</dt>
+                                                            <dd>
+                                                                <%= order.status %>
+                                                            </dd>
+
+                                                            
+
+                                                                    <dd>
+                                                                        <span
+                                                                            class="badge rounded-pill alert-success text-success">Payment
+                                                                            done</span>
+                                                                    </dd>
+                                                        </dl>
+                                                    </article>
+                                                </td>
+                                            </tr> 
+                                </tbody>
+                            </table>
+                        </div> <!-- table-responsive// -->
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <% } else { %>
+        <p>Order not found</p>
+      <% } %>
+
+
+    <%- include('../layouts/adminFooter.ejs') %>

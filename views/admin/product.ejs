@@ -1,0 +1,225 @@
+<%- include('../layouts/adminHeader.ejs') %>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+  <section class="content-main">
+    <div class="content-header">
+      <div>
+        <h2 class="content-title card-title">Products List</h2>
+        <p>Lorem ipsum dolor sit amet.</p>
+
+      </div>
+      <div>
+       
+        <a href="/admin/addproduct" class="btn btn-primary btn-sm rounded">Create new</a>
+      </div>
+    </div>
+    <div class="card mb-4">
+      <header class="card-header">
+        <div class="row align-items-center">
+
+          <form action="" method="get">
+
+            <div style="display: flex; align-items: center;">
+              <input type="text" id="searchInput" class="form-control" placeholder="Search for products...">
+          </div>
+
+            
+            
+      </div>  
+              
+
+            </div>
+          </form>
+
+
+
+
+        </div>
+      </header>
+
+      <div class="card-body">
+
+        <table id="products" class="table">
+          <thead>
+            <tr>
+              
+              <th >Image</th>
+              <th >Product Name</th>
+              <th >Product Price</th>
+              <th >Sale Price</th>
+              <th >Stock</th>
+              <th >Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% products.slice().reverse().forEach(product => { %>
+                <tr>
+                    <td>
+                        <% if (product.image && product.image.length > 0) { %>
+                            <a href="#">
+                                <img src="../admin-assets/imgs/productIMG/<%= product.image[0] %>" alt="<%= product.name %>" style="max-width: 100px; max-height: 100px;">
+                            </a>
+                        <% } %>
+                    </td>
+                    <td><%= product.name %></td>
+                    <td><%= product.price %></td>
+                    <td><%= product.discount_price %></td>
+                    <td><%= product.stock %></td>
+                    <td class="action-buttons">
+                        <a href="/admin/deleteProduct?id=<%= product._id %>">
+                            <button class="btn btn-danger rounded font-sm hover-up">delete</button>
+                        </a>
+                        <a href="/admin/editProduct?id=<%= product._id %>">
+                            <button class="btn btn-md rounded font-sm hover-up">Edit</button>
+                        </a>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+        
+        </table>
+
+      </div>
+    </div>
+
+   
+
+  </section>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+
+
+
+
+  <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const searchInput = document.getElementById("searchInput");
+      const table = document.getElementById("products");
+      const rows = table.getElementsByTagName("tr");
+
+      searchInput.addEventListener("keyup", function () {
+        const searchText = searchInput.value.toLowerCase();
+
+        for (let i = 1; i < rows.length; i++) {
+          const rowData = rows[i].textContent.toLowerCase();
+          if (rowData.includes(searchText)) {
+            rows[i].style.display = "";
+          } else {
+            rows[i].style.display = "none";
+          }
+          
+        }
+      });
+    });
+
+
+    function ProductUnlist(productId) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Please confirm to delete this product!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Perform the deletion via AJAX/fetch to the server
+          fetch(`/admin/deleteProduct/${productId}`, {
+            method: 'GET',
+            // Add other necessary headers or configurations
+          }).then(response => {
+            if (response.ok) {
+              // Product successfully deleted
+              Swal.fire({
+                title: "success",
+                text: "Please confirm to delete this product!",
+                icon: "success",
+                timer: 2000,
+                timeProgressBar: true,
+                showConfirmButton: false,
+
+
+              })
+                .then(() => {
+                  // Redirect after displaying the success message
+                  window.location.href = '/admin/products'; // Redirect to a suitable page
+                });
+            } else {
+              Swal.fire("Error!", "Failed to delete product", "error");
+            }
+          }).catch(error => {
+            Swal.fire("Error!", "Failed to delete product", "error");
+          });
+        }
+      });
+    }
+
+  </script>
+
+<script>
+  $(document).ready(function () {
+      new DataTable('#products', {
+          order: [[0, 'desc']],
+          "lengthMenu": [7, 20, 30, 50],
+          "pageLength": 7
+      });
+  });
+</script>
+<script>
+// Assuming you're using vanilla JavaScript
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    const searchResultsBody = document.getElementById('searchResultsBody');
+
+    searchInput.addEventListener('input', debounce(handleSearch, 300)); // debounce to avoid too many requests
+
+    function debounce(func, delay) {
+        let timeoutId;
+        return function () {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(context, args), delay);
+        };
+    }
+
+    async function handleSearch() {
+        const searchValue = searchInput.value.trim();
+        if (searchValue === '') {
+            searchResultsBody.innerHTML = ''; // Clear results if search input is empty
+            return;
+        }
+
+        try {
+            const response = await fetch(`/admin/search?query=${encodeURIComponent(searchValue)}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                displaySearchResults(data);
+            } else {
+                console.error('Error fetching search results:', data.error);
+            }
+        } catch (error) {
+            console.error('Error fetching search results:', error.message);
+        }
+    }
+
+    function displaySearchResults(results) {
+        searchResultsBody.innerHTML = ''; // Clear previous results
+
+        results.forEach(product => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${product.name}</td>`; // Customize based on your data
+            searchResultsBody.appendChild(row);
+        });
+    }
+});
+
+</script>
+
+  <%- include('../layouts/adminFooter.ejs') %>

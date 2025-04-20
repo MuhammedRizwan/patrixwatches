@@ -1,0 +1,369 @@
+<%- include('../layouts/userHeader.ejs') %>
+<main class="main">
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar Section for Category and Sorting -->
+      <div class="col-lg-3">
+        <div class="primary-sidebar sticky-sidebar">
+          <form action="/shop" method="get">
+            <div class="header-search-wrapper">
+                <label for="search" class="sr-only">Search</label>
+                <input type="search" class="form-control" name="search" id="search"
+                    placeholder="Search in..." required>
+                <button type="submit" style="display: none;">Search</button>
+                <!-- Category Filter -->
+<select name="category" onchange="this.form.submit()">
+  <option value="">All Categories</option>
+  <% categories.forEach(category => { %>
+  <option value="<%= category._id %>" <%= category._id == query.category ? 'selected' : '' %>>
+    <%= category.name %>
+  </option>
+  <% }); %>
+</select>
+
+<!-- Sorting Section -->
+<select name="sort" onchange="this.form.submit()">
+  <option value="asc" <%= sort === 'asc' ? 'selected' : '' %>>Price: Low to High</option>
+  <option value="desc" <%= sort === 'desc' ? 'selected' : '' %>>Price: High to Low</option>
+</select>
+
+
+                <!-- Add a submit button -->
+                <button type="submit">Search</button>
+            </div><!-- End .header-search-wrapper -->
+        </form>
+        
+        </div>
+      </div>
+
+      <!-- Product Section -->
+      <div class="col-lg-9">
+        <div class="shop-product-fillter">
+          <div class="totall-product">
+            <p class="mt-30">We found <strong class="text-brand">688</strong> items for you!</p>
+          </div>
+          <div class="sort-by-product-area"></div>
+        </div>
+        <div id="Grid" class="row product-grid-3">
+          <% for (const product of products) { %>
+            <% if (product.stock> 0) { %>
+              <!-- Product Card for available products -->
+              <div class="col-lg-4 col-md-4 col-12 col-sm-6">
+                <div id="product" class="product-cart-wrap mb-30">
+
+
+                  <!-- Product Image -->
+                  <div class="product-img-action-wrap">
+                    <div class="product-img product-img-zoom">
+                      <a href="/singleProduct/<%= product._id%>">
+                        <img class="default-img" src="/admin-assets/imgs/productIMG/<%= product.image[0]%>"
+                          alt="<%= product.name %>" />
+                      </a>
+                    </div>
+                    <div class="product-badges product-badges-position product-badges-mrg">
+                      <span class="hot">Hot</span>
+                    </div>
+                  </div>
+                  <!-- Product Details -->
+                  <div class="product-content-wrap">
+                    <div class="product-category">
+                      <a href="shop-grid-right.html">
+                        <%=product.category.name%>
+                      </a>
+                    </div>
+                    <h2><a href="/singleProduct/<%= product._id%>">
+                        <%= product.name %>
+                      </a></h2>
+                    <!-- Add more product details as needed -->
+                    <div class="rating-result" title="90%">
+                      <span>
+                          <% if (product.discountStatus == true && new Date() <= new Date(product.discountEnd)) { %>
+                              <% const percentageOff = ((product.price - product.discount_price) / product.price) * 100; %>
+                              <span style="font-size: 16px; background-color: rgb(255, 255, 255); border-radius: 2px; padding: 5px 10px 5px 10px;" class="old-price ml-3 text-success">
+                                  - <%= percentageOff.toFixed(2) %>% OFF
+                              </span>
+                          <% } %>
+                      </span>
+                  </div>
+                  <div class="product-price">
+                      <% if (product.discountStatus && new Date() <= new Date(product.discountEnd)) { %>
+                          <span>₹<%= product.discount_price %> </span>
+                          <span class="old-price">- ₹<s><%= product.price %></s></span>
+                      <% } else { %>
+                          <span> ₹<%= product.price %></span>
+                      <% } %>
+                  </div>
+            
+
+
+                    <!-- Add the stock message based on the stock value -->
+                    <% if (product.stock <=5) { %>
+                      <div class="low-stock-message" style="color: red;">Only <%= product.stock %> left.
+                      </div>
+                      <% } %>
+
+                        <!-- Add the form for adding to cart if needed -->
+                        <form id="myForm" action="/cart" method="post">
+                          <div class="product-action-1 show">
+                            <input type="hidden" value="<%= product._id %>" name="productData_id">
+                            <input type="hidden" value="1" name="qty">
+                            <!-- Assuming you have product information available in your template -->
+                            <button type="button" aria-label="Add To Cart" class="action-btn hover-up"
+                              onclick="addToCart('<%= product.id %>', '<%= product.name %>', '₹<%= product.price %>')">
+                              <i class="fi-rs-shopping-bag-add"></i>
+                            </button>
+                            <button type="button" aria-label="Add To Wishlist" class="action-btn hover-up"
+                              onclick="addToWishlist('<%= product.id %>', '<%= product.name %>', '₹<%= product.price %>')">
+                              <i class="fi-rs-heart"></i>
+                            </button>
+                          </div>
+                        </form>
+                  </div>
+                </div>
+              </div>
+              <% } else { %>
+                <!-- Product Card for sold-out products -->
+                <div class="col-lg-4 col-md-4 col-12 col-sm-6">
+                  <div id="product" class="product-cart-wrap mb-30 sold-out-product">
+                    <!-- Display other information as needed, e.g., product image -->
+                    <div class="product-img-action-wrap">
+                      <div class="product-img product-img-zoom">
+
+                        <img class="default-img" src="/admin-assets/imgs/productIMG/<%= product.image[0]%>"
+                          alt="<%= product.name %>" />
+                        </a>
+                      </div>
+                      <div class="sold-out-overlay">
+                        <div class="sold-out-message" style="color: red;">Out Of stock</div>
+                      </div>
+                    </div>
+                    <!-- Product Details -->
+                    <div class="product-content-wrap">
+                      <div class="product-category">
+                        <%=product.category.name%></a>
+                      </div>
+                      <h2>
+                        <%= product.name %>
+                      </h2>
+                      <div class="rating-result" title="90%">
+                        <span>
+                          <span>90%</span>
+                        </span>
+                      </div>
+                      <div class="product-price">
+                        <% if (product.discount_price) { %>
+                          <span>₹<%= product.discount_price %> </span>
+                          <span class="old-price">- ₹<s>
+                              <%= product.price %>
+                            </s></span>
+                          <% } else { %>
+                            <span class="old-price"> ₹<%= product.price %></span>
+                            <% } %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <% } %>
+                  <% } %>
+        </div>
+
+
+        <!-- Pagination Section -->
+
+        <nav class="mt-4" aria-label="Page navigation">
+          <ul class="pagination">
+            <% if (currentPage> 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              <% } %>
+
+                <% for (let i=1; i <=totalPages; i++) { %>
+                  <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i %>">
+                      <%= i %>
+                    </a>
+                  </li>
+                  <% } %>
+
+                    <% if (currentPage < totalPages) { %>
+                      <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                          <span aria-hidden="true">&raquo;</span>
+                        </a>
+                      </li>
+                      <% } %>
+          </ul>
+        </nav>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<!--pagination-->
+
+
+
+
+
+
+</div>
+
+
+
+
+</div>
+</div>
+</div>
+</section>
+
+</main>
+
+
+
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- Include jQuery UI for the slider -->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchInput");
+    const productGrid = document.querySelector(".product-grid-3");
+    const productItems = productGrid.getElementsByClassName("product-cart-wrap");
+
+    searchInput.addEventListener("keyup", function () {
+      const searchText = searchInput.value.toLowerCase();
+
+      for (let i = 0; i < productItems.length; i++) {
+        const productName = productItems[i]
+          .getElementsByClassName("product-content-wrap")[0]
+          .getElementsByTagName("h2")[0]
+          .textContent.toLowerCase();
+
+        if (productName.includes(searchText)) {
+          productItems[i].style.display = "";
+        } else {
+          productItems[i].style.display = "none";
+        }
+      }
+    });
+  })
+
+
+
+
+
+
+
+
+</script>
+
+
+<script>
+
+  function addToCartWithValidation(id, name, price, stock) {
+    var quantity = document.getElementById('quantity_' + id).value;
+
+    // Check if the selected quantity exceeds the available stock
+    if (parseInt(quantity) > parseInt(stock)) {
+      alert('Sorry, the selected quantity exceeds the available stock.');
+    } else {
+      // Call your addToCart function with the updated parameters
+      addToCart(id, name, price, quantity);
+    }
+  }
+
+  function addToCart(productId, productName, productPrice, quantity) {
+    // Get existing cart data from localStorage or initialize an empty array
+    const requestData = {
+      qty: 1,
+      ID: productId
+    };
+    fetch('/cart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestData),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log("Item added to cart successfully");
+          window.location.href = '/cart';
+        } else {
+          console.error('Error:', data.message);
+        }
+      })
+
+  }
+
+  function addToWishlist(productId) {
+    const requestData = {
+      productId: productId,
+    };
+
+    fetch('/addToWishlist', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestData),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log("Item added to wishlist successfully");
+
+          window.location.href = '/wishlist';
+        } else {
+          console.error('Error:', data.message);
+          // Optionally, handle error cases and show appropriate messages to the user
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Optionally, handle other error cases
+      });
+  }
+
+</script>
+
+
+<script>
+  function changeMainImage(imageUrl) {
+    const mainImage = document.getElementById('mainImage');
+    mainImage.src = `/admin-assets/imgs/productIMG/${imageUrl}`;
+  }
+  document.querySelector('.image-zoom').addEventListener('mousemove', function (e) {
+    const { left, top, width, height } = this.getBoundingClientRect();
+    const x = (e.clientX - left) / width * 100;
+    const y = (e.clientY - top) / height * 100;
+
+    this.style.transformOrigin = `${x}% ${y}%`;
+  });
+</script>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelector('select[name="category"]').addEventListener('change', function() {
+      this.form.submit();
+    });
+    document.querySelector('select[name="sort"]').addEventListener('change', function() {
+      this.form.submit();
+    });
+  });
+  </script>
+  
+
+
+<%- include('../layouts/userFooter.ejs') %>

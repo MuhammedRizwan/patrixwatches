@@ -1,0 +1,118 @@
+body{
+    margin-top:20px;
+    color: #1a202c;
+    text-align: left;
+    background-color: #e2e8f0;    
+}
+.main-body {
+    padding: 15px;
+}
+.card {
+    /* box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06); */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+}
+
+.card-body {
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 1rem;
+}
+.card-bodyuser {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    max-width: 300px;
+    margin: auto;
+    text-align: center;
+    transition: box-shadow 0.3s ease;
+  }
+  .card-bodyuser:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.3); /* New box shadow on hover */
+    animation: moveUpDown 0.5s infinite; /* Apply the move up and down animation on hover */
+}
+
+@keyframes moveUpDown {
+    0%, 100% {
+        transform: translateY(0); /* Initial and final state: no vertical translation */
+    }
+    50% {
+        transform: translateY(-5px); /* Move up at the halfway point */
+    }
+}
+
+/* @keyframes shake {
+    0%, 100% {
+        transform: translateX(0); 
+    }
+    25%, 75% {
+        transform: translateX(-5px); 
+    }
+    50% {
+        transform: translateX(5px); 
+    }
+} */
+  .title {
+    color: grey;
+    font-size: 18px;
+  }
+  
+
+.gutters-sm {
+    margin-right: -8px;
+    margin-left: -8px;
+}
+
+.gutters-sm>.col, .gutters-sm>[class*=col-] {
+    padding-right: 8px;
+    padding-left: 8px;
+}
+.mb-3, .my-3 {
+    margin-bottom: 1rem!important;
+}
+
+.bg-gray-300 {
+    background-color: #e2e8f0;
+}
+.h-100 {
+    height: 100%!important;
+}
+.shadow-none {
+    box-shadow: none!important;
+}
+.btn a{
+    text-decoration: none;
+}
+
+
+button {
+    border: none;
+    outline: 0;
+    display: inline-block;
+    padding: 8px;
+    color: white;
+    background-color: #000;
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
+  }
+  
+  a {
+    text-decoration: none;
+    font-size: 22px;
+    color: black;
+  }
+  
+  button:hover, a:hover {
+    opacity: 0.7;
+  }

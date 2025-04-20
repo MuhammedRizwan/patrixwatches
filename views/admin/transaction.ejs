@@ -1,0 +1,173 @@
+<%- include('../layouts/adminHeader.ejs') %>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Transaction List</h2>
+                </div>
+               
+            </div>
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row align-items-center" style="">
+
+                <form action="" method="get">
+
+                    <div style="display: flex;  align-items: center;">
+                      <input type="text" id="searchInput" class="form-control" placeholder="Search for products...">
+
+                    
+                      <div class="col-md-3 col-12 me-auto mb-md-0 mb-3" style="display: flex;">
+
+                        <label for="type" class="form-control">Select Status:</label>
+                        <select name="type" class="form-select" id="type">
+                            <option value="" selected>All</option>
+                            <option value="debit">Debit</option>
+                            <option value="credit">Credit</option>
+                           
+
+
+                        </select>
+                      </div>
+     
+                        <input type="submit" class="btn btn-sm font-sm rounded btn-brand" value="Filter">
+
+                  </div>
+                </form>
+           
+
+
+
+                  </div>
+                </header>
+            
+        <div class="card-body">
+                   
+            <table id="transaction" class="table">
+                <thead>
+                    <tr>
+                      <th scope="col">Transaction Id</th>
+                      <th scope="col">Description</th>
+                      <th scope="col">Transaction Type</th>
+                      <th scope="col">Date</th>
+                      <th scope="col">Amount</th>
+                      <th scope="col">Action</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+    
+                    <% transactions.forEach((transaction) => { %>
+                        <tr style="height: 80px;">                    
+                          <td><%= transaction._id %></td>
+                          <td><%= transaction.description %></td>
+                          <td>  <% if (transaction.type == 'debit') { %><span class="badge badge-pill badge-soft-success">
+                            <%= transaction.type %></span>
+                            <% } else { %>
+                                <span class="badge badge-pill badge-soft-danger"><%= transaction.type %></span>
+                                <% } %>
+                        </td>
+                          <td><%= new Date(transaction.date).toLocaleDateString() %></td>
+                          <td>  <% if (transaction.type == 'debit') { %><span class="badge badge-pill badge-soft-success">
+                            + <%= transaction.amount %>
+                          </span>
+                          <% } else { %>
+                            <span class="badge badge-pill badge-soft-danger">- <%= transaction.amount %></span>
+                            <% } %>
+                        </td>
+                        <td>  <a href="/admin/orderDetails?orderId=<%= transaction.orderId %>" class="btn btn-secondary">Details</a>
+                        </td>
+                    </tr>
+                    <% } )%>
+                </tbody>
+            </table>
+          
+                </div> <!-- card-body end// -->
+            </div> <!-- card end// -->
+         
+            <div class="pagination-area mt-30 mb-50" style="display: flex; justify-content: center;">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                      <% if (currentPage > 1) { %>
+                        <li class="page-item">
+                          <a class="page-link" href="?page=<%= currentPage - 1 %>"><</a>
+                        </li>
+                      <% } %>
+                  
+                      <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                      <% } %>
+                  
+                      <% if (currentPage < totalPages) { %>
+                        <li class="page-item">
+                          <a class="page-link" href="?page=<%= currentPage + 1 %>">></a>
+                        </li>
+                      <% } %>
+                 
+                        
+                    </ul>
+                </nav>
+            </div>
+        </section> <!-- content-main end// -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchInput");
+    const table = document.getElementById("transaction");
+    const rows = table.getElementsByTagName("tr");
+
+    searchInput.addEventListener("keyup", function () {
+        const searchText = searchInput.value.toLowerCase();
+
+        for (let i = 1; i < rows.length; i++) {
+            const rowData = rows[i].textContent.toLowerCase();
+            if (rowData.includes(searchText)) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    });
+});
+
+
+
+
+    $(document).ready(function () {
+        $('#transaction').DataTable({
+            "paging": false,  
+        });
+    });
+
+    function updateProductList(categoryId) {
+        $.ajax({
+            type: "GET",
+            url: "/transactionList", 
+            data: { categoryId: categoryId },
+            success: function (data) {
+                $("#product-list").html(data);
+            },
+            error: function (error) {
+                console.error("Error:", error);
+            }
+        });
+    }
+
+    document.getElementById('category-filter').addEventListener('change', function () {
+        const categoryId = this.value;
+        updateProductList(categoryId);
+    });
+
+    $(document).ready(function () {
+        updateProductList('');
+    });
+
+</script>
+
+        <%- include('../layouts/adminFooter.ejs') %>

@@ -1,0 +1,207 @@
+<%- include('../layouts/adminHeader.ejs') %>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Offer List</h2>
+                </div>
+               
+            </div>
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row align-items-center" style="">
+
+                <form action="" method="get">
+
+                    <div style="display: flex;  align-items: center;">
+                      <input type="text" id="searchInput" class="form-control" placeholder="Search for products...">
+
+                    
+                      <div class="col-md-3 col-12 me-auto mb-md-0 mb-3" style="display: flex;">
+
+                        <label for="status" class="form-control">Select Status:</label>
+                        <select name="discountOn" class="form-select" id="status">
+                            <option value="" selected>All</option>
+                            <option value="product">Product Offer</option>
+                            <option value="category">Category Offer</option>
+                          
+
+                        </select>
+                      </div>
+     
+                        <input type="submit" class="btn btn-sm font-sm rounded btn-brand" value="Filter">
+
+                  </div>
+                </form>
+           
+
+
+
+                  </div>
+                </header>
+            
+        <div class="card-body">
+                   
+        <table id="products" class="table">
+            <thead>
+              <tr>
+                <th scope="col">Offer Name</th>
+                <th scope="col">Offer On</th>
+                <th scope="col">Discount</th>
+                <th scope="col">Maximum Redeemable Amount</th>
+                <th scope="col">Offer Starts at</th>
+                <th scope="col">Offer ends at</th>
+                <th scope="col">Offered Product/Category</th>
+                <th scope="col">Status</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+                
+                <% offer.forEach((offer) => { %>
+                    <tr>                    
+                      <td><%= offer.name %></td>
+                      <td><%= offer.discountOn %></td>
+                      <td>
+                        <% if (offer.discountType === 'fixed Amount') { %>
+                            ₹<%= offer.discountValue %>
+                          <% } else { %>
+                            <%= offer.discountValue %>%
+                          <% } %></td>
+                      <td> <%= offer.maxAmt
+                        %></td>
+                      <td><%= new Date(offer.startDate).toLocaleDateString() %>  </td>
+                <td><%= new Date(offer.endDate ).toLocaleDateString() %> </td>
+
+                <td style="width: 250px;">
+                  <% if (offer.discountOn === 'product' && offer.discountedProduct) { %>
+                    <%= offer.discountedProduct.name.slice(0, 70) + '...' %>
+                  <% } else if (offer.discountedCategory) { %>
+                    <%= offer.discountedCategory.name %>
+                  <% } else { %>
+                    N/A
+                  <% } %>
+                </td>
+                
+
+                      
+                        <td>   <% if (offer.isActive == true) { %>
+            
+                            <div class="col-lg-2 col-sm-2 col-4 col-status">
+                                <span class="badge rounded-pill alert-success">Active</span>
+                            </div>
+                            <% } else { %>
+                                <div class="col-lg-2 col-sm-2 col-4 col-status">
+                                    <span class="badge rounded-pill alert-danger">Blocked</span>
+                                </div>
+                        <% } %></td>
+                        <td>    <% if (offer.isActive  == false) { %>
+                    
+                            <a href="/admin/blockOffer?offerId=<%= offer._id %>" class="btn btn-sm font-sm rounded btn-brand">
+                              List
+                              </a>
+                          
+                        <% } else { %>
+                          <a href="/admin/blockOffer?offerId=<%= offer._id %>" class="btn btn-sm font-sm rounded btn-danger">
+                            Unlist
+                          </a>
+                        <% } %>
+                        <a class="btn btn-sm font-sm rounded btn-light" href="/admin/offerEdit?offerId=<%= offer._id %>" class="material-icons md-edit"></i>Edit</a>
+                        </td>
+                      </td>
+                    </tr>
+                    <% }); %>
+
+            
+            </tbody>
+          </table>
+          
+                </div> <!-- card-body end// -->
+            </div> <!-- card end// -->
+         
+            <div class="pagination-area mt-30 mb-50" style="display: flex; justify-content: center;">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                      <% if (currentPage > 1) { %>
+                        <li class="page-item">
+                          <a class="page-link" href="?page=<%= currentPage - 1 %>"><</a>
+                        </li>
+                      <% } %>
+                  
+                      <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                      <% } %>
+                  
+                      <% if (currentPage < totalPages) { %>
+                        <li class="page-item">
+                          <a class="page-link" href="?page=<%= currentPage + 1 %>">></a>
+                        </li>
+                      <% } %>
+                 
+                        
+                    </ul>
+                </nav>
+            </div>
+        </section> <!-- content-main end// -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchInput");
+    const table = document.getElementById("products");
+    const rows = table.getElementsByTagName("tr");
+
+    searchInput.addEventListener("keyup", function () {
+        const searchText = searchInput.value.toLowerCase();
+
+        for (let i = 1; i < rows.length; i++) {
+            const rowData = rows[i].textContent.toLowerCase();
+            if (rowData.includes(searchText)) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    });
+});
+
+
+
+
+    $(document).ready(function () {
+        $('#products').DataTable({
+            "paging": false,  
+        });
+    });
+
+    function updateProductList(categoryId) {
+        $.ajax({
+            type: "GET",
+            url: "/products", 
+            data: { categoryId: categoryId },
+            success: function (data) {
+                $("#product-list").html(data);
+            },
+            error: function (error) {
+                console.error("Error:", error);
+            }
+        });
+    }
+
+    document.getElementById('category-filter').addEventListener('change', function () {
+        const categoryId = this.value;
+        updateProductList(categoryId);
+    });
+
+    $(document).ready(function () {
+        updateProductList('');
+    });
+
+</script>
+
+        <%- include('../layouts/adminFooter.ejs') %>

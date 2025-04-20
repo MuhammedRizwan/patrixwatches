@@ -1,0 +1,222 @@
+<%- include('../layouts/userHeader.ejs') %>
+
+
+<section class="mt-50" style="margin-bottom: 200px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                
+                        <% if (Wishlist.items && Wishlist.items.length > 0) { %>
+                          
+                        
+                        <table class="table shopping-summery text-center">
+
+                            <thead>
+                                <tr class="main-heading">
+                                    <th scope="col" colspan="2">Product</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col"> Discount Price</th>
+                                    <th scope="col">Action</th>
+                                    <th scope="col">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <% for(let i=0 ;i < Wishlist.items.length; i++){ %>
+                                    <tr>
+                                        <td class="image product-thumbnail"><img
+                                            src="/admin-assets/imgs/productIMG/<%=Wishlist.items[i].product.image[0]%>"
+                                                alt="#"></td>
+                                        <td class="product-des product-name">
+                                            <h5 class="product-name"><a
+                                                    href="/productPage?id=<%= Wishlist.items[i].product._id %>">
+                                                    <%= Wishlist.items[i].product.name %>
+                                                </a></h5>
+                                        </td>
+                                        <td class="price" data-title="Price"><span>
+                                                <%= Wishlist.items[i].product.price %>
+                                            </span></td>
+                                            <td class = "discount price" data-title="discount price"><span>
+                                                <%= Wishlist.items[i].product.discount_price%>
+                                            </span></td>
+                                        <td class="text-right" data-title="Cart">
+                                            <form action="/cart?id=<%= Wishlist.items[i].product._id %>"
+                                                method="post">
+                                                <input type="hidden" name="ID" value="<%= Wishlist.items[i].product._id %>">
+                                                <div class="product-details-quantity">
+                                                    <input type="number" id="qty" name="qty" class="form-control"
+                                                        value="1" min="1" max="10" step="1" data-decimals="0"
+                                                        hidden>
+                                                        
+                                                </div>
+                                                <button type="submit" class="btn btn-sm"><i
+                                                        class="add-to-cart-btn fi-rs-shopping-bag mr-5"></i>Add to cart</button>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <button type="button"  onclick="confirmRemoveWishlistItem('<%= Wishlist.items[i].product._id %>');" style="background-color: #e74c3c; color: #fff; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                                                <i class="fi-rs-trash me-2"></i> Remove
+                                            </button>
+                                            
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="6">
+                                                    <div
+                                                        style="display: flex; justify-content: center; margin-top: 30px; ">
+                                                        <h1 style="color: darkgoldenrod;">Wishlist is empty</h1>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="6">
+                                                    <div
+                                                        style="display: flex; justify-content: center; margin-top: 30px; ">
+                                                        <a href="/shop" class="btn btn-primary"
+                                                            style="font-size:medium; padding: 5px;"><i
+                                                                class="fa-solid fa-cart-shopping"></i>Continue
+                                                            Shoping</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <% } %>
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+
+
+<script>
+    function confirmRemoveWishlistItem(productId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You want to delete the item",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, remove it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // User clicked "Yes," so proceed with removing the wishlist item
+                console.log("Removing wishlist item with productId:", productId);
+                removeWishlistItem(productId);
+            }
+        });
+    }
+
+    function removeWishlistItem(productId) {
+        fetch(`/removeWishlist?productId=${productId}`, {
+            method: 'DELETE',
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Response from removeWishlistItem:", data);
+            if (data.success) {
+                localStorage.setItem('wishlistItemRemoved', 'true');
+                location.reload();
+            } else {
+                console.error('Failed to remove wishlist item:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error removing wishlist item:', error);
+        });
+    }
+
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('click', function (event) {
+            if (event.target.classList.contains('add-to-cart-btn')) {
+                event.preventDefault();
+
+                const qtyInput = event.target.closest('form').querySelector('.qty');
+                const productId = event.target.closest('form').querySelector('.ID').value;
+
+                const requestData = {
+                    qty: qtyInput.value,
+                    productData_id: productId
+                };
+
+                // Perform an asynchronous request to remove the product from the wishlist
+                fetch(`/wishlist/remove?id=${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Check the server's response
+                    if (data.success) {
+                        // Product removed from wishlist, now add it to the cart
+                        fetch('/cart', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(requestData),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Display success message
+                                Toastify({
+                                    text: "Product added to cart successfully",
+                                    backgroundColor: "green",
+                                }).showToast();
+                                location.reload();
+                            } else {
+                                // Display error message
+                                Toastify({
+                                    text: "Error adding product to cart",
+                                    backgroundColor: "red",
+                                }).showToast();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('There was a problem with the fetch operation:', error);
+                            // Display error message
+                            Toastify({
+                                text: "Error adding product to cart",
+                                backgroundColor: "red",
+                            }).showToast();
+                        });
+                    } else {
+                        // Display error message
+                        Toastify({
+                            text: "Failed to remove product from wishlist",
+                            backgroundColor: "red",
+                        }).showToast();
+                    }
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                    // Display error message
+                    Toastify({
+                        text: "Error removing product from wishlist",
+                        backgroundColor: "red",
+                    }).showToast();
+                });
+            }
+        });
+    });
+
+
+  
+
+
+   
+</script>
+
+
+
+<%- include('../layouts/userFooter.ejs') %>

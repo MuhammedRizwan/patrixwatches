@@ -1,0 +1,161 @@
+<%- include('../layouts/adminHeader.ejs') %>
+
+
+
+
+<form action="/admin/editOffer" method="post" id="offer-form">
+    <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+                <input type="hidden" name="offerId" value="<%= offer._id %>">
+                <div class="content-header">
+                    <h2 class="content-title">Edit Offer</h2>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mb-4">
+                <a href="/admin/offerList"><button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button></a>
+                <input type="submit" value="Edit Offer" class="btn btn-md rounded font-sm hover-up">
+            </div>
+            <div class="col-lg-12">
+                
+               
+             
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="category_name" class="form-label">Name</label>
+                                <input type="text" name="name" value="<%= offer.name %>" placeholder="Type here" class="form-control" id="offer_name">
+                                <div class="error-message" style="color: red;" id="offer_name-error"></div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="form-group">
+                                    <label class="form-label" for="discountType">Discount Type:</label>
+                                    <select class="form-select" id="discountType" value="<%= offer.discountType %>" name="discountType" required>
+                                        <option value="percentage"   <%= offer.discountType === 'percentage' ? 'selected' : '' %>>Percentage</option>
+                                        <option value="fixed Amount"  <%= offer.discountType === 'fixedAmount' ? 'selected' : '' %>>Fixed Amount</option>
+                                    </select><br>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="category_name" class="form-label">Discount</label>
+                                <input type="number" name="discountValue" placeholder="Type here" value="<%= offer.discountValue %>" class="form-control" id="banner_link">
+                                <div class="error-message" style="color: red;" id="banner_link-error"></div>
+                            </div>
+                           
+                            <div class="mb-4">
+                                <div class="form-group">
+                                    <label  class="form-label mt-3"  for="limit">Maximum Redeemable Amount</label>
+                                    <input type="number" class="form-control" value="<%= offer.maxAmt %>" id="maxRedeemableAmt" name="maxRedeemableAmt" required>
+                                </div>
+                            </div>
+                          
+                           
+
+                        </div>
+                    </div> <!-- card end// -->
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <div class="form-group">
+                                <label class="form-label mt-3" for="DiscountType">Discount On</label>
+                                <select class="form-control" value="<%= offer.discountOn %>" id="discountOn" name="discountOn" required>
+                                    <option value="product"  <%= offer.discountOn === 'product' ? 'selected' : '' %>>Product</option>
+                                    <option value="category"  <%= offer.discountOn === 'category' ? 'selected' : '' %>>Category</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div id="categorySelect" style="display: none;">
+                            <label class="form-label">Category</label>
+                            <select name="discountedCategory" class="form-select">
+                                <option value="" selected disabled>Select a category</option>
+                                <% if (category && category.length > 0 && offer.discountedCategory) { %>
+                                    <% for (let i = 0; i < category.length; i++) { %>
+                                        <option value="<%= category[i]._id %>" <%= offer.discountedCategory.equals(category[i]._id) ? 'selected' : '' %>>
+                                            <%= category[i].name %>
+                                        </option>
+                                    <% } %>
+                                <% } else { %>
+                                    <option value="" disabled>No categories available</option>
+                                <% } %>
+                            </select><br>
+                        </div>
+                        <div id="productSelect" style="display: none;">
+                            <label class="form-label">Product</label>
+                            <select name="discountedProduct" class="form-select">
+                                <option value="" selected disabled>Select a product</option>
+                                <% if (product && product.length > 0 && offer.discountedProduct) { %>
+                                    <% for (let i = 0; i < product.length; i++) { %>
+                                        <option value="<%= product[i]._id %>" <%= offer.discountedProduct.equals(product[i]._id) ? 'selected' : '' %>>
+                                            <%= product[i].name %>
+                                        </option>
+                                    <% } %>
+                                <% } else { %>
+                                    <option value="" disabled>No products available</option>
+                                <% } %>
+                            </select><br>
+                        </div>
+                        
+                        
+                        <!-- Category Div -->
+                        <div class="mb-2">
+                            <label for="category_name" class="form-label">Start Date</label>
+                            <input type="date" name="startDate" placeholder="Type here" value="<%= startDate %>" class="form-control" id="startDate">
+                            <div class="error-message" style="color: red;" id="startDate-error"></div>
+                        </div>
+                
+                        <div class="mb-2">
+                            <label for="start date" class="form-label">Expiry Date</label>
+                            <input type="date" name="endDate" placeholder="Type here" value="<%= endDate %>" class="form-control" id="expiryDate">
+                            <div class="error-message" style="color: red;" id="expiryDate-error"></div>
+                        </div>
+                      
+                    </div>
+                </div> <!-- card end// -->
+            </div>
+        </div>
+   
+        <div id="invalid">
+            <% if (typeof message !== 'undefined' && message) { %>
+                <p style="color: red;" id="message"><%= message %></p>
+            <% } %>
+                    </div>  
+        </div> 
+           
+            
+    
+    </section> <!-- content-main end// -->
+</form>
+<script>
+    // Initially display the product select
+    // document.getElementById('productSelect').style.display = 'block';
+
+    document.getElementById('discountOn').addEventListener('change', function () {
+        var categorySelect = document.getElementById('categorySelect');
+        var productSelect = document.getElementById('productSelect');
+
+        // Hide both divs by default
+        categorySelect.style.display = 'none';
+        productSelect.style.display = 'none';
+
+        // Show the selected div
+        var selectedOption = this.value;
+        if (selectedOption === 'category') {
+            categorySelect.style.display = 'block';
+        } else if (selectedOption === 'product') {
+            productSelect.style.display = 'block';
+        }
+    });
+</script>
+
+  
+    
+
+
+    <%- include('../layouts/adminFooter.ejs') %>

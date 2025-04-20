@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RIZT - Forgot Password</title>
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="/user-assets/imgs/theme/Wlogo.jpeg"
+    />
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <!-- Your Custom CSS -->
+    <link rel="stylesheet" href="/user-assets/css/main.css" />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+
+      .main {
+        margin-top: 50px;
+      }
+
+      .forgot-password-box {
+        max-width: 400px;
+        margin: auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+
+    <main class="main">
+      <section class="pt-5 pb-5">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-6">
+              <!-- Forgot Password box -->
+              <div class="forgot-password-box">
+                <div class="text-center mb-4">
+                  <h3>Forgot Password</h3>
+                </div>
+                <form action="/forget" method="POST" id="forgotPasswordForm">
+                  <div class="form-group">
+                    <label for="email">Enter Email:</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="email"
+                      name="email"
+                      required
+                    />
+                  </div>
+                  <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary px-4">
+                      Submit
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <!-- End Forgot Password box -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+  let emailId = document.getElementById("email");
+  let errorEmail = document.getElementById("erroremail");
+
+
+  emailId.addEventListener('input', function () {
+    errorEmail.innerHTML = emailId.value.trim() === "" ? "Please enter user name" : /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(emailId.value) == false ? "Please enter alphabets only" : "";
+  });
+
+
+
+});
+function validationChecking() {
+  let emailId = document.getElementById("email")
+  let errorEmail = document.getElementById("erroremail");
+ 
+
+  errorEmail.innerHTML =
+  emailId.value.trim() === ""
+      ? "Please enter email"
+      : /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(emailId.value) == false
+      ? "Please enter valid email only"
+      : "";
+  
+  if (errorEmail.innerHTML ) return false;
+  
+  return true;
+}
+
+
+</script>
+</body>
+</html>

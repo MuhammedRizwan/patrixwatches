@@ -1,0 +1,97 @@
+<%- include('../layouts/adminHeader.ejs') %>
+
+<form action="/admin/addCategory" method="post" id="category-form"  onsubmit="return validationChecking()">
+    <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Add New Category</h2>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Basic</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="category_name" class="form-label">Category name</label>
+                            <input type="text" name="name"  placeholder="Type here" class="form-control" id="category_name">
+                            <div class="error-message" style="color: red;" id="category_name-error"></div>
+                        </div>
+                      
+                    </div>
+                </div> <!-- card end// -->
+            </div>
+          
+                <div>
+                    <input type="submit" value="submit" class="btn btn-md rounded font-sm hover-up" >
+                </div>
+
+                <div id="invalid">
+                    <% if (typeof error !=='undefined' && error) { %>
+                        <p class="text-danger" id="message">
+                            <%= error %>
+                        </p>
+                        <% } %>
+                        
+                </div>
+            </div>
+            <div id="invalid">
+                <% if (typeof message !=='undefined' && message) { %>
+                    <p style="color: rgb(8, 96, 0);" id="message">
+                        <%= message %>
+                    </p>
+                    <% } %>
+                    
+            </div>
+            </div>
+        </div>
+    </section> <!-- content-main end// -->
+</form>
+<script>
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const category_name = document.getElementById("category_name");
+    const category_name_error = document.getElementById("category_name-error");
+    const description = document.getElementById("description");
+    const description_error = document.getElementById("description-error");
+
+    category_name.addEventListener('onsubmit', function () {
+        const inputValue = category_name.value.trim();
+        if (inputValue === "") {
+            category_name_error.innerHTML = "Please enter category name";
+        } else if (!isNaN(inputValue)) {
+            category_name_error.innerHTML = "Category name cannot be a number";
+        } else {
+            category_name_error.innerHTML = "";
+        }
+    });
+
+    description.addEventListener('onsubmit', function () {
+        description_error.innerHTML = description.value.trim() === "" ? "Please enter category description" : "";
+    });
+});
+function validationChecking(event) {
+    // event.preventDefault();
+            const category_name = document.getElementById("category_name").value;
+            const category_name_error = document.getElementById("category_name-error");
+
+            category_name_error.innerHTML = category_name.trim() === "" ? "Please enter category name" : "";
+
+            // Check if category name is a number
+            if (!isNaN(category_name)) {
+                category_name_error.innerHTML = "Category name cannot be a number";
+                    return false;// Prevent the form from submitting
+            }
+}
+
+            
+
+
+
+</script>
+
+
+    <%- include('../layouts/adminFooter.ejs') %>

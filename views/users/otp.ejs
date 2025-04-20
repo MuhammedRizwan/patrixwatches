@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RIZT</title>
+    <meta name="description" content="<%= locals.description %>" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="/user-assets/imgs/theme/Wlogo.jpeg"
+    />
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <!-- Your Custom CSS -->
+    <!-- <link rel="stylesheet" href="/user-assets/css/main.css"> -->
+  </head>
+  <body>
+
+    <main class="main">
+      <section class="pt-5 pb-5">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-6">
+              <!-- Outer box added here -->
+              <div class="outer-box border rounded p-4">
+                <div class="login_wrap widget-taber-content background-white border-radius-10">
+                  <div class="text-center">
+                    <h3 class="mb-4">OTP VERIFICATION</h3>
+                  </div>
+                  <form action="/otp" method="POST" id="otpForm">
+                    <div id="otp" class="inputs d-flex justify-content-center mt-2">
+                      <input
+                        class="m-2 text-center form-control rounded"
+                        type="text"
+                        name="otp"
+                        maxlength="4"
+                      />
+                    </div>
+                    <div class="mt-4 text-center">
+                      <button type="submit" class="btn btn-primary px-4">
+                        Submit
+                      </button>
+                    </div>
+                    <div class="text-center mt-3">
+                      <span style="color: red; font-size: 15px;" id="otp-expiry-time"></span>
+                    </div>
+                    <div class="text-center"> 
+                      <button class="btn btn-success px-4 py-0  validate text-center" id="resendButton">
+                        <a href="/resendOTP" class="text-white">resend</a>
+                      </button>                                
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const otpForm = document.getElementById('otpForm');
+        const otpInputs = otpForm.querySelectorAll('input[name^="otp"]');
+    
+        otpInputs.forEach((input, index) => {
+          input.addEventListener('input', function () {
+            if (input.value.length === 1 && index < otpInputs.length - 1) {
+              otpInputs[index + 1].focus();   
+            }
+          });
+        });
+      });
+
+      
+    
+      
+    </script>
+    <script>
+
+
+      // Check if countdownValue exists in localStorage
+    var storedCountdownValue = localStorage.getItem('countdownValue');
+    var countdownValue = storedCountdownValue ? parseInt(storedCountdownValue) : 60; // Set initial countdown value
+    let reload=0;
+    var countdownInterval;
+    
+    // Call resendOTP function when the page loads
+    window.onload = function () {
+    reload++
+      resendOTP();
+    };
+    
+    function resendOTP() {
+      
+      console.log('Resend OTP button clicked');
+      $("#resendButton").prop("disabled", true);
+    
+      clearInterval(countdownInterval); // Clear previous interval, if any
+      countdownInterval = setInterval(function() {
+        countdownValue--;
+    
+        if (countdownValue <= 0) {
+          clearInterval(countdownInterval);
+          $("#resendButton").prop("disabled", false);
+          $("#otp-expiry-time").text('');
+          countdownValue = 30; // Reset countdown value for the next iteration
+        } else {
+          $("#otp-expiry-time").text('Resend in ' + countdownValue + ' seconds');
+        }
+    
+        // Store countdownValue in localStorage on every decrement
+        localStorage.setItem('countdownValue', countdownValue.toString());
+      }, 1000);
+    }
+    </script>
+  
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,128 @@
+<%- include('../layouts/adminHeader.ejs') %>
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Coupon Detail</h2>
+            </div>
+            </div>
+            <div class="card">
+            <header class="card-header">
+            <div class="row align-items-center">
+            <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+            <span>
+            <i class="material-icons md-calendar_today"></i><br>
+            </span> <br>
+            <small class="text-muted font-xxl mb-4">Coupon Code: <span class="text-success"><%= coupon.code %></span></small><br><br>
+            <small class="text-muted mt-5">Coupon Status: </small><b class="">
+            <% if (coupon.is_listed == true) { %>
+            <span class="badge badge-pill badge-soft-success">Listed</span>
+   
+            <% } else { %>
+            <span class="badge badge-pill badge-soft-danger">Unlisted</span>
+            <% } %>
+            <br>
+           
+            </div>
+            
+     
+                    
+                    <script>
+                        function saveCouponStatus() {
+                            const dropdown = document.getElementById("orderStatusDropdown");
+                            const selectedStatus = dropdown.options[dropdown.selectedIndex].value;
+                    
+                            // Redirect to the selected route
+                            window.location.href = `/admin/coupontatus?orderId=<%= coupon._id.toString()%>&status=${selectedStatus}&orderDetails=true`;
+                        }
+                    </script>
+            </div>
+        </header> <!-- card-header end// -->
+        <div class="card-body doPdf">
+            <div class="row mb-50 mt-20 order-info-wrap">
+                <div class="col-md-4">
+                    <article class="icontext align-items-start">
+                        <span class="icon icon-sm rounded-circle bg-primary-light">
+                            <i class="text-primary material-icons md-person"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Customer</h6>
+                           
+                        </div>
+                    </article>
+                </div> <!-- col// -->
+                <div class="col-md-4">
+                    <article class="icontext align-items-start">
+                        <span class="icon icon-sm rounded-circle bg-primary-light">
+                            <i class="text-primary material-icons md-local_shipping"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Coupon info</h6>
+                            <small class="text-muted mt-5">Coupon Discount: </small><b class=""> 
+                                <%= coupon.discount %>%
+                              </b>
+                              <small class="text-muted mt-5">Coupon Expiry: </small><b class=""><%= new Date(coupon.expiry).toLocaleDateString() %></b>
+                        </div>
+                    </article>
+                </div> <!-- col// -->
+               
+            </div> <!-- row // -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th width="40%">User Name</th>
+                                    <th width="20%">email</th>
+                                    <th width="20%">Mobile</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% users.forEach(function(user) { %>
+                                    <tr>
+                                        <td>
+                                            <a class="itemside" href="#">
+                                                <div class="left">
+                                                    <img src="/user-assets/imgs/user/<%= user.image %>" width="40" height="40" class="img-xs" alt="Item">
+                                                </div>
+                                                <div class="info"><%= user.name.slice(0, 50) + '...'  %></div>
+                                            </a>
+                                        </td>
+                                        <td><%= user.email %></td>
+                                        <td><%= user.mobile %></td>
+                                    </tr>
+                                <% }); %>
+                                
+
+                                <tr>
+                                   
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> <!-- table-responsive// -->
+                </div> <!-- col// -->
+                <div class="col-lg-1"></div>
+                
+            </div>
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+</section> <!-- content-main end// -->
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script>
+    document.getElementById("pdfButton").addEventListener("click", function () {
+        const salesContainer = document.querySelector(".doPdf");
+        const pdfOptions = {
+            filename: 'CouponDetails.pdf',
+            image: { type: 'jpeg', quality: 1.0 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().from(salesContainer).set(pdfOptions).save();
+});
+</script>
+
+
+<%- include('../layouts/adminFooter.ejs') %>

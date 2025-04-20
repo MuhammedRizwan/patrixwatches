@@ -1,0 +1,200 @@
+<%- include('../layouts/userHeader.ejs') %>
+
+  <main class="main">
+    <div class="page-header breadcrumb-wrap">
+      <div class="container">
+        <div class="breadcrumb">
+          <a href="index.html" rel="nofollow">Home</a>
+          <span></span> Pages
+          <span></span> Account
+        </div>
+      </div>
+    </div>
+
+    <section class="pt-150 pb-150">
+
+      <div class="container">
+
+        <div class="row">
+          <div class="col-lg-10 m-auto">
+
+            <div class="row">
+              <div class="col-md-4">
+                <div class="dashboard-menu">
+                  <ul class="nav flex-column" role="tablist">
+                    <!-- <li class="nav-item">
+                                      <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+                                  </li> -->
+                    <li class="nav-item">
+                      <a class="nav-link" href="/userprofile"><i class="fi-rs-user mr-10"></i>Account details</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/userAddress"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab"
+                        aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab"
+                        aria-controls="track-orders" aria-selected="false"><i
+                          class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
+                    </li>
+
+
+                    <li class="nav-item">
+                      <a class="nav-link" href="page-login-register.html"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="col-md-8">
+
+
+                <section class="content-body p-xl-4">
+                  <form action="/addAddress" method="post" onsubmit="return validationChecking()">
+                    <div class="row">
+
+
+
+
+
+
+
+                      <div class="form-group">
+                        <input type="text" id="houseName" name="houseName" placeholder="Enter Name" />
+                        <div id="errorhouseName" class="ms-2 text-danger"></div>
+                      </div>
+                      <div class="form-group ">
+                        <input type="text" id="street" name="street" placeholder="Enter street" />
+                        <div id="errorstreet" class="ms-2 text-danger"></div>
+                      </div>
+                      <div class="form-group ">
+                        <input type="text" id="city" name="city" placeholder="Enter city" />
+                        <div id="errorcity" class="ms-2 text-danger"></div>
+                      </div>
+
+                      <div class="row">
+                        <div class="form-group col-md-6">
+                          <input type="text" id="state" name="state" placeholder="Enter state" />
+                          <div id="errorstate" class="ms-2 text-danger"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                          <input type="text" id="pincode" name="pincode" placeholder="Enter pincode" />
+                          <div id="errorpincode" class="ms-2 text-danger"></div>
+                        </div>
+                      </div>
+
+                    </div>
+                    <br>
+                    <div class="text-center">
+                      <button class="btn btn-primary " type="submit">Save changes</button>
+                    </div>
+
+                  </form>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  const houseName = document.getElementById("houseName");
+  const errorhouseName = document.getElementById("errorhouseName");
+  const street = document.getElementById("street");
+  const errorstreet = document.getElementById("errorstreet");
+  const city = document.getElementById("city");
+  const errorcity = document.getElementById("errorcity");
+  const state = document.getElementById("state");
+  const errorstate = document.getElementById("errorstate");
+  const pincode = document.getElementById("pincode");
+  const errorpincode = document.getElementById("errorpincode");
+
+  houseName.addEventListener('input', function () {
+    errorhouseName.innerHTML = houseName.value.trim() === "" ? "Please enter home name" : /^[a-zA-Z ]+$/.test(houseName.value) == false ? "Please enter alphabets only" : "";
+  });
+  street.addEventListener('input', function () {
+    errorstreet.innerHTML = street.value.trim() === "" ? "Please enter street name" : /^[a-zA-Z ]+$/.test(street.value) == false ? "Please enter alphabets only" : "";
+  });
+  city.addEventListener('input', function () {
+    errorcity.innerHTML = city.value.trim() === "" ? "Please enter city name" : /^[a-zA-Z ]+$/.test(city.value) == false ? "Please enter alphabets only" : "";
+  });
+  state.addEventListener('input', function () {
+    errorstate.innerHTML = state.value.trim() === "" ? "Please enter state name" : /^[a-zA-Z ]+$/.test(state.value) == false ? "Please enter alphabets only" : "";
+  });
+
+  pincode.addEventListener('input', function () {
+    errorpincode.innerHTML = pincode.value.trim() === "" ? "Please enter  number" : /^\d{6}$/.test(pincode.value) == false ? "Please enter valid  number" : "";
+  });
+
+
+});
+
+  function validationChecking() {
+    // Reset previous error messages
+    resetErrorMessages();
+
+    // Get form input values
+    const houseName = document.getElementById('houseName').value.trim();
+    const street = document.getElementById('street').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const state = document.getElementById('state').value.trim();
+    const pincode = document.getElementById('pincode').value.trim();
+
+    // Flag to check if the form is valid
+    let isValid = true;
+
+    // Validation for houseName
+    if (!houseName) {
+      displayError('errorhouseName', 'Please enter a name.');
+      isValid = false;
+    }
+
+    // Validation for street
+    if (!street) {
+      displayError('errorstreet', 'Please enter a street.');
+      isValid = false;
+    }
+
+    // Validation for city
+    if (!city) {
+      displayError('errorcity', 'Please enter a city.');
+      isValid = false;
+    }
+
+    // Validation for state
+    if (!state) {
+      displayError('errorstate', 'Please enter a state.');
+      isValid = false;
+    }
+
+    // Validation for pincode
+    if (!pincode || !/^\d{6}$/.test(pincode)) {
+      displayError('errorpincode', 'Please enter a valid 6-digit pincode.');
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  function resetErrorMessages() {
+    const errorElements = document.querySelectorAll('.text-danger');
+    errorElements.forEach(element => {
+      element.textContent = '';
+    });
+  }
+
+  function displayError(elementId, errorMessage) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.textContent = errorMessage;
+  }
+</script>
+
+
+<%- include('../layouts/userFooter.ejs') %>

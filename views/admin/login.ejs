@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NextTick</title>
+  <link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+  integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+  crossorigin="anonymous"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"
+/>
+<link rel="stylesheet" href="/style.css" />
+  <link rel="shortcut icon" type="image/png" href="/admin-assets/imgs/theme/Wlogo.jpeg" />
+  <link rel="stylesheet" href="../admin-assets/css/styles.min.css" />
+</head>
+
+<body>
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <div
+      class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+      <div class="d-flex align-items-center justify-content-center w-100">
+        <div class="row justify-content-center w-100">
+          <div class="col-md-8 col-lg-6 col-xxl-3">
+            <div class="card mb-0">
+              <div class="card-body">
+                <a href="./index.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                  <img src="admin-assets/imgs/theme/Wlogo.jpeg" width="180" alt="">
+                </a>
+              
+                <form action="/admin" method="post">
+             
+                  <div class="mb-3">
+                    <label for="email" class="form-label">Username</label>
+                    <input type="email" class="form-control" 
+                    class="ms-1 form-control"
+                    id="email"
+                    name="email"
+                    onblur="emailChaking()"
+                    placeholder="Enter Email"
+                    >
+                    <div
+                    id="erroremail"
+                    class="mt-0 ms-2 position-absolute text-danger"
+                  ></div>
+                  </div>
+                  <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" 
+                    class="form-control" 
+                    id="password"
+                    name="password"
+                    onblur="passwordChaking()"
+                    placeholder="Enter Password"
+                    >
+                    <div
+                    id="errorpassword"
+                    class="mt-0 ms-2 position-absolute text-danger"
+                  ></div>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between mb-4">
+                
+                    <!-- <a class="text-primary fw-bold" href="./index.html">Forgot Password ?</a> -->
+                  </div>
+                  <button
+                  type="submit"
+               
+                  class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2"
+                >
+                  submit
+                </button>
+             
+                  <div class="d-flex align-items-center justify-content-center">
+                       <div class="text-center">
+                <% if (typeof message !== 'undefined') { %>
+                <p style="color: green"><%= message %> </p>
+                <% } %>
+              </div>
+                   
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+
+    function emailChaking() {
+      let emailId = document.getElementById("email").value;
+      console.log("emailId" + emailId);
+      if (
+        /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(emailId) == false
+      ) {
+        console.log("emailIddd" + emailId);
+        document.getElementById("erroremail").innerHTML =
+          "Please enter valid email ";
+        return false;
+      } else {
+        document.getElementById("erroremail").innerHTML = "";
+        return true;
+      }
+    }
+
+    let password = document.getElementById("password").value;
+    function passwordChaking() {
+      password = document.getElementById("password").value;
+      if (password == "") {
+        document.getElementById("errorpassword").innerHTML =
+          "please enter your password";
+        return false;
+      } else if (password.length < 8) {
+        document.getElementById("errorpassword").innerHTML =
+          "please enter minimum 8 digits";
+        return false;
+      } else {
+        document.getElementById("errorpassword").innerHTML = "";
+        return true;
+      }
+    }
+    
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"
+  ></script>
+  <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

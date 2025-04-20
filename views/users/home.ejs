@@ -1,0 +1,240 @@
+<%- include('../layouts/userHeader.ejs') %>
+
+<!-- Add Swiper JS -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+<!-- Add Swiper JS -->
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+
+<main class="main">
+    <!-- Assuming banners is an array of banner documents -->
+    <% if (banners.length > 0) { %>
+        <section class="home-slider position-relative pt-50">
+            <div class="hero-slider-1 dot-style-1 dot-style-1-position-1">
+                <% for (let i = 0; i < banners.length; i++) { %>
+                    <div class="single-hero-slider single-animation-wrap">
+                        <div class="container">
+                            <div class="row align-items-center slider-animated-1">
+                                <!-- Display other banner details here -->
+                                <div class="col-lg-5 col-md-6">
+                                    <div class="hero-slider-content-2">
+                                        <h4 class="animated"><%= banners[i].bannerType %></h4>
+                                        <h2 class="animated fw-900">Super value deals</h2>
+                                        <h1 class="animated fw-900 text-brand">On all products</h1>
+                                        <!-- <p class="animated">Save more with coupons & up to 70% off</p> -->
+                                        <a class="animated btn btn-brush btn-brush-3" href="/shop"> Shop Now </a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-7 col-md-6">
+                                    <div class="single-slider-img single-slider-img-1">
+                                        <img class="animated slider-1-<%= i + 1 %>"
+                                            src="/admin-assets/bannerImg/<%= banners[i].image %>" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination"></div>
+                <!-- Remove Navigation -->
+            </div>
+        </section>
+        
+        <!-- Initialize Swiper -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var swiper = new Swiper('.hero-slider-1', {
+                    slidesPerView: 1,
+                    spaceBetween: 30,
+                    pagination: {
+                        el: '.swiper-pagination',
+                        clickable: true,
+                    },
+                });
+            });
+        </script>
+        <% } %>
+
+        
+            <section class="featured section-padding position-relative"  style="background-color: rgb(163, 218, 173);">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                            <div class="banner-features wow fadeIn animated hover-up">
+                                <img src="user-assets/imgs/theme/icons/feature-1.png" alt="">
+                                <h4 class="bg-1">Free Shipping</h4>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                            <div class="banner-features wow fadeIn animated hover-up">
+                                <img src="user-assets/imgs/theme/icons/feature-2.png" alt="">
+                                <h4 class="bg-3">Online Order</h4>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                            <div class="banner-features wow fadeIn animated hover-up">
+                                <img src="user-assets/imgs/theme/icons/feature-3.png" alt="">
+                                <h4 class="bg-2">Save Money</h4>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                            <div class="banner-features wow fadeIn animated hover-up">
+                                <img src="user-assets/imgs/theme/icons/feature-4.png" alt="">
+                                <h4 class="bg-4">Promotions</h4>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                            <div class="banner-features wow fadeIn animated hover-up">
+                                <img src="user-assets/imgs/theme/icons/feature-5.png" alt="">
+                                <h4 class="bg-5">Happy Sell</h4>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                            <div class="banner-features wow fadeIn animated hover-up">
+                                <img src="user-assets/imgs/theme/icons/feature-6.png" alt="">
+                                <h4 class="bg-6">24/7 Support</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+         
+            <section>
+                <% for (let i = 0; i < banners.length; i++) { %>
+                    <% if(banners[i].title === 'Omega') { %>
+                        <div class="banner-img banner-rectangle wow fadeIn f-none animated mt-50">
+                            <img class="border-radius-10" src="/admin-assets/bannerImg/<%= banners[i].image %>" alt="">
+                            <div class="banner-text">
+                                <h4 class="mb-15 mt-40">Repair Services</h4>
+                                <h2 class="fw-600 mb-20">We're an <br>Authorised Service Provider</h2>
+                            </div>
+                        </div>
+                    <% } %>
+                <% } %>
+            </section>
+            <style>
+            .banner-rectangle {
+                width: 100%; /* Set the width to 100% or adjust as needed */
+                height: auto; /* Allow the height to adjust based on the image aspect ratio */
+                /* Add any additional styling you need for the rectangle banner */
+            }
+            
+            .banner-rectangle img {
+                width: 100%;
+                height: auto;
+            }
+            
+            
+        </style>
+
+        <section class="product-tabs section-padding position-relative wow fadeIn animated">
+            <div class="bg-square"></div>
+            <div class="container">
+                <div class="tab-header">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">     
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="nav-tab-one" data-bs-toggle="tab"
+                                data-bs-target="#tab-one" type="button" role="tab" aria-controls="tab-one"
+                                aria-selected="true">Featured</button>
+                        </li>
+                    </ul>
+                    <a href="#" class="view-more d-none d-md-flex">View More<i
+                            class="fi-rs-angle-double-small-right"></i></a>
+                </div>
+                <!--End nav-tabs-->
+
+
+                <div class="tab-content wow fadeIn animated" id="myTabContent">
+                    <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
+                        <div class="row product-grid-4">
+                            <% for (const productItem of products) { if (productItem.is_listed ) { const categoryId = productItem.category; categories.forEach(category=> { if (categoryId.toString() === category._id.toString()) { if (category.is_listed) { %>
+                                <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                                    <div class="product-cart-wrap mb-30">
+                                        <div class="product-img-action-wrap">
+                                            <div class="product-img product-img-zoom">
+                                                <a href="/singleProduct/<%= productItem._id %>">
+                                                    <% if (productItem.image && productItem.image.length > 0) { %>
+                                                        <img class="default-img"
+                                                            src="/admin-assets/imgs/productIMG/<%= productItem.image[0] %>"
+                                                            alt="" />
+                                                        <% if (productItem.image.length > 1) { %>
+                                                            <img class="hover-img"
+                                                                src="/adminassets/imgs/productIMG/<%= productItem.image[1] %>"
+                                                                alt="" />
+                                                        <% } %>
+                                                    <% } %>
+                                                </a>
+                                            </div>
+
+                                            <div class="product-badges product-badges-position product-badges-mrg">
+                                                <span class="hot">Hot</span>
+                                            </div>
+                                        </div>
+                                        <div class="product-content-wrap">
+                                            <div class="product-category">
+                                                <a href="/singleProduct/<%= productItem._id%>">
+                                                    <%= category.name %>
+                                                </a>
+
+                                            </div>
+                                            <h2><a href="/singleProduct/<%= productItem._id%>">
+                                                    <%= productItem.name %>
+                                                </a></h2>
+                                            
+                                            <form id="myForm" action="/cart" method="post">
+                                                <div class="product-action-1 show">
+                                                    <input type="hidden" value="<%= productItem._id %>"
+                                                        name="productData_id">
+                                                    <input type="hidden" value="1" name="qty">
+                                                    <button type="button" aria-label="Add To Cart"
+                                                        class="action-btn hover-up">
+                                                        <i class="fi-rs-shopping-bag-add"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <% } } }); }} %>
+
+
+                        </div>
+                    </div>
+                    <!--En tab two (Popular)-->
+
+                            
+                        
+                    
+                        <div class="card-body">
+                            <h5 class="card-title">Best Sales</h5>
+                            <div class="row">
+                                <% bestSellingProducts.forEach((product, index) => { %>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="product-cart-wrap small hover-up">
+                                            <div class="product-img-action-wrap">
+                                                <div class="product-img product-img-zoom">
+                                                    <a href="/singleProduct/<%= product._id %>">
+                                                        <img class="default-img" src="/admin-assets/imgs/productIMG/<%= product.image[0] %>" alt="" />
+                                                        <img class="hover-img" src="/admin-assets/imgs/productIMG/<%= product.image[1] %>" alt="" />
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="product-content-wrap">
+                                                <h6> <%= product.productName %></h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    </div>
+                  
+                    
+                    
+                   
+
+    </main>
+    <%- include('../layouts/userFooter.ejs') %>
