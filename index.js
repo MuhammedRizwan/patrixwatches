@@ -6,18 +6,21 @@ const adminRoute = require('./routes/adminRoute');
 const dbConnection = require('./config/dbConnect')
 const session=require('express-session')
 const app=express()
-const port=process.env.PORT||3000
+const port=process.env.PORT
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 
 
 dbConnection();
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true
-}));
+app.use(
+  session({
+    secret: "your-secure-secret-key", 
+    resave: false, 
+    saveUninitialized: false, 
+    cookie: { secure: false },
+  })
+);;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));

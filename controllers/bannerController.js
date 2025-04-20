@@ -1,27 +1,26 @@
+const RESPONSE = require("../config/responseMessage");
+const STATUSCODE = require("../config/statusCode");
 const Banner = require("../models/bannerModel");
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 
-// Function to load banner adding page
+
 const loadBannerAdd = async (req, res) => {
   try {
     const category = await Category.find();
     const product = await Product.find();
     const admin = req.session.adminData;
-    res.render("bannerAdd", { admin, category, product });
+    res.status(STATUSCODE.OK).render("bannerAdd", { admin, category, product });
   } catch (error) {
-    console.log(error.message);
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).send(RESPONSE.SERVER_ERROR);
   }
 };
 
-// Function to add a banner
 const addBanner = async (req, res) => {
   try {
-    if (!req.body) {
-      res.redirect("/bannerAdd");
+    if (!req.body || !req.file) {
+      return res.status(STATUSCODE.BAD_REQUEST).redirect("/admin/bannerAdd");
     }
-
-    const image = req.file.filename;
 
     const {
       title,
@@ -32,88 +31,87 @@ const addBanner = async (req, res) => {
       bannerCategory,
       fromDate,
       expiryDate,
+      bannerType,
     } = req.body;
 
     const existingBanner = await Banner.findOne({ title });
-if (existingBanner) {
-  // Render an error message
-  const categories = await Category.find();
-  const products = await Product.find();
-  res.render("bannerAdd", {
-    errorMessage: "Banner already exists",
-    category: categories,
-    product: products, 
-  });
-  return;
-}
+    if (existingBanner) {
+      const categories = await Category.find();
+      const products = await Product.find();
+      return res.status(STATUSCODE.BAD_REQUEST).render("bannerAdd", {
+        errorMessage: RESPONSE.BANNER_EXISTS,
+        category: categories,
+        product: products,
+      });
+    }
 
-const newBanner = new Banner({
-  title,
-  image,
-  link,
-  subtitle,
-  offer,
-  product,
-  category: bannerCategory,
-  startDate: fromDate,
-  endDate: expiryDate,
-});
-    newBanner.bannerType = req.body.bannerType;
+    const newBanner = new Banner({
+      title,
+      image: req.file.filename,
+      link,
+      subtitle,
+      offer,
+      product,
+      category: bannerCategory,
+      startDate: fromDate,
+      endDate: expiryDate,
+      bannerType,
+    });
+
     await newBanner.save();
-
-    res.redirect("/admin/bannerList");
+    res.status(STATUSCODE.OK).redirect("/admin/bannerList");
   } catch (error) {
-    console.log(error.message);
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).render("bannerAdd", {
+      errorMessage: RESPONSE.SERVER_ERROR,
+      category: await Category.find(),
+      product: await Product.find(),
+    });
   }
 };
 
-// Function to load banner list page
 const bannerList = async (req, res) => {
   try {
     const admin = req.session.adminData;
     const page = parseInt(req.query.page) || 1;
-    let query = {};
     const limit = 7;
-    const totalCount = await Banner.countDocuments(query);
-
-    const totalPages = Math.ceil(totalCount / limit);
+    let query = {};
 
     if (req.query.bannerType) {
-      if (req.query.bannerType === "Category Banner") {
-        query.bannerType = "Category Banner";
-      } else if (req.query.bannerType === "Product Banner") {
-        query.bannerType = "Product Banner";
-      }else if (req.query.bannerType === "New Arrival") {
-        query.bannerType = "New Arrival";
-      } else if (req.query.bannerType === "Deals and Promotions") {
-        query.bannerType = "Deals and Promotions";
-      } else if (req.query.bannerType === "Seasonal Sales") {
-        query.bannerType = "Seasonal Sales";
-      }
-      
+      query.bannerType = req.query.bannerType;
     }
+
+    const totalCount = await Banner.countDocuments(query);
     const banner = await Banner.find(query)
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ startDate: -1 });
-      res.render("bannerList", { banner, admin, totalPages, currentPage: page });
 
+    res.status(STATUSCODE.OK).render("bannerList", {
+      banner,
+      admin,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+    });
   } catch (error) {
-    console.log(error.message);
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).send(RESPONSE.SERVER_ERROR);
   }
 };
 
-// Function to load benner edit page
 const loadBannerEdit = async (req, res) => {
   try {
-    const BannerId = req.query.bannerId;
-    const banner = await Banner.findById(BannerId).populate("product");
-    const category = await Category.find({});
+    const bannerId = req.query.bannerId;
+    const banner = await Banner.findById(bannerId).populate("product");
+    if (!banner) {
+      return res.status(STATUSCODE.NOT_FOUND).send(RESPONSE.BANNER_NOT_FOUND);
+    }
+
+    const category = await Category.find();
+    const product = await Product.find();
     const admin = req.session.adminData;
-    const product = await Product.find({});
     const startDate = new Date(banner.startDate).toISOString().split("T")[0];
     const endDate = new Date(banner.endDate).toISOString().split("T")[0];
-    res.render("bannerEdit", {
+
+    res.status(STATUSCODE.OK).render("bannerEdit", {
       banner,
       product,
       category,
@@ -122,68 +120,52 @@ const loadBannerEdit = async (req, res) => {
       endDate,
     });
   } catch (error) {
-    console.log(error.message);
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).send(RESPONSE.SERVER_ERROR);
   }
 };
 
-// Function to edit a banner
 const bannerEdit = async (req, res) => {
   try {
     const bannerId = req.body.bannerId;
     const bannerData = await Banner.findById(bannerId);
-    if (req.body.title) {
-      bannerData.title = req.body.title;
+    if (!bannerData) {
+      return res.status(STATUSCODE.NOT_FOUND).json({ success: false, error: RESPONSE.BANNER_NOT_FOUND });
     }
-    if (req.body.bannerType) {
-      bannerData.bannerType = req.body.bannerType;
-    }
-    if (req.body.link) {
-      bannerData.link = req.body.link;
-    }
-    if (req.body.subtitle) {
-      bannerData.subtitle = req.body.subtitle;
-    }
-    if (req.body.offer) {
-      bannerData.offer = req.body.offer;
-    }
-    if (req.body.category) {
-      bannerData.category = req.body.category;
-    }
-    if (req.body.product) {
-      bannerData.product = req.body.product;
-    }
-    if (req.body.startDate) {
-      bannerData.startDate = req.body.startDate;
-    }
-    if (req.body.endDate) {
-      bannerData.endDate = req.body.endDate;
-    }
-    if (req.file) {
-      bannerData.image = req.file.filename;
-    }
-    await bannerData.save();
-    res.redirect("/admin/bannerList");
+
+    const updateData = {
+      title: req.body.title || bannerData.title,
+      bannerType: req.body.bannerType || bannerData.bannerType,
+      link: req.body.link || bannerData.link,
+      subtitle: req.body.subtitle || bannerData.subtitle,
+      offer: req.body.offer || bannerData.offer,
+      category: req.body.category || bannerData.category,
+      product: req.body.product || bannerData.product,
+      startDate: req.body.startDate || bannerData.startDate,
+      endDate: req.body.endDate || bannerData.endDate,
+      ...(req.file && { image: req.file.filename }),
+    };
+
+    await Banner.findByIdAndUpdate(bannerId, { $set: updateData });
+    res.status(STATUSCODE.OK).redirect("/admin/bannerList");
   } catch (error) {
-    console.log(error.message);
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).json({ success: false, error: RESPONSE.SERVER_ERROR });
   }
 };
 
-// Function to block and unblock a banner
 const blockBanner = async (req, res) => {
   try {
     const id = req.query.bannerId;
-    const bannerData = await Banner.findById({ _id: id });
-
-    if (bannerData.isListed === false) {
-      bannerData.isListed = true;
-    } else {
-      bannerData.isListed = false;
+    const bannerData = await Banner.findById(id);
+    if (!bannerData) {
+      return res.status(STATUSCODE.NOT_FOUND).send(RESPONSE.BANNER_NOT_FOUND);
     }
 
+    bannerData.isListed = !bannerData.isListed;
     await bannerData.save();
-    res.redirect("/admin/bannerList");
+
+    res.status(STATUSCODE.OK).redirect("/admin/bannerList");
   } catch (error) {
-    console.log(error.message);
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).send(RESPONSE.SERVER_ERROR);
   }
 };
 

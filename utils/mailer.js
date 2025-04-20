@@ -45,6 +45,4 @@ function generateOTP(length) {
   return otp;
 }
 
-module.exports = {
-  sendVerifyMail, // Fix the function name here
-};
+module.exports = sendVerifyMail

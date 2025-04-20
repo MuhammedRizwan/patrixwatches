@@ -1,98 +1,297 @@
-<footer class="main">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compact Footer with Dark Green Theme</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="/user-assets/css/bootstrap.min.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Footer Styling */
+    footer.main {
+      background: #ffffff;
+      color: #333;
+      font-family: 'Poppins', sans-serif;
+      padding-top: 15px;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Newsletter Section */
+    .newsletter {
+      background: #f8f9fa;
+      padding: 20px 0;
+      text-align: center;
+    }
+    .newsletter h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #1a3c34; /* Changed to dark green */
+    }
+    .newsletter p {
+      font-size: 12px;
+      margin-bottom: 15px;
+      color: #555;
+    }
+    .newsletter-form {
+      max-width: 400px;
+      margin: 0 auto;
+      display: flex;
+      gap: 8px;
+    }
+    .newsletter-form input {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      flex: 1;
+      font-size: 12px;
+    }
+    .newsletter-form button {
+      padding: 8px 20px;
+      background: #1a3c34; /* Changed to dark green */
+      border: none;
+      border-radius: 20px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .newsletter-form button:hover {
+      background: #132c27; /* Changed to darker green */
+    }
+
+    /* Footer Mid Section */
+    .footer-mid {
+      padding: 20px 0;
+    }
+    .footer-mid .widget-about .logo img {
+      max-width: 20px;
+      border-radius: 50%;
+
+      transition: transform 0.3s ease;
+    }
+    .footer-mid .widget-about .logo img:hover {
+      transform: scale(1.1);
+    }
+    .footer-mid h5 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #1a3c34; /* Changed to dark green */
+    }
+    .footer-mid p {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #555;
+    }
+    .footer-mid .footer-list li {
+      margin-bottom: 8px;
+    }
+    .footer-mid .footer-list a {
+      color: #555;
+      font-size: 12px;
+      transition: color 0.3s ease;
+    }
+    .footer-mid .footer-list a:hover {
+      color: #1a3c34; /* Changed to dark green */
+      text-decoration: none;
+    }
+
+    /* Social Icons */
+    .mobile-social-icon {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .mobile-social-icon a {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+      text-align: center;
+      background: #e9ecef;
+      border-radius: 50%;
+      transition: background 0.3s ease;
+    }
+    .mobile-social-icon a:hover {
+      background: #1a3c34; /* Changed to dark green */
+    }
+    .mobile-social-icon img {
+      width: 16px;
+      vertical-align: middle;
+    }
+
+    /* Install App Section */
+    .download-app {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .download-app a img {
+      max-width: 120px;
+      transition: transform 0.3s ease;
+    }
+    .download-app a img:hover {
+      transform: scale(1.05);
+    }
+    .payment-method img {
+      max-width: 160px;
+    }
+
+    /* Footer Bottom */
+    .footer-bottom {
+      border-top: 1px solid #e9ecef;
+      padding-top: 15px;
+    }
+    .footer-bottom p {
+      font-size: 12px;
+      color: #555;
+    }
+    .footer-bottom a {
+      color: #1a3c34; /* Changed to dark green */
+      transition: color 0.3s ease;
+    }
+    .footer-bottom a:hover {
+      color: #132c27; /* Changed to darker green */
+      text-decoration: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .newsletter-form {
+        flex-direction: column;
+      }
+      .newsletter-form input,
+      .newsletter-form button {
+        width: 100%;
+      }
+      .footer-mid .col-lg-4,
+      .footer-mid .col-lg-2 {
+        margin-bottom: 20px;
+      }
+      .footer-bottom p {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <footer class="main">
+    <!-- Newsletter Section -->
     <section class="newsletter p-30 text-white wow fadeIn animated">
-        
+      <div class="container">
+        <h3>Stay Updated with Our Newsletter</h3>
+        <p>Join our community and get the latest updates, offers, and trends!</p>
+        <form class="newsletter-form">
+          <input type="email" placeholder="Enter your email address" required>
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
     </section>
+
+    <!-- Footer Mid Section -->
     <section class="section-padding footer-mid">
-        <div class="container pt-15 pb-20">
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <div class="widget-about font-md mb-md-5 mb-lg-0">
-                        <div class="logo logo-width-1 wow fadeIn animated">
-                            <a href="index.html"><img src="/user-assets/imgs/theme/Wlogo.jpeg" alt="logo"></a>
-                        </div>
-                        <h5 class="mt-20 mb-10 fw-600 text-grey-4 wow fadeIn animated">Contact</h5>
-                        <p class="wow fadeIn animated">
-                            <strong>Address: </strong>562 Wellington Road, Street 32, San Francisco
-                        </p>
-                        <p class="wow fadeIn animated">
-                            <strong>Phone: </strong>+01 2222 365 /(+91) 01 2345 6789
-                        </p>
-                        <p class="wow fadeIn animated">
-                            <strong>Hours: </strong>10:00 - 18:00, Mon - Sat
-                        </p>
-                        <!-- <h5 class="mb-10 mt-30 fw-600 text-grey-4 wow fadeIn animated">Follow Us</h5>
-                        <div class="mobile-social-icon wow fadeIn animated mb-sm-5 mb-md-0">
-                            <a href="#"><img src="/user-assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
-                            <a href="#"><img src="/user-assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
-                            <a href="#"><img src="/user-assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
-                            <a href="#"><img src="/user-assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
-                            <a href="#"><img src="/user-assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
-                        </div> -->
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-3">
-                    <a href="about" class="widget-title-link">
-                        <h5 class="widget-title wow fadeIn animated">About</h5>
-                    </a>
-                    <ul class="footer-list wow fadeIn animated mb-sm-5 mb-md-0">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Delivery Information</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms &amp; Conditions</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Support Center</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-2  col-md-3">
-                    <a href="userprofile" class="widget-title-link">
-                        <h5 class="widget-title wow fadeIn animated">My Account</h5>
-                    </a>
-                    <ul class="footer-list wow fadeIn animated">
-                        <li><a href="#">Sign In</a></li>
-                        <li><a href="#">View Cart</a></li>
-                        <li><a href="#">My Wishlist</a></li>
-                        <li><a href="#">Track My Order</a></li>
-                        <li><a href="#">Help</a></li>
-                        <li><a href="#">Order</a></li>
-                    </ul>
-                </div>
-                <!-- <div class="col-lg-4">
-                    <h5 class="widget-title wow fadeIn animated">Install App</h5>
-                    <div class="row">
-                        <div class="col-md-8 col-lg-12">
-                            <p class="wow fadeIn animated">From App Store or Google Play</p>
-                            <div class="download-app wow fadeIn animated">
-                                <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active" src="/user-assets/imgs/theme/app-store.jpg" alt=""></a>
-                                <a href="#" class="hover-up"><img src="/user-assets/imgs/theme/google-play.jpg" alt=""></a>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-lg-12 mt-md-3 mt-lg-0">
-                            <p class="mb-20 wow fadeIn animated">Secured Payment Gateways</p>
-                            <img class="wow fadeIn animated" src="/user-assets/imgs/theme/payment-method.png" alt="">
-                        </div>
-                    </div>
-                </div> -->
-            </div>
-        </div>
-    </section>
-    <div class="container pb-20 wow fadeIn animated">
+      <div class="container pt-15 pb-20">
         <div class="row">
-            <div class="col-12 mb-20">
-                <div class="footer-bottom"></div>
+          <!-- Contact Info -->
+          <div class="col-lg-4 col-md-6">
+            <div class="widget-about font-md mb-md-5 mb-lg-0">
+              <div class="logo logo-width-1 wow fadeIn animated">
+                <a href="index.html"><img  src="/user-assets/imgs/theme/nextTick_logo.png" alt="logo"></a>
+              </div>
+              <h5 class="mt-20 mb-10 fw-600 text-grey-4 wow fadeIn animated">Contact</h5>
+              <p class="wow fadeIn animated">
+                <strong>Address: </strong>123 Calicut City Center, Kozhikode, Kerala 673004, India
+              </p>
+              <p class="wow fadeIn animated">
+                <strong>Phone: </strong>+91 495 123 4567 / +91 987 654 3210
+              </p>
+              <p class="wow fadeIn animated">
+                <strong>Hours: </strong>10:00 - 18:00, Mon - Sat
+              </p>
+              <h5 class="mb-10 mt-30 fw-600 text-grey-4 wow fadeIn animated">Follow Us</h5>
+              <div class="mobile-social-icon wow fadeIn animated mb-sm-5 mb-md-0">
+                <a href="#" aria-label="Follow us on Facebook"><img src="/user-assets/imgs/theme/icons/icon-facebook.svg" alt="Facebook"></a>
+                <a href="#" aria-label="Follow us on Twitter"><img src="/user-assets/imgs/theme/icons/icon-twitter.svg" alt="Twitter"></a>
+                <a href="#" aria-label="Follow us on Instagram"><img src="/user-assets/imgs/theme/icons/icon-instagram.svg" alt="Instagram"></a>
+                <a href="#" aria-label="Follow us on Pinterest"><img src="/user-assets/imgs/theme/icons/icon-pinterest.svg" alt="Pinterest"></a>
+                <a href="#" aria-label="Follow us on YouTube"><img src="/user-assets/imgs/theme/icons/icon-youtube.svg" alt="YouTube"></a>
+              </div>
             </div>
-            <!-- <div class="col-lg-6">
-                <p class="float-md-left font-sm text-muted mb-0">&copy; 2021, <strong class="text-brand">Evara</strong> - HTML Ecommerce Template </p>
-            </div> -->
-            <div class="col-lg-6">
-                <p class="text-lg-end text-start font-sm text-muted mb-0">
-                    Designed by <a href="http://alithemes.com/" target="_blank">Alithemes.com</a>. All rights reserved
-                </p>
+          </div>
+          <!-- About Links -->
+          <div class="col-lg-2 col-md-3">
+            <a href="about" class="widget-title-link">
+              <h5 class="widget-title wow fadeIn animated">About</h5>
+            </a>
+            <ul class="footer-list wow fadeIn animated mb-sm-5 mb-md-0">
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Delivery Information</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms & Conditions</a></li>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">Support Center</a></li>
+            </ul>
+          </div>
+          <!-- My Account Links -->
+          <div class="col-lg-2 col-md-3">
+            <a href="userprofile" class="widget-title-link">
+              <h5 class="widget-title wow fadeIn animated">My Account</h5>
+            </a>
+            <ul class="footer-list wow fadeIn animated">
+              <li><a href="#">Sign In</a></li>
+              <li><a href="#">View Cart</a></li>
+              <li><a href="#">My Wishlist</a></li>
+              <li><a href="#">Track My Order</a></li>
+              <li><a href="#">Help</a></li>
+              <li><a href="#">Order</a></li>
+            </ul>
+          </div>
+          <!-- Install App Section -->
+          <div class="col-lg-4">
+            <h5 class="widget-title wow fadeIn animated">Install App</h5>
+            <div class="row">
+              <div class="col-md-8 col-lg-12">
+                <p class="wow fadeIn animated">From App Store or Google Play</p>
+                <div class="download-app wow fadeIn animated">
+                  <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active" src="/user-assets/imgs/theme/app-store.jpg" alt="App Store"></a>
+                  <a href="#" class="hover-up"><img src="/user-assets/imgs/theme/google-play.jpg" alt="Google Play"></a>
+                </div>
+              </div>
+              <div class="col-md-4 col-lg-12 mt-md-3 mt-lg-0">
+                <p class="mb-20 wow fadeIn animated">Secured Payment Gateways</p>
+                <img class="wow fadeIn animated payment-method" src="/user-assets/imgs/theme/payment-method.png" alt="Payment Methods">
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Footer Bottom -->
+    <div class="container pb-20 wow fadeIn animated">
+      <div class="row">
+        <div class="col-12 mb-20">
+          <div class="footer-bottom"></div>
+        </div>
+        <div class="col-lg-6">
+          <p class="float-md-left font-sm text-muted mb-0">© 2023, HTML Ecommerce Template</p>
+        </div>
+        <div class="col-lg-6">
+          <p class="text-lg-end text-start font-sm text-muted mb-0">
+            Designed by <a href="http://alithemes.com/" target="_blank">Alithemes.com</a>. All rights reserved
+          </p>
+        </div>
+      </div>
     </div>
   </footer>
 
-  <!-- Vendor JS-->
+  <!-- Vendor JS -->
   <script src="/user-assets/js/vendor/modernizr-3.6.0.min.js"></script>
   <script src="/user-assets/js/vendor/jquery-3.6.0.min.js"></script>
   <script src="/user-assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
@@ -113,13 +312,8 @@
   <script src="/user-assets/js/plugins/jquery.vticker-min.js"></script>
   <script src="/user-assets/js/plugins/jquery.theia.sticky.js"></script>
   <script src="/user-assets/js/plugins/jquery.elevatezoom.js"></script>
-  <!-- Template  JS -->
+  <!-- Template JS -->
   <script src="/user-assets/js/main.js"></script>
   <script src="/assets/js/shop.js"></script>
-  
-  
-  </body>
-  
-  
-  <!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:25:49 GMT -->
-  </html>
+</body>
+</html>

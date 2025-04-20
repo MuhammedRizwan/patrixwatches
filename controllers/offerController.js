@@ -1,21 +1,17 @@
 const Product = require("../models/productModel");
 const Category = require("../models/categoryModel");
 const Offer = require("../models/offerModel");
+const STATUSCODE = require("../config/statusCode");
+const RESPONSE = require("../config/responseMessage");
 
-// Function to load add offer page
 const loadOfferAdd = async (req, res) => {
   try {
     const admin = req.session.adminData;
     const product = await Product.find().sort({ date: -1 });
     const category = await Category.find().sort({ date: -1 });
-
-    // Initialize an empty errors object
-    const errors = {};
-
-    // Render the addOffer template with admin data, products, categories, and errors
-    res.render("addOffer", { admin, product, category, errors });
+    res.status(STATUSCODE.OK).render("addOffer", { admin, product, category, errors: {} });
   } catch (error) {
-    console.log(error.message);
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).send(RESPONSE.SERVER_ERROR);
   }
 };
 
@@ -24,7 +20,6 @@ const addOffer = async (req, res) => {
     const admin = req.session.admin_id;
     const category = await Category.find().sort({ date: -1 });
     const product = await Product.find().sort({ date: -1 });
-
     const {
       name,
       discountValue,
@@ -36,68 +31,59 @@ const addOffer = async (req, res) => {
       discountedProduct,
       discountedCategory,
     } = req.body;
- 
-    console.log(req.body);
 
-    const existingNameOffer = await Offer.findOne({ name:name });
-    const existingCategoryOffer =
-      discountedCategory && (await Offer.findOne({ discountedCategory }));
-    const existingProductOffer =
-      discountedProduct && (await Offer.findOne({ discountedProduct }));
-      if (existingNameOffer) {
+    const existingNameOffer = await Offer.findOne({ name });
+    const existingCategoryOffer = discountedCategory && (await Offer.findOne({ discountedCategory }));
+    const existingProductOffer = discountedProduct && (await Offer.findOne({ discountedProduct }));
 
-        return res.render("addOffer", {
-          errorMessage: "Duplicate Discount Name not allowed.",category,product
+    if (existingNameOffer) {
+      return res.status(STATUSCODE.BAD_REQUEST).render("addOffer", {
+        errorMessage: RESPONSE.DUPLICATE_OFFER_NAME,
+        category,
+        product,
       });
-       
-      }
-  
-      if (discountedCategory && existingCategoryOffer) {
-        return res.render("addOffer", {
-          errorMessage: "An offer for this category already exists.",category,product
+    }
+
+    if (discountedCategory && existingCategoryOffer) {
+      return res.status(STATUSCODE.BAD_REQUEST).render("addOffer", {
+        errorMessage: RESPONSE.CATEGORY_OFFER_EXISTS,
+        category,
+        product,
       });
-      }
-  
-      if (discountedProduct && existingProductOffer) {
-        return res.render("addOffer", {
-          errorMessage: "An offer for this product already exists.",category,product
+    }
+
+    if (discountedProduct && existingProductOffer) {
+      return res.status(STATUSCODE.BAD_REQUEST).render("addOffer", {
+        errorMessage: RESPONSE.PRODUCT_OFFER_EXISTS,
+        category,
+        product,
       });
-      }
-  
+    }
+
     const newOffer = new Offer({
-      name: name,
+      name,
       discountOn,
       discountType,
       discountValue,
-      maxAmt:maxRedeemableAmt,
+      maxAmt: maxRedeemableAmt,
       startDate,
-      endDate: endDate,
-      discountedProduct: discountedProduct ? discountedProduct : null,
-      discountedCategory: discountedCategory ? discountedCategory : null,
+      endDate,
+      discountedProduct: discountedProduct || null,
+      discountedCategory: discountedCategory || null,
     });
 
     await newOffer.save();
 
     if (discountedProduct) {
       const discountedProductData = await Product.findById(discountedProduct);
-
-      let discount = 0;
-      if (discountType === "percentage") {
-        discount = (discountedProductData.price * discountValue) / 100;
-      } else if (discountType === "fixed Amount") {
-        discount = discountValue;
-      }
+      const discount_price = calculateDiscountPrice(discountedProductData.price, discountType, discountValue);
 
       await Product.updateOne(
         { _id: discountedProduct },
         {
           $set: {
-            discount_price: calculateDiscountPrice(
-              discountedProductData.price,
-              discountType,
-              discountValue
-            ),
-            discount,
+            discount_price,
+            discount: discount_price < discountedProductData.price ? discountedProductData.price - discount_price : 0,
             discountStart: startDate,
             discountEnd: endDate,
             discountStatus: true,
@@ -106,43 +92,22 @@ const addOffer = async (req, res) => {
       );
     } else if (discountedCategory) {
       const categoryData = await Category.findById(discountedCategory);
-
-      const data = await Category.updateOne(
+      await Category.updateOne(
         { _id: discountedCategory },
-        {
-          $set: {
-            discountType,
-            discountValue,
-            discountStart: startDate,
-            discountEnd: endDate,
-            discountStatus: true,
-          },
-        }
+        { $set: { discountType, discountValue, discountStart: startDate, discountEnd: endDate, discountStatus: true } }
       );
 
-      const discountedProductData = await Product.find({
-        category: categoryData._id,
-      });
+      const discountedProductData = await Product.find({ category: categoryData._id });
       for (const product of discountedProductData) {
-        let discount = 0;
-        if (discountType === "percentage") {
-          discount = (product.price * discountValue) / 100;
-          
-        } else if (discountType === "fixed Amount") {
-          discount = discountValue;
-        }
+        const discount_price = calculateDiscountPrice(product.price, discountType, discountValue);
         await Product.updateOne(
           { _id: product._id },
           {
             $set: {
-              discount_price: calculateDiscountPrice(
-                product.price,
-                discountType,
-                discountValue
-              ),
-              discount,
+              discount_price,
+              discount: discount_price < product.price ? product.price - discount_price : 0,
               discountStart: startDate,
-              discountEnd: expiryDate,
+              discountEnd: endDate,
               discountStatus: true,
             },
           }
@@ -150,65 +115,58 @@ const addOffer = async (req, res) => {
       }
     }
 
-    return res.redirect("/admin/offerList");
+    res.status(STATUSCODE.OK).redirect("/admin/offerList");
   } catch (error) {
-    console.log(error.message);
-  
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).render("addOffer", {
+      errorMessage: RESPONSE.SERVER_ERROR,
+      category: await Category.find().sort({ date: -1 }),
+      product: await Product.find().sort({ date: -1 }),
+    });
   }
 };
 
-
-
-
-
-
 function calculateDiscountPrice(price, discountType, discountValue) {
   let discountedPrice = price;
-
   if (discountType === "percentage") {
     discountedPrice -= (price * discountValue) / 100;
   } else if (discountType === "fixed Amount") {
     discountedPrice -= discountValue;
   }
-
-  return discountedPrice;
+  return Math.max(discountedPrice, 0);
 }
 
 const OfferList = async (req, res) => {
   try {
     const admin = req.session.adminData;
     const page = parseInt(req.query.page) || 1;
-    let query = {};
     const limit = 7;
-    const totalCount = await Offer.countDocuments(query);
+    let query = {};
 
-    const totalPages = Math.ceil(totalCount / limit);
-    if (req.query.discountOn) {
-      if (req.query.discountOn === "product") {
-        query.discountOn = "product";
-      } else if (req.query.discountOn === "category") {
-        query.discountOn = "category";
-      }
+    if (req.query.discountOn === "product") {
+      query.discountOn = "product";
+    } else if (req.query.discountOn === "category") {
+      query.discountOn = "category";
     }
+
+    const totalCount = await Offer.countDocuments(query);
     const offer = await Offer.find(query)
       .populate("discountedProduct")
       .populate("discountedCategory")
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ startDate: -1 });
-      console.log(offer)
-    res.render("offerList", {
+
+    res.status(STATUSCODE.OK).render("offerList", {
       offer,
-      admin: admin,
-      totalPages,
+      admin,
+      totalPages: Math.ceil(totalCount / limit),
       currentPage: page,
     });
   } catch (error) {
-    console.log(error.message);
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).send(RESPONSE.SERVER_ERROR);
   }
 };
 
-// Function to laod offer edit page
 const loadOfferEdit = async (req, res) => {
   try {
     const product = await Product.find().sort({ date: -1 });
@@ -218,9 +176,14 @@ const loadOfferEdit = async (req, res) => {
     const offer = await Offer.findById(offerId)
       .populate("discountedProduct")
       .populate("discountedCategory");
+
+    if (!offer) {
+      return res.status(STATUSCODE.NOT_FOUND).send(RESPONSE.OFFER_NOT_FOUND);
+    }
+
     const startDate = new Date(offer.startDate).toISOString().split("T")[0];
     const endDate = new Date(offer.endDate).toISOString().split("T")[0];
-    res.render("offerEdit", {
+    res.status(STATUSCODE.OK).render("offerEdit", {
       admin,
       offer,
       product,
@@ -229,11 +192,9 @@ const loadOfferEdit = async (req, res) => {
       endDate,
     });
   } catch (error) {
-    console.log(error.message);
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).send(RESPONSE.SERVER_ERROR);
   }
 };
-
-//Function to Edit Offer
 
 const editOffer = async (req, res) => {
   try {
@@ -250,119 +211,123 @@ const editOffer = async (req, res) => {
       discountedCategory,
     } = req.body;
 
-    const existingOffer = await Offer.findById(offerId)
-      .populate('discountedProduct') // Populate the product details
-      .populate('discountedCategory'); // Populate the category details
-
+    const existingOffer = await Offer.findById(offerId);
     if (!existingOffer) {
-      return res.status(400).json({ success: false, error: "Offer not found" });
+      return res.status(STATUSCODE.NOT_FOUND).json({ success: false, error: RESPONSE.OFFER_NOT_FOUND });
     }
 
-    // Rest of your code...
-
     const updatedOffer = await Offer.findByIdAndUpdate(
-      { _id: offerId },
+      offerId,
       {
         $set: {
           name: offer_name,
           discountOn,
           discountType,
           discountValue,
-          maxAmt:maxRedeemableAmt,
+          maxAmt: maxRedeemableAmt,
           startDate,
           endDate: expiryDate,
-          discountedProduct: discountedProduct ? discountedProduct : null,
-          discountedCategory: discountedCategory ? discountedCategory : null,
+          discountedProduct: discountedProduct || null,
+          discountedCategory: discountedCategory || null,
         },
       },
       { new: true }
-    )
-      .populate('discountedProduct') // Populate the updated product details
-      .populate('discountedCategory'); // Populate the updated category details
+    );
 
-    // Rest of your code...
+    if (discountedProduct) {
+      const discountedProductData = await Product.findById(discountedProduct);
+      const discount_price = calculateDiscountPrice(discountedProductData.price, discountType, discountValue);
 
-    res.redirect("/admin/offerList");
+      await Product.updateOne(
+        { _id: discountedProduct },
+        {
+          $set: {
+            discount_price,
+            discount: discount_price < discountedProductData.price ? discountedProductData.price - discount_price : 0,
+            discountStart: startDate,
+            discountEnd: expiryDate,
+            discountStatus: true,
+          },
+        }
+      );
+    } else if (discountedCategory) {
+      const categoryData = await Category.findById(discountedCategory);
+      await Category.updateOne(
+        { _id: discountedCategory },
+        { $set: { discountType, discountValue, discountStart: startDate, discountEnd: expiryDate, discountStatus: true } }
+      );
+
+      const discountedProductData = await Product.find({ category: categoryData._id });
+      for (const product of discountedProductData) {
+        const discount_price = calculateDiscountPrice(product.price, discountType, discountValue);
+        await Product.updateOne(
+          { _id: product._id },
+          {
+            $set: {
+              discount_price,
+              discount: discount_price < product.price ? product.price - discount_price : 0,
+              discountStart: startDate,
+              discountEnd: expiryDate,
+              discountStatus: true,
+            },
+          }
+        );
+      }
+    }
+
+    res.status(STATUSCODE.OK).redirect("/admin/offerList");
   } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ success: false, error: "Failed to update offer" });
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).json({ success: false, error: RESPONSE.FAILED_TO_UPDATE_OFFER });
   }
 };
-
-
-// Function for Offer Block and UnBlock
 
 const offerBlock = async (req, res) => {
   try {
     const id = req.query.offerId;
-
     const offer = await Offer.findById(id);
 
-    console.log("Offer before update:", offer)
+    if (!offer) {
+      return res.status(STATUSCODE.NOT_FOUND).send(RESPONSE.OFFER_NOT_FOUND);
+    }
 
     offer.isActive = !offer.isActive;
 
     if (offer.discountedProduct) {
       const discountedProduct = await Product.findById(offer.discountedProduct);
-      if (offer.isActive == false) {
+      if (!offer.isActive) {
         discountedProduct.discount_price = discountedProduct.price;
+        discountedProduct.discountStatus = false;
       } else {
-        let discount = 0;
-        if (offer.discountType === "percentage") {
-          discount = (discountedProduct.price * offer.discountValue) / 100;
-        } else if (offer.discountType === "fixed Amount") {
-          discount = offer.discountValue;
-        }
         discountedProduct.discount_price = calculateDiscountPrice(
           discountedProduct.price,
           offer.discountType,
           offer.discountValue
         );
+        discountedProduct.discountStatus = true;
       }
-
-      if (discountedProduct) {
-        discountedProduct.discountStatus = offer.isActive;
-        await discountedProduct.save();
-      }
+      await discountedProduct.save();
     } else if (offer.discountedCategory) {
-      const discountedCategory = await Category.findById(
-        offer.discountedCategory
-      );
-      const discountedProductData = await Product.find({
-        category: discountedCategory._id,
-      });
-      if (discountedCategory) {
-        discountedCategory.discountStatus = offer.isActive;
-        await discountedCategory.save();
-        const discountedProducts = await Product.updateMany(
-          { category: discountedCategory._id },
-          { $set: { discountStatus: offer.isActive } }
-        );
-      }
+      const discountedCategory = await Category.findById(offer.discountedCategory);
+      const discountedProductData = await Product.find({ category: discountedCategory._id });
+
+      discountedCategory.discountStatus = offer.isActive;
+      await discountedCategory.save();
+      await Product.updateMany({ category: discountedCategory._id }, { $set: { discountStatus: offer.isActive } });
+
       for (const product of discountedProductData) {
-        if (offer.isActive == false) {
+        if (!offer.isActive) {
           product.discount_price = product.price;
         } else {
-          let discount = 0;
-          if (offer.discountType === "percentage") {
-            discount = (product.price * offer.discountValue) / 100;
-          } else if (offer.discountType === "fixed Amount") {
-            discount = offer.discountValue;
-          }
-          product.discount_price = calculateDiscountPrice(
-            product.price,
-            offer.discountType,
-            offer.discountValue
-          );
+          product.discount_price = calculateDiscountPrice(product.price, offer.discountType, offer.discountValue);
         }
         await product.save();
       }
     }
 
     await offer.save();
-    res.redirect("/admin/offerList");
+    res.status(STATUSCODE.OK).redirect("/admin/offerList");
   } catch (error) {
-    console.log(error);
+    res.status(STATUSCODE.INTERNAL_SERVER_ERROR).send(RESPONSE.SERVER_ERROR);
   }
 };
 
@@ -372,5 +337,5 @@ module.exports = {
   OfferList,
   loadOfferEdit,
   editOffer,
-  offerBlock
+  offerBlock,
 };
